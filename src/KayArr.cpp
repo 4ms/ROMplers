@@ -48,23 +48,35 @@ struct KayArr : Module {
 		OUTPUTS_LEN
 	};
 	enum LightId {
+		KICK_LIGHT,
+		SNARE_LIGHT,
+		TOM_LIGHT,
+		CL_LIGHT,
+		OH_LIGHT,
+		CLAVE_LIGHT,
+		RIMSHOT_LIGHT,
+		COWBELL_LIGHT,
+		CYMBAL_LIGHT,
+		CONGA_LIGHT,
 		LIGHTS_LEN
 	};
 
 	struct Voice {
 		bool lastInputTrigger = false;
 		bool lastButtonTrigger = false;
-
+	
 		float samplePos = 0.f;
 		bool playing = false;
 		const unsigned char* rawData = nullptr;
 		int sampleLength = 0;
 		int outputId = 0;
-
+		int lightId = -1; 
+	
 		int16_t readSample16(int index) {
 			return (int16_t)(rawData[2 * index] | (rawData[2 * index + 1] << 8));
 		}
 	};
+	
 
 	Voice kickVoice, snareVoice, tomVoice;
 	Voice closedHatVoice, openHatVoice;
@@ -119,25 +131,28 @@ struct KayArr : Module {
 		configOutput(CYMBALOUT_OUTPUT, "Cymbal");
 		configOutput(CONGAOUT_OUTPUT, "Conga");
 
-		kickVoice = createVoice(KRKick, sizeof(KRKick), KICKOUT_OUTPUT);
-		snareVoice = createVoice(KRSnare, sizeof(KRSnare), SNAREOUT_OUTPUT);
-		tomVoice = createVoice(KRTom, sizeof(KRTom), TOMOUT_OUTPUT);
-		closedHatVoice = createVoice(KRClosedHat, sizeof(KRClosedHat), CLOUT_OUTPUT);
-		openHatVoice = createVoice(KROpenHat, sizeof(KROpenHat), OHOUT_OUTPUT);
-		claveVoice = createVoice(KRClave, sizeof(KRClave), CLAVEOUT_OUTPUT);
-		rimshotVoice = createVoice(KRRimshot, sizeof(KRRimshot), RIMSHOTOUT_OUTPUT);
-		cowbellVoice = createVoice(KRCowbell, sizeof(KRCowbell), COWBELLOUT_OUTPUT);
-		cymbalVoice = createVoice(KRCymbal, sizeof(KRCymbal), CYMBALOUT_OUTPUT);
-		congaVoice = createVoice(KRConga, sizeof(KRConga), CONGAOUT_OUTPUT);
+		kickVoice      = createVoice(KRKick, sizeof(KRKick), KICKOUT_OUTPUT, KICK_LIGHT);
+		snareVoice     = createVoice(KRSnare, sizeof(KRSnare), SNAREOUT_OUTPUT, SNARE_LIGHT);
+		tomVoice       = createVoice(KRTom, sizeof(KRTom), TOMOUT_OUTPUT, TOM_LIGHT);
+		closedHatVoice = createVoice(KRClosedHat, sizeof(KRClosedHat), CLOUT_OUTPUT, CL_LIGHT);
+		openHatVoice   = createVoice(KROpenHat, sizeof(KROpenHat), OHOUT_OUTPUT, OH_LIGHT);
+		claveVoice     = createVoice(KRClave, sizeof(KRClave), CLAVEOUT_OUTPUT, CLAVE_LIGHT);
+		rimshotVoice   = createVoice(KRRimshot, sizeof(KRRimshot), RIMSHOTOUT_OUTPUT, RIMSHOT_LIGHT);
+		cowbellVoice   = createVoice(KRCowbell, sizeof(KRCowbell), COWBELLOUT_OUTPUT, COWBELL_LIGHT);
+		cymbalVoice    = createVoice(KRCymbal, sizeof(KRCymbal), CYMBALOUT_OUTPUT, CYMBAL_LIGHT);
+		congaVoice     = createVoice(KRConga, sizeof(KRConga), CONGAOUT_OUTPUT, CONGA_LIGHT);
+		
 	}
 
-	Voice createVoice(const unsigned char* data, size_t size, int outputId) {
+	Voice createVoice(const unsigned char* data, size_t size, int outputId, int lightId) {
 		Voice v;
 		v.rawData = data;
 		v.sampleLength = size / 2;
 		v.outputId = outputId;
+		v.lightId = lightId; 
 		return v;
 	}
+	
 
 	void process(const ProcessArgs& args) override {
 		float knobSpeed = 0.01f + params[SPEED_PARAM].getValue() * (1.0f - 0.01f);
@@ -203,6 +218,13 @@ struct KayArr : Module {
 		} else {
 			outputs[voice.outputId].setVoltage(0.f);
 		}
+		if (voice.lightId >= 0) {
+			if ((inputRising || buttonRising || (loopEnabled && !voice.playing))) {
+				lights[voice.lightId].setBrightness(1.f); 
+			}
+			lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
+		}
+		
 	}
 };
 struct KayArrWidget : ModuleWidget {
@@ -218,16 +240,36 @@ struct KayArrWidget : ModuleWidget {
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(25.4, 21.308)), module, KayArr::SPEED_PARAM));
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(11.24, 33.508)), module, KayArr::LENGTH_PARAM));
 		addParam(createParamCentered<_2Pos>(mm2px(Vec(41.683, 33.508)), module, KayArr::LOOP_PARAM));
-		addParam(createParamCentered<VCVButton>(mm2px(Vec(7.0, 59.14)), module, KayArr::KICKPUSH_PARAM));
-		addParam(createParamCentered<VCVButton>(mm2px(Vec(16.49, 59.14)), module, KayArr::SNAREPUSH_PARAM));
-		addParam(createParamCentered<VCVButton>(mm2px(Vec(25.4, 59.14)), module, KayArr::CLPUSH_PARAM));
-		addParam(createParamCentered<VCVButton>(mm2px(Vec(35.318, 59.14)), module, KayArr::OHPUSH_PARAM));
-		addParam(createParamCentered<VCVButton>(mm2px(Vec(44.699, 59.14)), module, KayArr::TOMPUSH_PARAM));
-		addParam(createParamCentered<VCVButton>(mm2px(Vec(7.0, 94.743)), module, KayArr::CONGAPUSH_PARAM));
-		addParam(createParamCentered<VCVButton>(mm2px(Vec(16.49, 94.743)), module, KayArr::CLAVEPUSH_PARAM));
-		addParam(createParamCentered<VCVButton>(mm2px(Vec(25.4, 94.743)), module, KayArr::RIMSHOTPUSH_PARAM));
-		addParam(createParamCentered<VCVButton>(mm2px(Vec(35.318, 94.743)), module, KayArr::COWBELLPUSH_PARAM));
-		addParam(createParamCentered<VCVButton>(mm2px(Vec(44.699, 94.743)), module, KayArr::CYMPUSH_PARAM));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.0, 59.14)), module, KayArr::KICKPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.0, 59.14)), module, KayArr::KICK_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(16.49, 59.14)), module, KayArr::SNAREPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(16.49, 59.14)), module, KayArr::SNARE_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(25.4, 59.14)), module, KayArr::CLPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(25.4, 59.14)), module, KayArr::CL_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(35.318, 59.14)), module, KayArr::OHPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(35.318, 59.14)), module, KayArr::OH_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(44.699, 59.14)), module, KayArr::TOMPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(44.699, 59.14)), module, KayArr::TOM_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.0, 94.743)), module, KayArr::CONGAPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.0, 94.743)), module, KayArr::CONGA_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(16.49, 94.743)), module, KayArr::CLAVEPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(16.49, 94.743)), module, KayArr::CLAVE_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(25.4, 94.743)), module, KayArr::RIMSHOTPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(25.4, 94.743)), module, KayArr::RIMSHOT_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(35.318, 94.743)), module, KayArr::COWBELLPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(35.318, 94.743)), module, KayArr::COWBELL_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(44.699, 94.743)), module, KayArr::CYMPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(44.699, 94.743)), module, KayArr::CYMBAL_LIGHT));
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.4, 33.97)), module, KayArr::SPEEDCVIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.24, 45.349)), module, KayArr::LENGTHCVIN_INPUT));
