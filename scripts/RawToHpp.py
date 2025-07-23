@@ -28,11 +28,21 @@ def sanitize_array_name(filename):
     return sanitized
 
 def fix_array_names(xxd_output, new_name):
+    # Replace array name in the array declaration line
     match = re.search(r"unsigned char (\w+)\[\] = {", xxd_output)
     if not match:
         return xxd_output
     old_name = match.group(1)
     fixed_output = re.sub(rf"\b{re.escape(old_name)}\b", new_name, xxd_output)
+
+    # Fix the length line: replace any "unsigned int <old_name>_len = <num>;"
+    # with "unsigned int <new_name>_len = <num>;"
+    len_pattern = re.compile(r"unsigned int (\w+_len) = (\d+);")
+    def repl_len(m):
+        return f"unsigned int {new_name}_len = {m.group(2)};"
+    
+    fixed_output = len_pattern.sub(repl_len, fixed_output)
+
     return fixed_output
 
 def main():
