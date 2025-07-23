@@ -1,0 +1,23 @@
+{
+  "slug": "4ms-ROMplers",
+  "name": "ROMplers",
+  "version": "2.0.0",
+  "license": "GPL-3.0-or-later",
+  "brand": "4ms",
+  "author": "4ms Company",
+  "authorEmail": "4ms@4mscompany.com",
+  "authorUrl": "https://4mscompany.com",
+  "pluginUrl": "https://github.com/4ms/ROMplers/",
+  "manualUrl": "",
+  "sourceUrl": "https://github.com/4ms/ROMplers/",
+  "donateUrl": "",
+  "changelogUrl": "https://github.com/4ms/ROMplers/blob/main/CHANGELOG.md",
+  "modules": [
+    {
+      "slug": "KayOne",
+      "name": "KayOne",
+      "description": "Casio SK-1 samples with playback speed, sample length, and looping.",
+      "tags": ["Drum"]
+    }
+  ]
+}
