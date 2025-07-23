@@ -37,24 +37,31 @@ struct KayOne : Module {
 	};
 	enum LightId {
 		KICK_LIGHT,
+		SNARE_LIGHT,
+		TOML_LIGHT,
+		TOMH_LIGHT,
+		CL_LIGHT,
+		OH_LIGHT,
 		LIGHTS_LEN
 	};
 
 	struct Voice {
 		bool lastInputTrigger = false;
 		bool lastButtonTrigger = false;
-
+	
 		float samplePos = 0.f;
 		bool playing = false;
 		bool lastTriggerState = false;
 		const unsigned char* rawData = nullptr;
 		int sampleLength = 0;
 		int outputId = 0;
-
+		int lightId = -1;  
+	
 		int16_t readSample16(int index) {
 			return (int16_t)(rawData[2 * index] | (rawData[2 * index + 1] << 8));
 		}
 	};
+	
 
 	Voice kickVoice;
 	Voice snareVoice;
@@ -103,26 +110,32 @@ struct KayOne : Module {
 		kickVoice.rawData = Kick;
 		kickVoice.sampleLength = sizeof(Kick) / 2;
 		kickVoice.outputId = KICKOUT_OUTPUT;
+		kickVoice.lightId = KICK_LIGHT;
 
 		snareVoice.rawData = Snare;
 		snareVoice.sampleLength = sizeof(Snare) / 2;
 		snareVoice.outputId = SNAREOUT_OUTPUT;
+		snareVoice.lightId = SNARE_LIGHT;
 
 		tomLoVoice.rawData = TomLo;
 		tomLoVoice.sampleLength = sizeof(TomLo) / 2;
 		tomLoVoice.outputId = TOMLOUT_OUTPUT;
+		tomLoVoice.lightId = TOML_LIGHT;
 
 		tomHiVoice.rawData = TomHi;
 		tomHiVoice.sampleLength = sizeof(TomHi) / 2;
 		tomHiVoice.outputId = TOMHOUT_OUTPUT;
+		tomHiVoice.lightId = TOMH_LIGHT;
 
 		closedHatVoice.rawData = ClosedHat;
 		closedHatVoice.sampleLength = sizeof(ClosedHat) / 2;
 		closedHatVoice.outputId = CLOUT_OUTPUT;
+		closedHatVoice.lightId = CL_LIGHT;
 
 		openHatVoice.rawData = OpenHat;
 		openHatVoice.sampleLength = sizeof(OpenHat) / 2;
 		openHatVoice.outputId = OHOUT_OUTPUT;
+		openHatVoice.lightId = OH_LIGHT;
 	}
 
 	void process(const ProcessArgs& args) override {
@@ -162,24 +175,26 @@ struct KayOne : Module {
 	}
 
 	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId, int outputId, float speed, float lengthRatio, bool loopEnabled) {
-		// Input and button trigger levels
+		// Detect triggers
 		bool inputTrigger = inputs[trigInputId].getVoltage() > 1.0f;
 		bool buttonTrigger = params[pushParamId].getValue() > 0.5f;
 	
-		// Rising edge detection — treat each as an independent trigger
 		bool inputRising = inputTrigger && !voice.lastInputTrigger;
 		bool buttonRising = buttonTrigger && !voice.lastButtonTrigger;
 	
-		if ((inputRising || buttonRising)) {
+		if (inputRising || buttonRising) {
 			voice.playing = true;
 			voice.samplePos = 0.f;
+	
+			// Light full brightness on trigger
+			if (voice.lightId >= 0)
+				lights[voice.lightId].setBrightness(1.0f);
 		}
 	
-		// Store last states
 		voice.lastInputTrigger = inputTrigger;
 		voice.lastButtonTrigger = buttonTrigger;
 	
-		// Loop override
+		// Loop mode
 		if (loopEnabled && !voice.playing) {
 			voice.playing = true;
 			voice.samplePos = 0.f;
@@ -205,6 +220,10 @@ struct KayOne : Module {
 		} else {
 			outputs[outputId].setVoltage(0.f);
 		}
+	
+		// Smooth light fade-out
+		if (voice.lightId >= 0)
+			lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
 	}	
 };
 
@@ -221,12 +240,23 @@ struct KayOneWidget : ModuleWidget {
 		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(20.32, 15.958)), module, KayOne::SPEED_PARAM));
 		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(8.867, 35.67)), module, KayOne::LENGTH_PARAM));
 		addParam(createParamCentered<_2Pos>(mm2px(Vec(30.511, 35.67)), module, KayOne::LOOP_PARAM));
-		addParam(createParamCentered<VCVButton>(mm2px(Vec(5.692, 63.771)), module, KayOne::KICKPUSH_PARAM));
-		addParam(createParamCentered<VCVButton>(mm2px(Vec(5.692, 73.417)), module, KayOne::SNAREPUSH_PARAM));
-		addParam(createParamCentered<VCVButton>(mm2px(Vec(5.692, 83.302)), module, KayOne::TOMLPUSH_PARAM));
-		addParam(createParamCentered<VCVButton>(mm2px(Vec(5.692, 93.19)), module, KayOne::TOMHPUSH_PARAM));
-		addParam(createParamCentered<VCVButton>(mm2px(Vec(5.692, 103.551)), module, KayOne::CLPUSH_PARAM));
-		addParam(createParamCentered<VCVButton>(mm2px(Vec(5.692, 114.064)), module, KayOne::OHPUSH_PARAM));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 63.771)), module, KayOne::KICKPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 63.771)), module, KayOne::KICK_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 73.417)), module, KayOne::SNAREPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 73.417)), module, KayOne::SNARE_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 83.302)), module, KayOne::TOMLPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 83.302)), module, KayOne::TOML_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 93.19)), module, KayOne::TOMHPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 93.19)), module, KayOne::TOMH_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 103.551)), module, KayOne::CLPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 103.551)), module, KayOne::CL_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 114.064)), module, KayOne::OHPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 114.064)), module, KayOne::OH_LIGHT));
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.32, 29.153)), module, KayOne::SPEEDCVIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.867, 49.49)), module, KayOne::LENGTHCVIN_INPUT));
