@@ -17,7 +17,17 @@
       "slug": "KayOne",
       "name": "KayOne",
       "description": "Casio SK-1 samples with playback speed, sample length, and looping.",
-      "tags": ["Drum"]
+      "tags": [
+        "Drum"
+      ]
+    },
+    {
+      "slug": "KayArr",
+      "name": "KayArr",
+      "description": "KR55 samples with playback speed, sample length, and looping.\"",
+      "tags": [
+        "Drum"
+      ]
     }
   ]
 }
