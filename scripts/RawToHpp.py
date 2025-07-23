@@ -61,8 +61,21 @@ def main():
         print(f"No .raw* files found in '{input_dir}'.")
         return
 
+    # Prepare simplified names for comment list
+    simplified_names = []
+    for filepath in files:
+        basename = os.path.basename(filepath)
+        # Remove .raw or .raw.* suffix
+        name = re.sub(r"\.raw(\..*)?$", "", basename, flags=re.IGNORECASE)
+        simplified_names.append(name)
+
+    # Write header comment with filenames and total count
     with open(output_file, "w") as out_f:
-        out_f.write(f"// Auto-generated header for {drum_name} samples\n\n")
+        out_f.write(f"// {drum_name} Samples:\n")
+        out_f.write("//\n")
+        for i, name in enumerate(simplified_names, start=1):
+            out_f.write(f"// {i}. {name}\n")
+        out_f.write(f"//\n// Total # of Samples = {len(files)}\n\n")
 
         for f in files:
             result = subprocess.run(["xxd", "-i", f], capture_output=True, text=True)

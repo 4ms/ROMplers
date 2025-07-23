@@ -1,4 +1,17 @@
-// Auto-generated header for KR55 samples
+// KayArr Samples:
+//
+// 1. Cowbell
+// 2. Clave
+// 3. Rimshot
+// 4. Kick
+// 5. Snare
+// 6. Cymbal
+// 7. ClosedHat
+// 8. OpenHat
+// 9. Conga
+// 10. Tom
+//
+// Total # of Samples = 10
 
 unsigned char Cowbell[] = {
   0xe6, 0xed, 0x8c, 0x97, 0xe7, 0x93, 0x94, 0xa4, 0x91, 0xab, 0x75, 0xc2,
