@@ -100,28 +100,28 @@ struct KayOne : Module {
 		configOutput(CLOUT_OUTPUT, "Closed Hat");
 		configOutput(OHOUT_OUTPUT, "Open Hat");
 
-		kickVoice.rawData = Kick_raw;
-		kickVoice.sampleLength = sizeof(Kick_raw) / 2;
+		kickVoice.rawData = Kick;
+		kickVoice.sampleLength = sizeof(Kick) / 2;
 		kickVoice.outputId = KICKOUT_OUTPUT;
 
-		snareVoice.rawData = Snare_raw;
-		snareVoice.sampleLength = sizeof(Snare_raw) / 2;
+		snareVoice.rawData = Snare;
+		snareVoice.sampleLength = sizeof(Snare) / 2;
 		snareVoice.outputId = SNAREOUT_OUTPUT;
 
-		tomLoVoice.rawData = TomLo_raw;
-		tomLoVoice.sampleLength = sizeof(TomLo_raw) / 2;
+		tomLoVoice.rawData = TomLo;
+		tomLoVoice.sampleLength = sizeof(TomLo) / 2;
 		tomLoVoice.outputId = TOMLOUT_OUTPUT;
 
-		tomHiVoice.rawData = TomHi_raw;
-		tomHiVoice.sampleLength = sizeof(TomHi_raw) / 2;
+		tomHiVoice.rawData = TomHi;
+		tomHiVoice.sampleLength = sizeof(TomHi) / 2;
 		tomHiVoice.outputId = TOMHOUT_OUTPUT;
 
-		closedHatVoice.rawData = ClosedHat_raw;
-		closedHatVoice.sampleLength = sizeof(ClosedHat_raw) / 2;
+		closedHatVoice.rawData = ClosedHat;
+		closedHatVoice.sampleLength = sizeof(ClosedHat) / 2;
 		closedHatVoice.outputId = CLOUT_OUTPUT;
 
-		openHatVoice.rawData = OpenHat_raw;
-		openHatVoice.sampleLength = sizeof(OpenHat_raw) / 2;
+		openHatVoice.rawData = OpenHat;
+		openHatVoice.sampleLength = sizeof(OpenHat) / 2;
 		openHatVoice.outputId = OHOUT_OUTPUT;
 	}
 
