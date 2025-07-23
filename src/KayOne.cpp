@@ -36,10 +36,14 @@ struct KayOne : Module {
 		OUTPUTS_LEN
 	};
 	enum LightId {
+		KICK_LIGHT,
 		LIGHTS_LEN
 	};
 
 	struct Voice {
+		bool lastInputTrigger = false;
+		bool lastButtonTrigger = false;
+
 		float samplePos = 0.f;
 		bool playing = false;
 		bool lastTriggerState = false;
@@ -142,25 +146,33 @@ struct KayOne : Module {
 		}
 		
 		// Process each voice
-		processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKOUT_OUTPUT, speed, lengthRatio, loopEnabled);
-		processVoice(args, snareVoice, SNARETRIGIN_INPUT, SNAREOUT_OUTPUT, speed, lengthRatio, loopEnabled);
-		processVoice(args, tomLoVoice, TOMLTRIG_INPUT, TOMLOUT_OUTPUT, speed, lengthRatio, loopEnabled);
-		processVoice(args, tomHiVoice, TOMHTRIG_INPUT, TOMHOUT_OUTPUT, speed, lengthRatio, loopEnabled);
-		processVoice(args, closedHatVoice, CLTRIG_INPUT, CLOUT_OUTPUT, speed, lengthRatio, loopEnabled);
-		processVoice(args, openHatVoice, OHTRIG_INPUT, OHOUT_OUTPUT, speed, lengthRatio, loopEnabled);		
+		processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, KICKOUT_OUTPUT, speed, lengthRatio, loopEnabled);
+		processVoice(args, snareVoice, SNARETRIGIN_INPUT, SNAREPUSH_PARAM, SNAREOUT_OUTPUT, speed, lengthRatio, loopEnabled);
+		processVoice(args, tomLoVoice, TOMLTRIG_INPUT, TOMLPUSH_PARAM, TOMLOUT_OUTPUT, speed, lengthRatio, loopEnabled);
+		processVoice(args, tomHiVoice, TOMHTRIG_INPUT, TOMHPUSH_PARAM, TOMHOUT_OUTPUT, speed, lengthRatio, loopEnabled);
+		processVoice(args, closedHatVoice, CLTRIG_INPUT, CLPUSH_PARAM, CLOUT_OUTPUT, speed, lengthRatio, loopEnabled);
+		processVoice(args, openHatVoice, OHTRIG_INPUT, OHPUSH_PARAM, OHOUT_OUTPUT, speed, lengthRatio, loopEnabled);
 	}
 
-	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int outputId, float speed, float lengthRatio, bool loopEnabled) {
-		bool trigger = inputs[trigInputId].getVoltage() > 1.0f;
+	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId, int outputId, float speed, float lengthRatio, bool loopEnabled) {
+		// Input and button trigger levels
+		bool inputTrigger = inputs[trigInputId].getVoltage() > 1.0f;
+		bool buttonTrigger = params[pushParamId].getValue() > 0.5f;
 	
-		// Rising edge detection: start or restart voice
-		if (trigger && !voice.lastTriggerState) {
+		// Rising edge detection — treat each as an independent trigger
+		bool inputRising = inputTrigger && !voice.lastInputTrigger;
+		bool buttonRising = buttonTrigger && !voice.lastButtonTrigger;
+	
+		if ((inputRising || buttonRising)) {
 			voice.playing = true;
 			voice.samplePos = 0.f;
 		}
-		voice.lastTriggerState = trigger;
 	
-		// If loop is enabled and we're not already playing, auto-start
+		// Store last states
+		voice.lastInputTrigger = inputTrigger;
+		voice.lastButtonTrigger = buttonTrigger;
+	
+		// Loop override
 		if (loopEnabled && !voice.playing) {
 			voice.playing = true;
 			voice.samplePos = 0.f;
@@ -177,7 +189,7 @@ struct KayOne : Module {
 				voice.samplePos += speed;
 			} else {
 				if (loopEnabled) {
-					voice.samplePos = 0.f; // Restart loop
+					voice.samplePos = 0.f;
 				} else {
 					voice.playing = false;
 					outputs[outputId].setVoltage(0.f);
