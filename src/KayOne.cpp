@@ -107,33 +107,33 @@ struct KayOne : Module {
 		configOutput(CLOUT_OUTPUT, "Closed Hat");
 		configOutput(OHOUT_OUTPUT, "Open Hat");
 
-		kickVoice.rawData = Kick;
-		kickVoice.sampleLength = sizeof(Kick) / 2;
+		kickVoice.rawData = SKKick;
+		kickVoice.sampleLength = sizeof(SKKick) / 2;
 		kickVoice.outputId = KICKOUT_OUTPUT;
 		kickVoice.lightId = KICK_LIGHT;
 
-		snareVoice.rawData = Snare;
-		snareVoice.sampleLength = sizeof(Snare) / 2;
+		snareVoice.rawData = SKSnare;
+		snareVoice.sampleLength = sizeof(SKSnare) / 2;
 		snareVoice.outputId = SNAREOUT_OUTPUT;
 		snareVoice.lightId = SNARE_LIGHT;
 
-		tomLoVoice.rawData = TomLo;
-		tomLoVoice.sampleLength = sizeof(TomLo) / 2;
+		tomLoVoice.rawData = SKTomLo;
+		tomLoVoice.sampleLength = sizeof(SKTomLo) / 2;
 		tomLoVoice.outputId = TOMLOUT_OUTPUT;
 		tomLoVoice.lightId = TOML_LIGHT;
 
-		tomHiVoice.rawData = TomHi;
-		tomHiVoice.sampleLength = sizeof(TomHi) / 2;
+		tomHiVoice.rawData = SKTomHi;
+		tomHiVoice.sampleLength = sizeof(SKTomHi) / 2;
 		tomHiVoice.outputId = TOMHOUT_OUTPUT;
 		tomHiVoice.lightId = TOMH_LIGHT;
 
-		closedHatVoice.rawData = ClosedHat;
-		closedHatVoice.sampleLength = sizeof(ClosedHat) / 2;
+		closedHatVoice.rawData = SKClosedHat;
+		closedHatVoice.sampleLength = sizeof(SKClosedHat) / 2;
 		closedHatVoice.outputId = CLOUT_OUTPUT;
 		closedHatVoice.lightId = CL_LIGHT;
 
-		openHatVoice.rawData = OpenHat;
-		openHatVoice.sampleLength = sizeof(OpenHat) / 2;
+		openHatVoice.rawData = SKOpenHat;
+		openHatVoice.sampleLength = sizeof(SKOpenHat) / 2;
 		openHatVoice.outputId = OHOUT_OUTPUT;
 		openHatVoice.lightId = OH_LIGHT;
 	}
