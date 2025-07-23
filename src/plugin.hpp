@@ -61,12 +61,3 @@ struct _3PosHorizontal : SvgSwitch {
         addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/SubMiniToggleH_2.svg")));
     }
 };
-
-struct WhiteMomentary7mm : SvgSwitch {
-    WhiteMomentary7mm() {
-        momentary = false; // true for momentary behavior
-        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/button_x.svg")));
-        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/led_x.svg")));
-    }
-};
-
