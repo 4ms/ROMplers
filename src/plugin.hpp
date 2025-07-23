@@ -10,6 +10,7 @@ extern Plugin* pluginInstance;
 // Declare each Model, defined in each module source file
 extern Model* modelKayOne;
 extern Model* modelKayArr;
+extern Model* modelAyysKing;
 
 struct _9mmKnob : RoundKnob {
     _9mmKnob() {

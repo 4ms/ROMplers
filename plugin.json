@@ -28,6 +28,14 @@
       "tags": [
         "Drum"
       ]
+    },
+    {
+      "slug": "AyysKing",
+      "name": "AyysKing",
+      "description": "Ace Tone Rhythm King samples with playback speed, sample length, and looping",
+      "tags": [
+        "Drum"
+      ]
     }
   ]
 }
