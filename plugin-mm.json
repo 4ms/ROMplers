@@ -11,6 +11,10 @@
 	{
 		"slug": "KayOne",
 		"name": "KayOne"
+	},
+  {
+		"slug": "KayArr",
+		"name": "KayArr"
 	}
 ]
 }
