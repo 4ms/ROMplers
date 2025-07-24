@@ -18,8 +18,8 @@ struct DeeArr : Module {
 		LOOPCVIN_INPUT,
 		KICKTRIGIN_INPUT,
 		SNARETRIGIN_INPUT,
-		HATTRIG_INPUT,
-		RIMTRIG_INPUT,
+		HATTRIGIN_INPUT,
+		RIMTRIGIN_INPUT,
 		INPUTS_LEN
 	};
 	enum OutputId {
@@ -51,8 +51,8 @@ struct DeeArr : Module {
 		configInput(LOOPCVIN_INPUT, "Loop CV");
 		configInput(KICKTRIGIN_INPUT, "Kick CV");
 		configInput(SNARETRIGIN_INPUT, "Snare Trig");
-		configInput(HATTRIG_INPUT, "Hat Trig");
-		configInput(RIMTRIG_INPUT, "Rim Trig");
+		configInput(HATTRIGIN_INPUT, "Hat Trig");
+		configInput(RIMTRIGIN_INPUT, "Rim Trig");
 		configOutput(KICKOUT_OUTPUT, "Kick");
 		configOutput(SNAREOUT_OUTPUT, "Snare");
 		configOutput(HATOUT_OUTPUT, "Hat");
@@ -95,8 +95,8 @@ struct DeeArrWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(30.511, 49.49)), module, DeeArr::LOOPCVIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 63.771)), module, DeeArr::KICKTRIGIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 73.417)), module, DeeArr::SNARETRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 83.302)), module, DeeArr::HATTRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 93.19)), module, DeeArr::RIMTRIG_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 83.302)), module, DeeArr::HATTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 93.19)), module, DeeArr::RIMTRIGIN_INPUT));
 
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 63.771)), module, DeeArr::KICKOUT_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 73.417)), module, DeeArr::SNAREOUT_OUTPUT));
