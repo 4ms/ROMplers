@@ -36,6 +36,14 @@
       "tags": [
         "Drum"
       ]
+    },
+    {
+      "slug": "SinSahnix",
+      "name": "SinSahnix",
+      "description": "Synsonics samples with playback speed, sample length, and looping.",
+      "tags": [
+        "Drum"
+      ]
     }
   ]
 }

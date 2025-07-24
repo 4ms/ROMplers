@@ -22,7 +22,9 @@ set(SOURCE_DIR .)
 target_sources(4ms-ROMplers PRIVATE
     ${SOURCE_DIR}/src/KayOne.cpp                    # Note: this file contains init(rack::Plugin*
     ${SOURCE_DIR}/src/KayArr.cpp       
-    ${SOURCE_DIR}/src/AyysKing.cpp                 
+    ${SOURCE_DIR}/src/AyysKing.cpp        
+    ${SOURCE_DIR}/src/SinSahnix.cpp        
+    ${SOURCE_DIR}/src/SinSahnixSamples.hpp                                   
     ${SOURCE_DIR}/src/AyysKingSamples.hpp                 
     ${SOURCE_DIR}/src/KayOneSamples.hpp                 
     ${SOURCE_DIR}/src/KayArrSamples.hpp        

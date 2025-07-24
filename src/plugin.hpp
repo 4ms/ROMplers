@@ -11,6 +11,7 @@ extern Plugin* pluginInstance;
 extern Model* modelKayOne;
 extern Model* modelKayArr;
 extern Model* modelAyysKing;
+extern Model* modelSinSahnix;
 
 struct _9mmKnob : RoundKnob {
     _9mmKnob() {
