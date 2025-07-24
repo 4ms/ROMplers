@@ -45,38 +45,176 @@ struct SinSahnix : Module {
 		LIGHTS_LEN
 	};
 
+	struct Voice {
+		bool lastInputTrigger = false;
+		bool lastButtonTrigger = false;
+	
+		float samplePos = 0.f;
+		bool playing = false;
+		const unsigned char* rawData = nullptr;
+		int sampleLength = 0;
+		int outputId = 0;
+		int lightId = -1;
+	
+		int16_t readSample16(int index) {
+			return (int16_t)(rawData[2 * index] | (rawData[2 * index + 1] << 8));
+		}
+	};
+
+	Voice kickVoice;
+	Voice snareVoice;
+	Voice tomLoVoice;
+	Voice tomMedVoice;
+	Voice tomHiVoice;
+	Voice cymbalVoice;
+
+	const float SPEED_LOW = 0.05f;
+	const float SPEED_HIGH = 2.0f;
+	const float LENGTH_MIN = 0.1f;
+	const float LENGTH_MAX = 1.0f;
+
 	SinSahnix() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam(SPEED_PARAM, 0.f, 1.f, 0.f, "Speed", "%", 0.f, 100.f);
-		configParam(LENGTH_PARAM, 0.f, 1.f, 0.f, "Length", "%", 0.f, 100.f);
+
+		configParam(SPEED_PARAM, 0.f, 1.f, 0.5f, "Speed", "%", 0.f, 100.f);
+		configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length", "%", 0.f, 100.f);
 		configSwitch(LOOP_PARAM, 0.f, 1.f, 0.f, "Loop", {"Off", "On"});
+
 		configSwitch(KICKPUSH_PARAM, 0.f, 1.f, 0.f, "Kick Trig", {"Off", "On"});
 		configSwitch(SNAREPUSH_PARAM, 0.f, 1.f, 0.f, "Snare Trig", {"Off", "On"});
 		configSwitch(TOMLPUSH_PARAM, 0.f, 1.f, 0.f, "Tom Lo Trig", {"Off", "On"});
-		configSwitch(TOMMPUSH_PARAM, 0.f, 1.f, 0.f, "Tom Med Trig", {"Off", "On"});
+		configSwitch(TOMMPUSH_PARAM, 0.f, 1.f, 0.f, "Tom Mid Trig", {"Off", "On"});
 		configSwitch(TOMHPUSH_PARAM, 0.f, 1.f, 0.f, "Tom Hi Trig", {"Off", "On"});
 		configSwitch(CYMPUSH_PARAM, 0.f, 1.f, 0.f, "Cymbal Trig", {"Off", "On"});
+
 		configInput(SPEEDCVIN_INPUT, "Speed CV");
 		configInput(LENGTHCVIN_INPUT, "Length CV");
-		configInput(LOOPCVIN_INPUT, "Loop CV");
+		configInput(LOOPCVIN_INPUT, "Loop Gate");
 		configInput(KICKTRIGIN_INPUT, "Kick Trig");
 		configInput(SNARETRIGIN_INPUT, "Snare Trig");
 		configInput(TOMLTRIGIN_INPUT, "Tom Lo Trig");
-		configInput(TOMMTRIGIN_INPUT, "Tom Med Trig");
+		configInput(TOMMTRIGIN_INPUT, "Tom Mid Trig");
 		configInput(TOMHTRIGIN_INPUT, "Tom Hi Trig");
 		configInput(CYMTRIGIN_INPUT, "Cymbal Trig");
+
 		configOutput(KICKOUT_OUTPUT, "Kick");
 		configOutput(SNAREOUT_OUTPUT, "Snare");
 		configOutput(TOMLOUT_OUTPUT, "Tom Lo");
-		configOutput(TOMMOUT_OUTPUT, "Tom Med");
+		configOutput(TOMMOUT_OUTPUT, "Tom Mid");
 		configOutput(TOMHOUT_OUTPUT, "Tom Hi");
 		configOutput(CYMOUT_OUTPUT, "Cymbal");
+
+		kickVoice.rawData = SSKick;
+		kickVoice.sampleLength = sizeof(SSKick) / 2;
+		kickVoice.outputId = KICKOUT_OUTPUT;
+		kickVoice.lightId = KICK_LIGHT;
+
+		snareVoice.rawData = SSSnare;
+		snareVoice.sampleLength = sizeof(SSSnare) / 2;
+		snareVoice.outputId = SNAREOUT_OUTPUT;
+		snareVoice.lightId = SNARE_LIGHT;
+
+		tomLoVoice.rawData = SSTomL;
+		tomLoVoice.sampleLength = sizeof(SSTomL) / 2;
+		tomLoVoice.outputId = TOMLOUT_OUTPUT;
+		tomLoVoice.lightId = TOML_LIGHT;
+
+		tomMedVoice.rawData = SSTomM;
+		tomMedVoice.sampleLength = sizeof(SSTomM) / 2;
+		tomMedVoice.outputId = TOMMOUT_OUTPUT;
+		tomMedVoice.lightId = TOMM_LIGHT;
+
+		tomHiVoice.rawData = SSTomH;
+		tomHiVoice.sampleLength = sizeof(SSTomH) / 2;
+		tomHiVoice.outputId = TOMHOUT_OUTPUT;
+		tomHiVoice.lightId = TOMH_LIGHT;
+
+		cymbalVoice.rawData = SSCymbal;
+		cymbalVoice.sampleLength = sizeof(SSCymbal) / 2;
+		cymbalVoice.outputId = CYMOUT_OUTPUT;
+		cymbalVoice.lightId = CYM_LIGHT;
 	}
 
 	void process(const ProcessArgs& args) override {
+		// Speed calculation
+		float knobSpeed = 0.01f + params[SPEED_PARAM].getValue() * (1.0f - 0.01f);
+		float speedCV = clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -5.f, 5.f);
+		float speedOffset = (speedCV / 5.f) * 0.5f;
+		float normSpeed = clamp(knobSpeed + speedOffset, 0.01f, 1.0f);
+		float speed = SPEED_LOW + (normSpeed - 0.01f) * ((SPEED_HIGH - SPEED_LOW) / (1.0f - 0.01f));
+
+		// Length calculation
+		float knobLength = params[LENGTH_PARAM].getValue();
+		float lengthCV = clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -5.f, 5.f);
+		float lengthOffset = (lengthCV / 5.f) * 0.5f;
+		float normLength = clamp(knobLength + lengthOffset, 0.1f, 1.0f);
+		float lengthRatio = LENGTH_MIN + (normLength - 0.1f) * ((LENGTH_MAX - LENGTH_MIN) / (1.0f - 0.1f));
+
+		bool baseLoop = params[LOOP_PARAM].getValue() > 0.5f;
+		float loopCV = inputs[LOOPCVIN_INPUT].getVoltage();
+		bool loopEnabled = baseLoop;
+
+		if (!baseLoop && loopCV > 1.f) {
+			loopEnabled = true;
+		} else if (baseLoop && loopCV < -1.f) {
+			loopEnabled = false;
+		}
+
+		processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, snareVoice, SNARETRIGIN_INPUT, SNAREPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, tomLoVoice, TOMLTRIGIN_INPUT, TOMLPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, tomMedVoice, TOMMTRIGIN_INPUT, TOMMPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, tomHiVoice, TOMHTRIGIN_INPUT, TOMHPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, cymbalVoice, CYMTRIGIN_INPUT, CYMPUSH_PARAM, speed, lengthRatio, loopEnabled);
+	}
+
+	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId, float speed, float lengthRatio, bool loopEnabled) {
+		bool inputTrigger = inputs[trigInputId].getVoltage() > 1.0f;
+		bool buttonTrigger = params[pushParamId].getValue() > 0.5f;
+
+		bool inputRising = inputTrigger && !voice.lastInputTrigger;
+		bool buttonRising = buttonTrigger && !voice.lastButtonTrigger;
+
+		if (inputRising || buttonRising) {
+			voice.playing = true;
+			voice.samplePos = 0.f;
+			if (voice.lightId >= 0)
+				lights[voice.lightId].setBrightness(1.0f);
+		}
+
+		voice.lastInputTrigger = inputTrigger;
+		voice.lastButtonTrigger = buttonTrigger;
+
+		if (loopEnabled && !voice.playing) {
+			voice.playing = true;
+			voice.samplePos = 0.f;
+		}
+
+		int maxSamplesToPlay = (int)(voice.sampleLength * lengthRatio);
+
+		if (voice.playing) {
+			int idx = (int)voice.samplePos;
+			if (idx < maxSamplesToPlay) {
+				int16_t sampleInt = voice.readSample16(idx);
+				float sample = (float)sampleInt / 32768.f;
+				outputs[voice.outputId].setVoltage(sample * 5.f);
+				voice.samplePos += speed;
+			} else {
+				if (loopEnabled) {
+					voice.samplePos = 0.f;
+				} else {
+					voice.playing = false;
+					outputs[voice.outputId].setVoltage(0.f);
+				}
+			}
+		} else {
+			outputs[voice.outputId].setVoltage(0.f);
+		}
+
+		if (voice.lightId >= 0)
+			lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
 	}
 };
-
 
 struct SinSahnixWidget : ModuleWidget {
 	SinSahnixWidget(SinSahnix* module) {
