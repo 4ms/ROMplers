@@ -21,11 +21,11 @@ struct SicksOh : Module {
 		LOOPCVIN_INPUT,
 		KICKTRIGIN_INPUT,
 		SNARETRIGIN_INPUT,
-		TOMLTRIG_INPUT,
-		TOMHTRIG_INPUT,
-		CLTRIG_INPUT,
-		OHTRIG_INPUT,
-		CYMTRIG_INPUT,
+		TOMLTRIGIN_INPUT,
+		TOMHTRIGIN_INPUT,
+		CLTRIGIN_INPUT,
+		OHTRIGIN_INPUT,
+		CYMTRIGIN_INPUT,
 		INPUTS_LEN
 	};
 	enum OutputId {
@@ -98,11 +98,11 @@ struct SicksOh : Module {
 		configInput(LOOPCVIN_INPUT, "Loop CV");
 		configInput(KICKTRIGIN_INPUT, "Kick Trig");
 		configInput(SNARETRIGIN_INPUT, "Snare Trig");
-		configInput(TOMLTRIG_INPUT, "Tom Lo Trig");
-		configInput(TOMHTRIG_INPUT, "Tom Hi Trig");
-		configInput(CLTRIG_INPUT, "Closed Hat Trig");
-		configInput(OHTRIG_INPUT, "Open Hat Trig");
-		configInput(CYMTRIG_INPUT, "Cymbal Trig");
+		configInput(TOMLTRIGIN_INPUT, "Tom Lo Trig");
+		configInput(TOMHTRIGIN_INPUT, "Tom Hi Trig");
+		configInput(CLTRIGIN_INPUT, "Closed Hat Trig");
+		configInput(OHTRIGIN_INPUT, "Open Hat Trig");
+		configInput(CYMTRIGIN_INPUT, "Cymbal Trig");
 
 		configOutput(KICKOUT_OUTPUT, "Kick");
 		configOutput(SNAREOUT_OUTPUT, "Snare");
@@ -170,11 +170,11 @@ struct SicksOh : Module {
 
 		processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, speed, lengthRatio, loopEnabled);
 		processVoice(args, snareVoice, SNARETRIGIN_INPUT, SNAREPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, tomLoVoice, TOMLTRIG_INPUT, TOMLPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, tomHiVoice, TOMHTRIG_INPUT, TOMHPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, closedHatVoice, CLTRIG_INPUT, CLPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, openHatVoice, OHTRIG_INPUT, OHPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, cymVoice, CYMTRIG_INPUT, CYMPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, tomLoVoice, TOMLTRIGIN_INPUT, TOMLPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, tomHiVoice, TOMHTRIGIN_INPUT, TOMHPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, closedHatVoice, CLTRIGIN_INPUT, CLPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, openHatVoice, OHTRIGIN_INPUT, OHPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, cymVoice, CYMTRIGIN_INPUT, CYMPUSH_PARAM, speed, lengthRatio, loopEnabled);
 	}
 
 	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId, float speed, float lengthRatio, bool loopEnabled) {
@@ -266,11 +266,11 @@ struct SicksOhWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(30.511, 38.377)), module, SicksOh::LOOPCVIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 53.187)), module, SicksOh::KICKTRIGIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 62.834)), module, SicksOh::SNARETRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 72.719)), module, SicksOh::TOMLTRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 82.607)), module, SicksOh::TOMHTRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 92.968)), module, SicksOh::CLTRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 103.481)), module, SicksOh::OHTRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 113.154)), module, SicksOh::CYMTRIG_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 72.719)), module, SicksOh::TOMLTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 82.607)), module, SicksOh::TOMHTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 92.968)), module, SicksOh::CLTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 103.481)), module, SicksOh::OHTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 113.154)), module, SicksOh::CYMTRIGIN_INPUT));
 
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 53.187)), module, SicksOh::KICKOUT_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 62.834)), module, SicksOh::SNAREOUT_OUTPUT));
