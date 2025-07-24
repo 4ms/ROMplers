@@ -60,6 +60,14 @@
       "tags": [
         "Drum"
       ]
+    },
+    {
+      "slug": "SeaArr",
+      "name": "SeaArr",
+      "description": "CR-78 samples with playback speed, sample length, looping, and direct outs.",
+      "tags": [
+        "Drum"
+      ]
     }
   ]
 }
