@@ -25,6 +25,8 @@ target_sources(4ms-ROMplers PRIVATE
     ${SOURCE_DIR}/src/AyysKing.cpp        
     ${SOURCE_DIR}/src/SinSahnix.cpp        
     ${SOURCE_DIR}/src/SicksOh.cpp        
+    ${SOURCE_DIR}/src/DeeArr.cpp        
+    ${SOURCE_DIR}/src/DeeArrSamples.hpp                                   
     ${SOURCE_DIR}/src/SicksOhSamples.hpp                                   
     ${SOURCE_DIR}/src/SinSahnixSamples.hpp                                   
     ${SOURCE_DIR}/src/AyysKingSamples.hpp                 
