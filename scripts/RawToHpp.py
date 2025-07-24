@@ -53,7 +53,7 @@ def main():
     parser.add_argument("--input", "-i", type=str, default=".",
                         help="Input directory containing .raw* files (default: current directory)")
     parser.add_argument("--output", "-o", type=str,
-                        help="Output .hpp file path. If omitted, will be derived from drum machine name.")
+                        help="Output directory where the .hpp file will be saved")
     parser.add_argument("--info", action="store_true",
                         help="Show detailed instructions for preparing your audio files")
     args = parser.parse_args()
@@ -64,7 +64,15 @@ def main():
 
     drum_name = input("Drum Machine Name? ").strip()
     clean_name = drum_name.replace("_", "")
-    output_file = args.output or os.path.join(os.getcwd(), f"{clean_name}Samples.hpp")
+    
+    # Determine output file path
+    if args.output:
+        output_dir = args.output
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        output_file = os.path.join(output_dir, f"{clean_name}Samples.hpp")
+    else:
+        output_file = os.path.join(os.getcwd(), f"{clean_name}Samples.hpp")
 
     input_dir = os.path.abspath(args.input)
     if not os.path.isdir(input_dir):
