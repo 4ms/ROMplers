@@ -49,11 +49,42 @@ struct SicksOh : Module {
 		LIGHTS_LEN
 	};
 
+	struct Voice {
+		bool lastInputTrigger = false;
+		bool lastButtonTrigger = false;
+
+		float samplePos = 0.f;
+		bool playing = false;
+		const unsigned char* rawData = nullptr;
+		int sampleLength = 0;
+		int outputId = 0;
+		int lightId = -1;
+
+		int16_t readSample16(int index) {
+			return (int16_t)(rawData[2 * index] | (rawData[2 * index + 1] << 8));
+		}
+	};
+
+	Voice kickVoice;
+	Voice snareVoice;
+	Voice tomLoVoice;
+	Voice tomHiVoice;
+	Voice closedHatVoice;
+	Voice openHatVoice;
+	Voice cymVoice;
+
+	const float SPEED_LOW = 0.05f;
+	const float SPEED_HIGH = 1.0f;
+	const float LENGTH_MIN = 0.1f;
+	const float LENGTH_MAX = 1.0f;
+
 	SicksOh() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam(SPEED_PARAM, 0.f, 1.f, 0.f, "Speed", "%", 0.f, 100.f);
-		configParam(LENGTH_PARAM, 0.f, 1.f, 0.f, "Length", "%", 0.f, 100.f);
+
+		configParam(SPEED_PARAM, 0.f, 1.f, 0.5f, "Speed", "%", 0.f, 100.f);
+		configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length", "%", 0.f, 100.f);
 		configSwitch(LOOP_PARAM, 0.f, 1.f, 0.f, "Loop", {"Off", "On"});
+
 		configSwitch(KICKPUSH_PARAM, 0.f, 1.f, 0.f, "Kick Trig", {"Off", "On"});
 		configSwitch(SNAREPUSH_PARAM, 0.f, 1.f, 0.f, "Snare Trig", {"Off", "On"});
 		configSwitch(TOMLPUSH_PARAM, 0.f, 1.f, 0.f, "Tom Lo Trig", {"Off", "On"});
@@ -61,6 +92,7 @@ struct SicksOh : Module {
 		configSwitch(CLPUSH_PARAM, 0.f, 1.f, 0.f, "Closed Hat Trig", {"Off", "On"});
 		configSwitch(OHPUSH_PARAM, 0.f, 1.f, 0.f, "Open Hat Trig", {"Off", "On"});
 		configSwitch(CYMPUSH_PARAM, 0.f, 1.f, 0.f, "Cymbal Trig", {"Off", "On"});
+
 		configInput(SPEEDCVIN_INPUT, "Speed CV");
 		configInput(LENGTHCVIN_INPUT, "Length CV");
 		configInput(LOOPCVIN_INPUT, "Loop CV");
@@ -71,6 +103,7 @@ struct SicksOh : Module {
 		configInput(CLTRIG_INPUT, "Closed Hat Trig");
 		configInput(OHTRIG_INPUT, "Open Hat Trig");
 		configInput(CYMTRIG_INPUT, "Cymbal Trig");
+
 		configOutput(KICKOUT_OUTPUT, "Kick");
 		configOutput(SNAREOUT_OUTPUT, "Snare");
 		configOutput(TOMLOUT_OUTPUT, "Tom Lo");
@@ -78,12 +111,120 @@ struct SicksOh : Module {
 		configOutput(CLOUT_OUTPUT, "Closed Hat");
 		configOutput(OHOUT_OUTPUT, "Open Hat");
 		configOutput(CYMOUT_OUTPUT, "Cymbal");
+
+		kickVoice.rawData = SOKick;
+		kickVoice.sampleLength = sizeof(SOKick) / 2;
+		kickVoice.outputId = KICKOUT_OUTPUT;
+		kickVoice.lightId = KICK_LIGHT;
+
+		snareVoice.rawData = SOSnare;
+		snareVoice.sampleLength = sizeof(SOSnare) / 2;
+		snareVoice.outputId = SNAREOUT_OUTPUT;
+		snareVoice.lightId = SNARE_LIGHT;
+
+		tomLoVoice.rawData = SOTomL;
+		tomLoVoice.sampleLength = sizeof(SOTomL) / 2;
+		tomLoVoice.outputId = TOMLOUT_OUTPUT;
+		tomLoVoice.lightId = TOML_LIGHT;
+
+		tomHiVoice.rawData = SOTomH;
+		tomHiVoice.sampleLength = sizeof(SOTomH) / 2;
+		tomHiVoice.outputId = TOMHOUT_OUTPUT;
+		tomHiVoice.lightId = TOMH_LIGHT;
+
+		closedHatVoice.rawData = SOClosedHat;
+		closedHatVoice.sampleLength = sizeof(SOClosedHat) / 2;
+		closedHatVoice.outputId = CLOUT_OUTPUT;
+		closedHatVoice.lightId = CL_LIGHT;
+
+		openHatVoice.rawData = SOOpenHat;
+		openHatVoice.sampleLength = sizeof(SOOpenHat) / 2;
+		openHatVoice.outputId = OHOUT_OUTPUT;
+		openHatVoice.lightId = OH_LIGHT;
+
+		cymVoice.rawData = SOCym;
+		cymVoice.sampleLength = sizeof(SOCym) / 2;
+		cymVoice.outputId = CYMOUT_OUTPUT;
+		cymVoice.lightId = CYM_LIGHT;
 	}
 
 	void process(const ProcessArgs& args) override {
-	}
-};
+		float knobSpeed = 0.01f + params[SPEED_PARAM].getValue() * (1.0f - 0.01f);
+		float speedCV = clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -5.f, 5.f);
+		float speedOffset = (speedCV / 5.f) * 0.5f;
+		float normSpeed = clamp(knobSpeed + speedOffset, 0.01f, 1.0f);
+		float speed = SPEED_LOW + (normSpeed - 0.01f) * ((SPEED_HIGH - SPEED_LOW) / (1.0f - 0.01f));
 
+		float knobLength = params[LENGTH_PARAM].getValue();
+		float lengthCV = clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -5.f, 5.f);
+		float lengthOffset = (lengthCV / 5.f) * 0.5f;
+		float normLength = clamp(knobLength + lengthOffset, 0.1f, 1.0f);
+		float lengthRatio = LENGTH_MIN + (normLength - 0.1f) * ((LENGTH_MAX - LENGTH_MIN) / (1.0f - 0.1f));
+
+		bool baseLoop = params[LOOP_PARAM].getValue() > 0.5f;
+		bool loopEnabled = baseLoop;
+
+		float loopCV = inputs[LOOPCVIN_INPUT].getVoltage();
+		if (!baseLoop && loopCV > 1.f) loopEnabled = true;
+		else if (baseLoop && loopCV < -1.f) loopEnabled = false;
+
+		processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, snareVoice, SNARETRIGIN_INPUT, SNAREPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, tomLoVoice, TOMLTRIG_INPUT, TOMLPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, tomHiVoice, TOMHTRIG_INPUT, TOMHPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, closedHatVoice, CLTRIG_INPUT, CLPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, openHatVoice, OHTRIG_INPUT, OHPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, cymVoice, CYMTRIG_INPUT, CYMPUSH_PARAM, speed, lengthRatio, loopEnabled);
+	}
+
+	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId, float speed, float lengthRatio, bool loopEnabled) {
+		bool inputTrig = inputs[trigInputId].getVoltage() > 1.f;
+		bool buttonTrig = params[pushParamId].getValue() > 0.5f;
+	
+		bool inputRising = inputTrig && !voice.lastInputTrigger;
+		bool buttonRising = buttonTrig && !voice.lastButtonTrigger;
+	
+		if (inputRising || buttonRising) {
+			voice.playing = true;
+			voice.samplePos = 0.f;
+	
+			if (voice.lightId >= 0)
+				lights[voice.lightId].setBrightness(1.0f);  // instant light on trigger
+		}
+	
+		voice.lastInputTrigger = inputTrig;
+		voice.lastButtonTrigger = buttonTrig;
+	
+		if (loopEnabled && !voice.playing) {
+			voice.playing = true;
+			voice.samplePos = 0.f;
+		}
+	
+		int maxSamples = (int)(voice.sampleLength * lengthRatio);
+	
+		if (voice.playing) {
+			int idx = (int)voice.samplePos;
+			if (idx < maxSamples) {
+				int16_t s = voice.readSample16(idx);
+				float out = (float)s / 32768.f;
+				outputs[voice.outputId].setVoltage(out * 5.f);
+				voice.samplePos += speed;
+			} else {
+				if (loopEnabled)
+					voice.samplePos = 0.f;
+				else {
+					voice.playing = false;
+					outputs[voice.outputId].setVoltage(0.f);
+				}
+			}
+		} else {
+			outputs[voice.outputId].setVoltage(0.f);
+		}
+	
+		if (voice.lightId >= 0)
+			lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);  // smooth fade
+	}	
+};
 
 struct SicksOhWidget : ModuleWidget {
 	SicksOhWidget(SicksOh* module) {
