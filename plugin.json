@@ -68,6 +68,14 @@
       "tags": [
         "Drum"
       ]
+    },
+    {
+      "slug": "SehvenToo",
+      "name": "SehvenToo",
+      "description": "TR-727 samples with playback speed, sample length, looping, and direct outs.",
+      "tags": [
+        "Drum"
+      ]
     }
   ]
 }
