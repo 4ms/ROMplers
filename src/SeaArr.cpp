@@ -1,5 +1,5 @@
 #include "plugin.hpp"
-#include "SeaArrSamples.hpp"
+#include "SeaArrSamples.hpp"  // Your samples header
 
 struct SeaArr : Module {
 	enum ParamId {
@@ -69,11 +69,37 @@ struct SeaArr : Module {
 		LIGHTS_LEN
 	};
 
+	struct Voice {
+		bool lastInputTrigger = false;
+		bool lastButtonTrigger = false;
+
+		float samplePos = 0.f;
+		bool playing = false;
+		const unsigned char* rawData = nullptr;
+		int sampleLength = 0;
+		int outputId = 0;
+		int lightId = -1;
+
+		int16_t readSample16(int index) {
+			return (int16_t)(rawData[2 * index] | (rawData[2 * index + 1] << 8));
+		}
+	};
+
+	Voice kickVoice, snareVoice, hatVoice, hatMetalVoice, rimVoice;
+	Voice cowVoice, congaVoice, bongoLVoice, bongoHVoice, tambVoice, guiroVoice, cymVoice;
+
+	const float SPEED_MIN = 0.05f;
+	const float SPEED_MAX = 2.0f;
+	const float LENGTH_MIN = 0.1f;
+	const float LENGTH_MAX = 1.0f;
+
 	SeaArr() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam(SPEED__PARAM, 0.f, 1.f, 1.f, "Speed", "%", 0.f, 100.f);
-		configParam(LENGTH_PARAM, 0.f, 1.f, 0.5f, "Length", "%", 0.f, 100.f);
+
+		configParam(SPEED__PARAM, 0.f, 1.f, 0.5f, "Speed", "%", 0.f, 100.f);
+		configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length", "%", 0.f, 100.f);
 		configSwitch(LOOP_PARAM, 0.f, 1.f, 0.f, "Loop", {"Off", "On"});
+
 		configSwitch(KICKPUSH_PARAM, 0.f, 1.f, 0.f, "Kick Trig", {"Off", "On"});
 		configSwitch(SNAREPUSH_PARAM, 0.f, 1.f, 0.f, "Snare Trig", {"Off", "On"});
 		configSwitch(HATPUSH_PARAM, 0.f, 1.f, 0.f, "Hat Trig", {"Off", "On"});
@@ -86,6 +112,7 @@ struct SeaArr : Module {
 		configSwitch(TAMPUSH_PARAM, 0.f, 1.f, 0.f, "Tambourine Trig", {"Off", "On"});
 		configSwitch(GUIROPUSH_PARAM, 0.f, 1.f, 0.f, "Guiro Trig", {"Off", "On"});
 		configSwitch(CYMPUSH_PARAM, 0.f, 1.f, 0.f, "Cymbal Trig", {"Off", "On"});
+
 		configInput(SPEEDCVIN_INPUT, "Speed CV");
 		configInput(LENGTHCVIN_INPUT, "Length CV");
 		configInput(LOOPCVIN_INPUT, "Loop CV");
@@ -101,6 +128,7 @@ struct SeaArr : Module {
 		configInput(TAMTRIGIN_INPUT, "Tambourine Trig");
 		configInput(GUIROTRIGIN_INPUT, "Guiro Trig");
 		configInput(CYMTRIGIN_INPUT, "Cymbal Trig");
+
 		configOutput(KICKOUT_OUTPUT, "Kick");
 		configOutput(SNAREOUT_OUTPUT, "Snare");
 		configOutput(HATOUT_OUTPUT, "Hi-Hat");
@@ -113,12 +141,97 @@ struct SeaArr : Module {
 		configOutput(TAMOUT_OUTPUT, "Tambourine");
 		configOutput(GUIROOUT_OUTPUT, "Guiro");
 		configOutput(CYMOUT_OUTPUT, "Cymbal");
+
+		// Initialize voices with sample data from SeaArrSamples.hpp
+		kickVoice = createVoice(SAKick, sizeof(SAKick), KICKOUT_OUTPUT, KICK_LIGHT);
+		snareVoice = createVoice(SASnare, sizeof(SASnare), SNAREOUT_OUTPUT, SNARE_LIGHT);
+		hatVoice = createVoice(SAHiHat, sizeof(SAHiHat), HATOUT_OUTPUT, HAT_LIGHT);
+		hatMetalVoice = createVoice(SAHiHatMetal, sizeof(SAHiHatMetal), HATMETALOUT_OUTPUT, HATMETAL_LIGHT);
+		rimVoice = createVoice(SARim, sizeof(SARim), RIMOUT_OUTPUT, RIM_LIGHT);
+		cowVoice = createVoice(SACowbell, sizeof(SACowbell), COWOUT_OUTPUT, COW_LIGHT);
+		congaVoice = createVoice(SACongaL, sizeof(SACongaL), CONGAOUT_OUTPUT, CONGA_LIGHT);
+		bongoLVoice = createVoice(SABongoL, sizeof(SABongoL), BONGOLOUT_OUTPUT, BONGOL_LIGHT);
+		bongoHVoice = createVoice(SABongoH, sizeof(SABongoH), BONGOHOUT_OUTPUT, BONGOH_LIGHT);
+		tambVoice = createVoice(SATamb, sizeof(SATamb), TAMOUT_OUTPUT, TAM_LIGHT);
+		guiroVoice = createVoice(SAGuiro, sizeof(SAGuiro), GUIROOUT_OUTPUT, GUIRO_LIGHT);
+		cymVoice = createVoice(SACym, sizeof(SACym), CYMOUT_OUTPUT, CYM_LIGHT);
+	}
+
+	Voice createVoice(const unsigned char* data, size_t size, int outputId, int lightId) {
+		Voice v;
+		v.rawData = data;
+		v.sampleLength = size / 2; // 16-bit samples
+		v.outputId = outputId;
+		v.lightId = lightId;
+		return v;
+	}
+
+	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId, float speed, float lengthRatio, bool loopEnabled) {
+		bool inputTrigger = inputs[trigInputId].getVoltage() > 1.0f;
+		bool buttonTrigger = params[pushParamId].getValue() > 0.5f;
+		bool inputRising = inputTrigger && !voice.lastInputTrigger;
+		bool buttonRising = buttonTrigger && !voice.lastButtonTrigger;
+		if (inputRising || buttonRising || (loopEnabled && !voice.playing)) {
+			voice.playing = true;
+			voice.samplePos = 0.f;
+		}
+		voice.lastInputTrigger = inputTrigger;
+		voice.lastButtonTrigger = buttonTrigger;
+
+		int maxSamplesToPlay = (int)(voice.sampleLength * lengthRatio);
+		if (voice.playing) {
+			int idx = (int)voice.samplePos;
+			if (idx < maxSamplesToPlay) {
+				int16_t sampleInt = voice.readSample16(idx);
+				float sample = (float)sampleInt / 32768.f;
+				outputs[voice.outputId].setVoltage(sample * 5.f);
+				voice.samplePos += speed;
+			} else {
+				if (loopEnabled) {
+					voice.samplePos = 0.f;
+				} else {
+					voice.playing = false;
+					outputs[voice.outputId].setVoltage(0.f);
+				}
+			}
+		} else {
+			outputs[voice.outputId].setVoltage(0.f);
+		}
+		if (voice.lightId >= 0) {
+			if (inputRising || buttonRising || (loopEnabled && !voice.playing)) {
+				lights[voice.lightId].setBrightness(1.f);
+			}
+			lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
+		}
 	}
 
 	void process(const ProcessArgs& args) override {
+		float speed = rescale(params[SPEED__PARAM].getValue(), 0.f, 1.f, SPEED_MIN, SPEED_MAX);
+		if (inputs[SPEEDCVIN_INPUT].isConnected()) {
+			speed *= clamp(inputs[SPEEDCVIN_INPUT].getVoltage() / 10.f, 0.f, 1.f);
+		}
+
+		float lengthRatio = rescale(params[LENGTH_PARAM].getValue(), 0.f, 1.f, LENGTH_MIN, LENGTH_MAX);
+		if (inputs[LENGTHCVIN_INPUT].isConnected()) {
+			lengthRatio *= clamp(inputs[LENGTHCVIN_INPUT].getVoltage() / 10.f, 0.f, 1.f);
+		}
+
+		bool loopEnabled = (params[LOOP_PARAM].getValue() > 0.5f) || (inputs[LOOPCVIN_INPUT].getVoltage() > 1.f);
+
+		processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, snareVoice, SNARETRIGIN_INPUT, SNAREPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, hatVoice, HATTRIGIN_INPUT, HATPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, hatMetalVoice, HATMETALTRIGIN_INPUT, HATMETALPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, rimVoice, RIMTRIGIN_INPUT, RIMPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, cowVoice, COWTRIGIN_INPUT, COWPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, congaVoice, CONGATRIGIN_INPUT, CONGAPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, bongoLVoice, BONGOLTRIGIN_INPUT, BONGOLPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, bongoHVoice, BONGOHTRIGIN_INPUT, BONGOHPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, tambVoice, TAMTRIGIN_INPUT, TAMPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, guiroVoice, GUIROTRIGIN_INPUT, GUIROPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		processVoice(args, cymVoice, CYMTRIGIN_INPUT, CYMPUSH_PARAM, speed, lengthRatio, loopEnabled);
 	}
 };
-
 
 struct SeaArrWidget : ModuleWidget {
 	SeaArrWidget(SeaArr* module) {
