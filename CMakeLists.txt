@@ -29,6 +29,7 @@ target_sources(4ms-ROMplers PRIVATE
     ${SOURCE_DIR}/src/SeaArr.cpp        
     ${SOURCE_DIR}/src/SehvenToo.cpp     
     ${SOURCE_DIR}/src/Kick.cpp     
+    ${SOURCE_DIR}/src/KickSamples.hpp                                      
     ${SOURCE_DIR}/src/SehvenTooSamples.hpp                                      
     ${SOURCE_DIR}/src/SeaArrSamples.hpp                                   
     ${SOURCE_DIR}/src/DeeArrSamples.hpp                                   
