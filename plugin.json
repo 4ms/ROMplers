@@ -76,6 +76,14 @@
       "tags": [
         "Drum"
       ]
+    },
+    {
+      "slug": "Kick",
+      "name": "Kick",
+      "description": "'Real' kick samples with playback speed and a decay envelope",
+      "tags": [
+        "Drum"
+      ]
     }
   ]
 }

@@ -16,6 +16,7 @@ extern Model* modelSicksOh;
 extern Model* modelDeeArr;
 extern Model* modelSeaArr;
 extern Model* modelSehvenToo;
+extern Model* modelKick;
 
 struct _9mmKnob : RoundKnob {
     _9mmKnob() {
