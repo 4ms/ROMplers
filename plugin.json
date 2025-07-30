@@ -132,6 +132,14 @@
       "tags": [
         "Drum"
       ]
+    },
+    {
+      "slug": "Crash",
+      "name": "Crash",
+      "description": "'Real' crash samples with playback speed, velocity, and a decay envelope",
+      "tags": [
+        "Drum"
+      ]
     }
   ]
 }

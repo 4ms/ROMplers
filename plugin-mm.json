@@ -67,6 +67,10 @@
 	{
 		"slug": "Clap",
 		"name": "Clap"
+	},
+	{
+		"slug": "Crash",
+		"name": "Crash"
 	}
 ]
 }
