@@ -55,6 +55,10 @@
 	{
 		"slug": "Percussion",
 		"name": "Percussion"
+	},
+	{
+		"slug": "Ride",
+		"name": "Ride"
 	}
 ]
 }

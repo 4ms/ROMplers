@@ -108,6 +108,14 @@
       "tags": [
         "Drum"
       ]
+    },
+    {
+      "slug": "Ride",
+      "name": "Ride",
+      "description": "'Real' Ride samples with playback speed, velocity, and a decay envelope",
+      "tags": [
+        "Drum"
+      ]
     }
   ]
 }
