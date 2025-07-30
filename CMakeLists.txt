@@ -31,7 +31,9 @@ target_sources(4ms-ROMplers PRIVATE
     ${SOURCE_DIR}/src/Kick.cpp     
     ${SOURCE_DIR}/src/Snare.cpp     
     ${SOURCE_DIR}/src/Tom.cpp     
-    ${SOURCE_DIR}/src/TomSamples.hpp                                      
+    ${SOURCE_DIR}/src/Percussion.cpp  
+    ${SOURCE_DIR}/src/TomSamples.hpp                                         
+    ${SOURCE_DIR}/src/PercussionSamples.hpp                                      
     ${SOURCE_DIR}/src/SnareSamples.hpp                                      
     ${SOURCE_DIR}/src/KickSamples.hpp                                      
     ${SOURCE_DIR}/src/SehvenTooSamples.hpp                                      
