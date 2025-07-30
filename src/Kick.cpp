@@ -39,12 +39,14 @@ struct Kick : Module {
 	const float MIN_PLAYBACK_SPEED = 0.01f;
 	const float MAX_PLAYBACK_SPEED = 2.0f;
 
+	int numSamples = 60;
+
 	Kick() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		std::vector<std::string> sampleChoices;
-		for (int i = 1; i <= 60; ++i)
+		for (int i = 1; i <= numSamples; ++i)
 			sampleChoices.push_back(std::to_string(i));
-		configSwitch(SAMPLE_PARAM, 0.f, 59.f, 0.f, "Sample", sampleChoices);
+		configSwitch(SAMPLE_PARAM, 0.f, (numSamples-1), 0.f, "Sample", sampleChoices);
 		configParam(PITCH_PARAM, -1.f, 1.f, 0.f, "Pitch", "%", 0.f, 100.f);
 		configParam(DECAY_PARAM, 0.f, 1.f, 1.f, "Decay", "s");
 		configParam(PUSH_PARAM, 0.f, 1.f, 0.f, "Trigger button");
@@ -104,7 +106,7 @@ struct Kick : Module {
 			kickLightBrightness = 1.0f;
 
 			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() + inputs[SAMPLECVIN_INPUT].getVoltage());
-			sampleIndex = clamp(sampleIndex, 0, 59);
+			sampleIndex = clamp(sampleIndex, 0, (numSamples-1));
 
 			currentSample = getSampleByIndex(sampleIndex);
 			sampleLength = getSampleLengthByIndex(sampleIndex);
