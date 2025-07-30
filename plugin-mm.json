@@ -1,5 +1,5 @@
 {
-"MetaModuleBrandName": "ROMplers",
+  "MetaModuleBrandName": "ROMplers",
   "MetaModuleBrandSlug": "4ms-ROMplers",
   "MetaModuleBrandAliases": ["4msROMplers", "ROMplers"],
   "MetaModulePluginMaintainer": "4ms Company",
@@ -9,76 +9,76 @@
   "MetaModuleIncludedModules":
   [
 	{
-		"slug": "KayOne",
-		"name": "KayOne"
-	},
-  {
-		"slug": "KayArr",
-		"name": "KayArr"
-	},
-  {
-		"slug": "AyysKing",
-		"name": "AyysKing"
-	},
-  {
-		"slug": "SinSahnix",
-		"name": "SinSahnix"
+	  "slug": "AyysKing",
+	  "name": "AyysKing"
 	},
 	{
-		"slug": "SicksOh",
-		"name": "SicksOh"
+	  "slug": "Clap",
+	  "name": "Clap"
 	},
 	{
-		"slug": "DeeArr",
-		"name": "DeeArr"
+	  "slug": "ClosedHat",
+	  "name": "ClosedHat"
 	},
 	{
-		"slug": "SeaArr",
-		"name": "SeaArr"
+	  "slug": "Crash",
+	  "name": "Crash"
 	},
 	{
-		"slug": "SehvenToo",
-		"name": "SehvenToo"
+	  "slug": "DeeArr",
+	  "name": "DeeArr"
 	},
 	{
-		"slug": "Kick",
-		"name": "Kick"
+	  "slug": "KayArr",
+	  "name": "KayArr"
 	},
 	{
-		"slug": "Snare",
-		"name": "Snare"
+	  "slug": "KayOne",
+	  "name": "KayOne"
 	},
 	{
-		"slug": "Tom",
-		"name": "Tom"
+	  "slug": "Kick",
+	  "name": "Kick"
 	},
 	{
-		"slug": "Percussion",
-		"name": "Percussion"
+	  "slug": "OpenHat",
+	  "name": "OpenHat"
 	},
 	{
-		"slug": "Ride",
-		"name": "Ride"
+	  "slug": "Percussion",
+	  "name": "Percussion"
 	},
 	{
-		"slug": "Rimshot",
-		"name": "Rimshot"
+	  "slug": "Ride",
+	  "name": "Ride"
 	},
 	{
-		"slug": "Clap",
-		"name": "Clap"
+	  "slug": "Rimshot",
+	  "name": "Rimshot"
 	},
 	{
-		"slug": "Crash",
-		"name": "Crash"
+	  "slug": "SeaArr",
+	  "name": "SeaArr"
 	},
 	{
-		"slug": "ClosedHat",
-		"name": "ClosedHat"
+	  "slug": "SehvenToo",
+	  "name": "SehvenToo"
 	},
 	{
-		"slug": "OpenHat",
-		"name": "OpenHat"
+	  "slug": "SicksOh",
+	  "name": "SicksOh"
+	},
+	{
+	  "slug": "SinSahnix",
+	  "name": "SinSahnix"
+	},
+	{
+	  "slug": "Snare",
+	  "name": "Snare"
+	},
+	{
+	  "slug": "Tom",
+	  "name": "Tom"
 	}
-]
+  ]  
 }

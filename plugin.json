@@ -12,23 +12,8 @@
   "sourceUrl": "https://github.com/4ms/ROMplers/",
   "donateUrl": "",
   "changelogUrl": "https://github.com/4ms/ROMplers/blob/main/CHANGELOG.md",
-  "modules": [
-    {
-      "slug": "KayOne",
-      "name": "KayOne",
-      "description": "Casio SK-1 samples with playback speed, sample length, and looping.",
-      "tags": [
-        "Drum"
-      ]
-    },
-    {
-      "slug": "KayArr",
-      "name": "KayArr",
-      "description": "KR55 samples with playback speed, sample length, and looping.",
-      "tags": [
-        "Drum"
-      ]
-    },
+  "modules": 
+  [
     {
       "slug": "AyysKing",
       "name": "AyysKing",
@@ -38,17 +23,25 @@
       ]
     },
     {
-      "slug": "SinSahnix",
-      "name": "SinSahnix",
-      "description": "Synsonics samples with playback speed, sample length, and looping.",
+      "slug": "Clap",
+      "name": "Clap",
+      "description": "'Real' clap samples with playback speed, velocity, and a decay envelope",
       "tags": [
         "Drum"
       ]
     },
     {
-      "slug": "SicksOh",
-      "name": "SicksOh",
-      "description": "TR-606 samples with playback speed, sample length, and looping.\"",
+      "slug": "ClosedHat",
+      "name": "ClosedHat",
+      "description": "'Real' closed hi-hat samples with playback speed, velocity, and a decay envelope",
+      "tags": [
+        "Drum"
+      ]
+    },
+    {
+      "slug": "Crash",
+      "name": "Crash",
+      "description": "'Real' crash samples with playback speed, velocity, and a decay envelope",
       "tags": [
         "Drum"
       ]
@@ -62,17 +55,17 @@
       ]
     },
     {
-      "slug": "SeaArr",
-      "name": "SeaArr",
-      "description": "CR-78 samples with playback speed, sample length, looping, and direct outs.",
+      "slug": "KayArr",
+      "name": "KayArr",
+      "description": "KR55 samples with playback speed, sample length, and looping.",
       "tags": [
         "Drum"
       ]
     },
     {
-      "slug": "SehvenToo",
-      "name": "SehvenToo",
-      "description": "TR-727 samples with playback speed, sample length, looping, and direct outs.",
+      "slug": "KayOne",
+      "name": "KayOne",
+      "description": "Casio SK-1 samples with playback speed, sample length, and looping.",
       "tags": [
         "Drum"
       ]
@@ -86,17 +79,9 @@
       ]
     },
     {
-      "slug": "Snare",
-      "name": "Snare",
-      "description": "'Real' snare samples with playback speed, velocity, and a decay envelope",
-      "tags": [
-        "Drum"
-      ]
-    },
-    {
-      "slug": "Tom",
-      "name": "Tom",
-      "description": "'Real' tom samples with playback speed, velocity, and a decay envelope",
+      "slug": "OpenHat",
+      "name": "OpenHat",
+      "description": "'Real' open hi-hat samples with playback speed, velocity, and a decay envelope",
       "tags": [
         "Drum"
       ]
@@ -126,36 +111,52 @@
       ]
     },
     {
-      "slug": "Clap",
-      "name": "Clap",
-      "description": "'Real' clap samples with playback speed, velocity, and a decay envelope",
+      "slug": "SeaArr",
+      "name": "SeaArr",
+      "description": "CR-78 samples with playback speed, sample length, looping, and direct outs.",
       "tags": [
         "Drum"
       ]
     },
     {
-      "slug": "Crash",
-      "name": "Crash",
-      "description": "'Real' crash samples with playback speed, velocity, and a decay envelope",
+      "slug": "SehvenToo",
+      "name": "SehvenToo",
+      "description": "TR-727 samples with playback speed, sample length, looping, and direct outs.",
       "tags": [
         "Drum"
       ]
     },
     {
-      "slug": "ClosedHat",
-      "name": "ClosedHat",
-      "description": "'Real' closed hi-hat samples with playback speed, velocity, and a decay envelope",
+      "slug": "SicksOh",
+      "name": "SicksOh",
+      "description": "TR-606 samples with playback speed, sample length, and looping.\"",
       "tags": [
         "Drum"
       ]
     },
     {
-      "slug": "OpenHat",
-      "name": "OpenHat",
-      "description": "'Real' open hi-hat samples with playback speed, velocity, and a decay envelope",
+      "slug": "SinSahnix",
+      "name": "SinSahnix",
+      "description": "Synsonics samples with playback speed, sample length, and looping.",
+      "tags": [
+        "Drum"
+      ]
+    },
+    {
+      "slug": "Snare",
+      "name": "Snare",
+      "description": "'Real' snare samples with playback speed, velocity, and a decay envelope",
+      "tags": [
+        "Drum"
+      ]
+    },
+    {
+      "slug": "Tom",
+      "name": "Tom",
+      "description": "'Real' tom samples with playback speed, velocity, and a decay envelope",
       "tags": [
         "Drum"
       ]
     }
-  ]
+  ]  
 }

@@ -8,24 +8,25 @@ using namespace rack;
 extern Plugin* pluginInstance;
 
 // Declare each Model, defined in each module source file
-extern Model* modelKayOne;
-extern Model* modelKayArr;
 extern Model* modelAyysKing;
-extern Model* modelSinSahnix;
-extern Model* modelSicksOh;
+extern Model* modelClap;
+extern Model* modelClosedHat;
+extern Model* modelCrash;
 extern Model* modelDeeArr;
-extern Model* modelSeaArr;
-extern Model* modelSehvenToo;
+extern Model* modelKayArr;
+extern Model* modelKayOne;
 extern Model* modelKick;
-extern Model* modelSnare;
-extern Model* modelTom;
+extern Model* modelOpenHat;
 extern Model* modelPercussion;
 extern Model* modelRide;
 extern Model* modelRimshot;
-extern Model* modelClap;
-extern Model* modelCrash;
-extern Model* modelClosedHat;
-extern Model* modelOpenHat;
+extern Model* modelSeaArr;
+extern Model* modelSehvenToo;
+extern Model* modelSicksOh;
+extern Model* modelSinSahnix;
+extern Model* modelSnare;
+extern Model* modelTom;
+
 
 struct _9mmKnob : RoundKnob {
     _9mmKnob() {

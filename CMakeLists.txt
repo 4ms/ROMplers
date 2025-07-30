@@ -20,45 +20,48 @@ add_library(4ms-ROMplers STATIC)
 set(SOURCE_DIR .)
 
 target_sources(4ms-ROMplers PRIVATE
-    ${SOURCE_DIR}/src/KayOne.cpp                    # Note: this file contains init(rack::Plugin*
-    ${SOURCE_DIR}/src/KayArr.cpp       
-    ${SOURCE_DIR}/src/AyysKing.cpp        
-    ${SOURCE_DIR}/src/SinSahnix.cpp        
-    ${SOURCE_DIR}/src/SicksOh.cpp        
-    ${SOURCE_DIR}/src/DeeArr.cpp        
-    ${SOURCE_DIR}/src/SeaArr.cpp        
-    ${SOURCE_DIR}/src/SehvenToo.cpp     
-    ${SOURCE_DIR}/src/Kick.cpp     
-    ${SOURCE_DIR}/src/Snare.cpp     
-    ${SOURCE_DIR}/src/Tom.cpp     
-    ${SOURCE_DIR}/src/Percussion.cpp  
-    ${SOURCE_DIR}/src/Ride.cpp  
-    ${SOURCE_DIR}/src/Rimshot.cpp  
-    ${SOURCE_DIR}/src/Clap.cpp  
-    ${SOURCE_DIR}/src/Crash.cpp 
-    ${SOURCE_DIR}/src/ClosedHat.cpp 
-    ${SOURCE_DIR}/src/OpenHat.cpp 
-    ${SOURCE_DIR}/src/ClosedHatSamples.hpp                                          
-    ${SOURCE_DIR}/src/OpenHatSamples.hpp                                          
-    ${SOURCE_DIR}/src/CrashSamples.hpp                                          
-    ${SOURCE_DIR}/src/ClapSamples.hpp                                         
-    ${SOURCE_DIR}/src/RimshotSamples.hpp                                         
-    ${SOURCE_DIR}/src/RideSamples.hpp                                         
-    ${SOURCE_DIR}/src/TomSamples.hpp                                         
-    ${SOURCE_DIR}/src/PercussionSamples.hpp                                      
-    ${SOURCE_DIR}/src/SnareSamples.hpp                                      
-    ${SOURCE_DIR}/src/KickSamples.hpp                                      
-    ${SOURCE_DIR}/src/SehvenTooSamples.hpp                                      
-    ${SOURCE_DIR}/src/SeaArrSamples.hpp                                   
-    ${SOURCE_DIR}/src/DeeArrSamples.hpp                                   
-    ${SOURCE_DIR}/src/SicksOhSamples.hpp                                   
-    ${SOURCE_DIR}/src/SinSahnixSamples.hpp                                   
-    ${SOURCE_DIR}/src/AyysKingSamples.hpp                 
-    ${SOURCE_DIR}/src/KayOneSamples.hpp                 
-    ${SOURCE_DIR}/src/KayArrSamples.hpp        
+# Note: this file contains init(rack::Plugin*)
+
     ${SOURCE_DIR}/src/plugin.cpp        
     ${SOURCE_DIR}/src/plugin.hpp        
-    ) 
+
+    ${SOURCE_DIR}/src/AyysKing.cpp        
+    ${SOURCE_DIR}/src/AyysKingSamples.hpp                 
+    ${SOURCE_DIR}/src/Clap.cpp  
+    ${SOURCE_DIR}/src/ClapSamples.hpp                                         
+    ${SOURCE_DIR}/src/ClosedHat.cpp 
+    ${SOURCE_DIR}/src/ClosedHatSamples.hpp                                          
+    ${SOURCE_DIR}/src/Crash.cpp 
+    ${SOURCE_DIR}/src/CrashSamples.hpp                                          
+    ${SOURCE_DIR}/src/DeeArr.cpp        
+    ${SOURCE_DIR}/src/DeeArrSamples.hpp                                   
+    ${SOURCE_DIR}/src/KayArr.cpp       
+    ${SOURCE_DIR}/src/KayArrSamples.hpp        
+    ${SOURCE_DIR}/src/KayOne.cpp                    
+    ${SOURCE_DIR}/src/KayOneSamples.hpp                 
+    ${SOURCE_DIR}/src/Kick.cpp     
+    ${SOURCE_DIR}/src/KickSamples.hpp                                      
+    ${SOURCE_DIR}/src/OpenHat.cpp 
+    ${SOURCE_DIR}/src/OpenHatSamples.hpp                                          
+    ${SOURCE_DIR}/src/Percussion.cpp  
+    ${SOURCE_DIR}/src/PercussionSamples.hpp                                      
+    ${SOURCE_DIR}/src/Ride.cpp  
+    ${SOURCE_DIR}/src/RideSamples.hpp                                         
+    ${SOURCE_DIR}/src/Rimshot.cpp  
+    ${SOURCE_DIR}/src/RimshotSamples.hpp                                         
+    ${SOURCE_DIR}/src/SeaArr.cpp        
+    ${SOURCE_DIR}/src/SeaArrSamples.hpp                                   
+    ${SOURCE_DIR}/src/SehvenToo.cpp     
+    ${SOURCE_DIR}/src/SehvenTooSamples.hpp                                      
+    ${SOURCE_DIR}/src/SicksOh.cpp        
+    ${SOURCE_DIR}/src/SicksOhSamples.hpp                                   
+    ${SOURCE_DIR}/src/SinSahnix.cpp        
+    ${SOURCE_DIR}/src/SinSahnixSamples.hpp                                   
+    ${SOURCE_DIR}/src/Snare.cpp     
+    ${SOURCE_DIR}/src/SnareSamples.hpp                                      
+    ${SOURCE_DIR}/src/Tom.cpp     
+    ${SOURCE_DIR}/src/TomSamples.hpp                                         
+)
 
 # Add includes and compile options for source repo
 target_include_directories(4ms-ROMplers PRIVATE ${SOURCE_DIR}/src)
