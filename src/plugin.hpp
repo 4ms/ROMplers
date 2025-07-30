@@ -24,6 +24,7 @@ extern Model* modelSeaArr;
 extern Model* modelSehvenToo;
 extern Model* modelSicksOh;
 extern Model* modelSinSahnix;
+extern Model* modelSlap;
 extern Model* modelSnare;
 extern Model* modelTom;
 

@@ -24,6 +24,7 @@ p->addModel(modelSeaArr);
 p->addModel(modelSehvenToo);
 p->addModel(modelSicksOh);
 p->addModel(modelSinSahnix);
+p->addModel(modelSlap);
 p->addModel(modelSnare);
 p->addModel(modelTom);
 

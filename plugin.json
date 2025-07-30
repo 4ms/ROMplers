@@ -127,6 +127,14 @@
       ]
     },
     {
+      "slug": "Slap",
+      "name": "Slap",
+      "description": "The only bass sample anyone ever needs.",
+      "tags": [
+        "Synth Voice"
+      ]
+    },
+    {
       "slug": "SicksOh",
       "name": "SicksOh",
       "description": "TR-606 samples with playback speed, sample length, and looping.\"",
