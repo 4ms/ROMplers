@@ -92,6 +92,14 @@
       "tags": [
         "Drum"
       ]
+    },
+    {
+      "slug": "Tom",
+      "name": "Tom",
+      "description": "'Real' tom samples with playback speed, velocity, and a decay envelope",
+      "tags": [
+        "Drum"
+      ]
     }
   ]
 }

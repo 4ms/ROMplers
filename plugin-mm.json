@@ -47,6 +47,10 @@
 	{
 		"slug": "Snare",
 		"name": "Snare"
+	},
+	{
+		"slug": "Tom",
+		"name": "Tom"
 	}
 ]
 }
