@@ -34,7 +34,7 @@ struct Crash : Module {
 	float env = 0.f;
 	float lastTrigValue = 0.f;
 	float lastButtonValue = 0.f;
-	float kickLightBrightness = 0.f;
+	float CrashLightBrightness = 0.f;
 
 	const float MIN_PLAYBACK_SPEED = 0.01f;
 	const float MAX_PLAYBACK_SPEED = 2.0f;
@@ -91,7 +91,7 @@ struct Crash : Module {
 		bool triggered = trigRising || buttonRising;
 
 		if (triggered) {
-			kickLightBrightness = 1.0f;
+			CrashLightBrightness = 1.0f;
 
 			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() + inputs[SAMPLECVIN_INPUT].getVoltage());
 			sampleIndex = clamp(sampleIndex, 0, (numSamples-1));
@@ -105,8 +105,8 @@ struct Crash : Module {
 			env = 1.0f;
 		}
 
-		kickLightBrightness = std::max(0.f, kickLightBrightness - (float)(args.sampleTime * 10.f));
-		lights[CRASH_LIGHT].setBrightnessSmooth(kickLightBrightness, args.sampleTime);
+		CrashLightBrightness = std::max(0.f, CrashLightBrightness - (float)(args.sampleTime * 10.f));
+		lights[CRASH_LIGHT].setBrightnessSmooth(CrashLightBrightness, args.sampleTime);
 
 		float output = 0.f;
 

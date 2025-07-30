@@ -20,8 +20,6 @@ add_library(4ms-ROMplers STATIC)
 set(SOURCE_DIR .)
 
 target_sources(4ms-ROMplers PRIVATE
-# Note: this file contains init(rack::Plugin*)
-
     ${SOURCE_DIR}/src/plugin.cpp        
     ${SOURCE_DIR}/src/plugin.hpp        
 
