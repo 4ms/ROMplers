@@ -24,6 +24,8 @@ void init(Plugin* p) {
 	p->addModel(modelRimshot);
 	p->addModel(modelClap);
 	p->addModel(modelCrash);
+	p->addModel(modelClosedHat);
+	p->addModel(modelOpenHat);
 	// Any other plugin initialization may go here.
 	// As an alternative, consider lazy-loading assets and lookup tables when your module is created to reduce startup times of Rack.
 }

@@ -36,6 +36,10 @@ target_sources(4ms-ROMplers PRIVATE
     ${SOURCE_DIR}/src/Rimshot.cpp  
     ${SOURCE_DIR}/src/Clap.cpp  
     ${SOURCE_DIR}/src/Crash.cpp 
+    ${SOURCE_DIR}/src/ClosedHat.cpp 
+    ${SOURCE_DIR}/src/OpenHat.cpp 
+    ${SOURCE_DIR}/src/ClosedHatSamples.hpp                                          
+    ${SOURCE_DIR}/src/OpenHatSamples.hpp                                          
     ${SOURCE_DIR}/src/CrashSamples.hpp                                          
     ${SOURCE_DIR}/src/ClapSamples.hpp                                         
     ${SOURCE_DIR}/src/RimshotSamples.hpp                                         

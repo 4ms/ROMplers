@@ -24,6 +24,8 @@ extern Model* modelRide;
 extern Model* modelRimshot;
 extern Model* modelClap;
 extern Model* modelCrash;
+extern Model* modelClosedHat;
+extern Model* modelOpenhat;
 
 struct _9mmKnob : RoundKnob {
     _9mmKnob() {

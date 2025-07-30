@@ -140,6 +140,22 @@
       "tags": [
         "Drum"
       ]
+    },
+    {
+      "slug": "ClosedHat",
+      "name": "ClosedHat",
+      "description": "'Real' closed hi-hat samples with playback speed, velocity, and a decay envelope",
+      "tags": [
+        "Drum"
+      ]
+    },
+    {
+      "slug": "OpenHat",
+      "name": "OpenHat",
+      "description": "'Real' open hi-hat samples with playback speed, velocity, and a decay envelope",
+      "tags": [
+        "Drum"
+      ]
     }
   ]
 }

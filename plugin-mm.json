@@ -71,6 +71,14 @@
 	{
 		"slug": "Crash",
 		"name": "Crash"
+	},
+	{
+		"slug": "ClosedHat",
+		"name": "ClosedHat"
+	},
+	{
+		"slug": "OpenHat",
+		"name": "OpenHat"
 	}
 ]
 }
