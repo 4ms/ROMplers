@@ -31,7 +31,7 @@
      inkscape:window-x="104"
      inkscape:window-y="25"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer2" />
+     inkscape:current-layer="layer1" />
   <defs
      id="defs1" />
   <g
@@ -127,7 +127,7 @@
        cx="10.16"
        cy="89.34166"
        r="1.5"
-       inkscape:label="KickPush" />
+       inkscape:label="Push" />
     <circle
        style="fill:#00ff00;stroke-width:0.349999;stroke-linecap:square;stroke-linejoin:round;paint-order:markers fill stroke"
        id="path1-2-5"

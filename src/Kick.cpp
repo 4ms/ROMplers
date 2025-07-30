@@ -6,7 +6,7 @@ struct Kick : Module {
 		SAMPLE_PARAM,
 		PITCH_PARAM,
 		DECAY_PARAM,
-		KICKPUSH_PARAM,
+		PUSH_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -47,7 +47,7 @@ struct Kick : Module {
 		configSwitch(SAMPLE_PARAM, 0.f, 59.f, 0.f, "Sample", sampleChoices);
 		configParam(PITCH_PARAM, -1.f, 1.f, 0.f, "Pitch", "%", 0.f, 100.f);
 		configParam(DECAY_PARAM, 0.f, 1.f, 1.f, "Decay", "s");
-		configParam(KICKPUSH_PARAM, 0.f, 1.f, 0.f, "Trigger button");
+		configParam(PUSH_PARAM, 0.f, 1.f, 0.f, "Trigger button");
 		configInput(SAMPLECVIN_INPUT, "Sample CV");
 		configInput(PITCHCVIN_INPUT, "Pitch CV");
 		configInput(DECAYCVIN_INPUT, "Decay CV");
@@ -90,7 +90,7 @@ struct Kick : Module {
 
 	void process(const ProcessArgs& args) override {
 		float trigIn = inputs[TRIGIN_INPUT].getVoltage();
-		float buttonIn = params[KICKPUSH_PARAM].getValue();
+		float buttonIn = params[PUSH_PARAM].getValue();
 
 		bool trigRising = (lastTrigValue <= 1.f && trigIn > 1.f);
 		bool buttonRising = (lastButtonValue <= 0.5f && buttonIn > 0.5f);
@@ -186,7 +186,7 @@ struct KickWidget : ModuleWidget {
 		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 15.971)), module, Kick::SAMPLE_PARAM));
 		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 39.997)), module, Kick::PITCH_PARAM));
 		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 64.029)), module, Kick::DECAY_PARAM));
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 89.342)), module, Kick::KICKPUSH_PARAM));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 89.342)), module, Kick::PUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(10.16, 89.342)), module, Kick::KICK_LIGHT));
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 29.578)), module, Kick::SAMPLECVIN_INPUT));
