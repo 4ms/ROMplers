@@ -14,6 +14,7 @@ struct Kick : Module {
 		PITCHCVIN_INPUT,
 		DECAYCVIN_INPUT,
 		TRIGIN_INPUT,
+		VOLCVIN_INPUT,
 		INPUTS_LEN
 	};
 	enum OutputId {
@@ -50,6 +51,7 @@ struct Kick : Module {
 		configInput(SAMPLECVIN_INPUT, "Sample CV");
 		configInput(PITCHCVIN_INPUT, "Pitch CV");
 		configInput(DECAYCVIN_INPUT, "Decay CV");
+		configInput(VOLCVIN_INPUT, "Volume CV");
 		configInput(TRIGIN_INPUT, "Trig");
 		configOutput(AUDIOOUT_OUTPUT, "Audio output");
 	}
@@ -163,8 +165,14 @@ struct Kick : Module {
 			}
 		}
 
-		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.0f);
-	}
+float volumeCV = 5.f;
+if (inputs[VOLCVIN_INPUT].isConnected()) {
+	volumeCV = clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
+}
+
+output *= volumeCV / 5.f;
+
+outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.0f);	}
 };
 
 struct KickWidget : ModuleWidget {
@@ -175,18 +183,19 @@ struct KickWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 21.792)), module, Kick::SAMPLE_PARAM));
-		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 45.818)), module, Kick::PITCH_PARAM));
-		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 69.85)), module, Kick::DECAY_PARAM));
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 95.162)), module, Kick::KICKPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(10.16, 95.162)), module, Kick::KICK_LIGHT));
+		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 15.971)), module, Kick::SAMPLE_PARAM));
+		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 39.997)), module, Kick::PITCH_PARAM));
+		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 64.029)), module, Kick::DECAY_PARAM));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 89.342)), module, Kick::KICKPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(10.16, 89.342)), module, Kick::KICK_LIGHT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 35.399)), module, Kick::SAMPLECVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 59.903)), module, Kick::PITCHCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 85.479)), module, Kick::DECAYCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.469, 113.419)), module, Kick::TRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 29.578)), module, Kick::SAMPLECVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 54.083)), module, Kick::PITCHCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 79.658)), module, Kick::DECAYCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.469, 105.481)), module, Kick::TRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.994, 105.481)), module, Kick::VOLCVIN_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(16.317, 113.419)), module, Kick::AUDIOOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.16, 119.24)), module, Kick::AUDIOOUT_OUTPUT));
 	}
 };
 
