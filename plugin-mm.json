@@ -43,6 +43,10 @@
 	{
 		"slug": "Kick",
 		"name": "Kick"
+	},
+	{
+		"slug": "Snare",
+		"name": "Snare"
 	}
 ]
 }

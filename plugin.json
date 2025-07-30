@@ -80,7 +80,15 @@
     {
       "slug": "Kick",
       "name": "Kick",
-      "description": "'Real' kick samples with playback speed and a decay envelope",
+      "description": "'Real' kick samples with playback speed, velocity, and a decay envelope",
+      "tags": [
+        "Drum"
+      ]
+    },
+    {
+      "slug": "Snare",
+      "name": "Snare",
+      "description": "'Real' snare samples with playback speed, velocity, and a decay envelope",
       "tags": [
         "Drum"
       ]
