@@ -63,6 +63,10 @@
 	{
 		"slug": "Rimshot",
 		"name": "Rimshot"
+	},
+	{
+		"slug": "Clap",
+		"name": "Clap"
 	}
 ]
 }

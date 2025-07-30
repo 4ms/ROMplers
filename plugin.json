@@ -124,6 +124,14 @@
       "tags": [
         "Drum"
       ]
+    },
+    {
+      "slug": "Clap",
+      "name": "Clap",
+      "description": "'Real' clap samples with playback speed, velocity, and a decay envelope",
+      "tags": [
+        "Drum"
+      ]
     }
   ]
 }
