@@ -59,6 +59,10 @@
 	{
 		"slug": "Ride",
 		"name": "Ride"
+	},
+	{
+		"slug": "Rimshot",
+		"name": "Rimshot"
 	}
 ]
 }

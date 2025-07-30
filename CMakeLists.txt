@@ -33,6 +33,8 @@ target_sources(4ms-ROMplers PRIVATE
     ${SOURCE_DIR}/src/Tom.cpp     
     ${SOURCE_DIR}/src/Percussion.cpp  
     ${SOURCE_DIR}/src/Ride.cpp  
+    ${SOURCE_DIR}/src/Rimshot.cpp  
+    ${SOURCE_DIR}/src/RimshotSamples.hpp                                         
     ${SOURCE_DIR}/src/RideSamples.hpp                                         
     ${SOURCE_DIR}/src/TomSamples.hpp                                         
     ${SOURCE_DIR}/src/PercussionSamples.hpp                                      

@@ -112,7 +112,15 @@
     {
       "slug": "Ride",
       "name": "Ride",
-      "description": "'Real' Ride samples with playback speed, velocity, and a decay envelope",
+      "description": "'Real' ride samples with playback speed, velocity, and a decay envelope",
+      "tags": [
+        "Drum"
+      ]
+    },
+    {
+      "slug": "Rimshot",
+      "name": "Rimshot",
+      "description": "'Real' rimshot samples with playback speed, velocity, and a decay envelope",
       "tags": [
         "Drum"
       ]
