@@ -26,8 +26,11 @@ struct Clap : Module {
 		LIGHTS_LEN
 	};
 
-	const unsigned char* currentSample = nullptr;
-	int sampleLength = 0;
+	// Pre-decoded sample buffer (float samples)
+	std::vector<float> decodedSample;
+	const float* currentSampleFloat = nullptr;
+	int decodedSampleLength = 0;
+
 	float samplePos = 0.f;
 	bool playing = false;
 
@@ -46,7 +49,7 @@ struct Clap : Module {
 		std::vector<std::string> sampleChoices;
 		for (int i = 1; i <= numSamples; ++i)
 			sampleChoices.push_back(std::to_string(i));
-		configSwitch(SAMPLE_PARAM, 0.f, (numSamples-1), 0.f, "Sample", sampleChoices);
+		configSwitch(SAMPLE_PARAM, 0.f, (numSamples - 1), 0.f, "Sample", sampleChoices);
 		configParam(PITCH_PARAM, -1.f, 1.f, 0.f, "Pitch", "%", 0.f, 100.f);
 		configParam(DECAY_PARAM, 0.f, 1.f, 1.f, "Decay", "s");
 		configParam(PUSH_PARAM, 0.f, 1.f, 0.f, "Trigger button");
@@ -60,18 +63,56 @@ struct Clap : Module {
 
 	const unsigned char* getSampleByIndex(int index) {
 		switch (index) {
-			case 0: return Clap1; case 1: return Clap2; case 2: return Clap3; case 3: return Clap4; case 4: return Clap5; case 5: return Clap6;
-			case 6: return Clap7; case 7: return Clap8; case 8: return Clap9;
+			case 0: return Clap1;
+			case 1: return Clap2;
+			case 2: return Clap3;
+			case 3: return Clap4;
+			case 4: return Clap5;
+			case 5: return Clap6;
+			case 6: return Clap7;
+			case 7: return Clap8;
+			case 8: return Clap9;
 			default: return nullptr;
 		}
 	}
 
 	int getSampleLengthByIndex(int index) {
 		switch (index) {
-			case 0: return Clap1_len; case 1: return Clap2_len; case 2: return Clap3_len; case 3: return Clap4_len; case 4: return Clap5_len; case 5: return Clap6_len;
-			case 6: return Clap7_len; case 7: return Clap8_len; case 8: return Clap9_len;
+			case 0: return Clap1_len;
+			case 1: return Clap2_len;
+			case 2: return Clap3_len;
+			case 3: return Clap4_len;
+			case 4: return Clap5_len;
+			case 5: return Clap6_len;
+			case 6: return Clap7_len;
+			case 7: return Clap8_len;
+			case 8: return Clap9_len;
 			default: return 0;
 		}
+	}
+
+	// Predecode sample bytes to float buffer once per sample change
+	void loadSample(int index) {
+		const unsigned char* sampleData = getSampleByIndex(index);
+		int length = getSampleLengthByIndex(index);
+
+		if (!sampleData || length < 2) {
+			currentSampleFloat = nullptr;
+			decodedSampleLength = 0;
+			decodedSample.clear();
+			return;
+		}
+
+		int numSamplesInt = length / 2;
+		decodedSample.resize(numSamplesInt);
+
+		for (int i = 0; i < numSamplesInt; ++i) {
+			int16_t s = (int16_t)(sampleData[i * 2] | (sampleData[i * 2 + 1] << 8));
+			decodedSample[i] = (float)s / 32768.f;
+		}
+
+		currentSampleFloat = decodedSample.data();
+		decodedSampleLength = numSamplesInt;
 	}
 
 	void process(const ProcessArgs& args) override {
@@ -90,13 +131,12 @@ struct Clap : Module {
 			ClapLightBrightness = 1.0f;
 
 			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() + inputs[SAMPLECVIN_INPUT].getVoltage());
-			sampleIndex = clamp(sampleIndex, 0, (numSamples-1));
+			sampleIndex = clamp(sampleIndex, 0, numSamples - 1);
 
-			currentSample = getSampleByIndex(sampleIndex);
-			sampleLength = getSampleLengthByIndex(sampleIndex);
+			loadSample(sampleIndex);
+
 			samplePos = 0.f;
-
-			playing = (currentSample != nullptr && sampleLength > 1);
+			playing = (currentSampleFloat != nullptr && decodedSampleLength > 1);
 
 			env = 1.0f;
 		}
@@ -106,59 +146,49 @@ struct Clap : Module {
 
 		float output = 0.f;
 
-		if (playing && currentSample) {
-			float pitchMod = params[PITCH_PARAM].getValue() + inputs[PITCHCVIN_INPUT].getVoltage();
-			pitchMod = clamp(pitchMod, -1.f, 1.f);
-
-			float normalizedPitch = (pitchMod + 1.f) / 2.f;
+		if (playing && currentSampleFloat) {
+			// Cache parameters once
+			float pitchMod = clamp(params[PITCH_PARAM].getValue() + inputs[PITCHCVIN_INPUT].getVoltage(), -1.f, 1.f);
+			float normalizedPitch = (pitchMod + 1.f) * 0.5f;
 			float pitchRatio = MIN_PLAYBACK_SPEED + normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
 
 			constexpr float sampleSampleRate = 44100.f;
 			float sampleRateRatio = sampleSampleRate / args.sampleRate;
 
+			float decayParam = clamp(params[DECAY_PARAM].getValue() + inputs[DECAYCVIN_INPUT].getVoltage(), 0.f, 1.f);
+			float minDecayTime = 0.005f;
+			float maxDecayTime = (float)decodedSampleLength / sampleSampleRate;
+			float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
+			float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
+
+			// Advance sample position
 			samplePos += pitchRatio * sampleRateRatio;
 
-			int numSamples = sampleLength / 2;
-
-			if ((int)samplePos >= numSamples) {
+			if ((int)samplePos >= decodedSampleLength) {
 				playing = false;
 			} else {
 				int idx = (int)samplePos;
-				int nextIdx = (idx + 1 < numSamples) ? idx + 1 : idx;
+				int nextIdx = (idx + 1 < decodedSampleLength) ? idx + 1 : idx;
 				float frac = samplePos - idx;
 
-				int16_t s1s = (int16_t)(currentSample[idx * 2] | (currentSample[idx * 2 + 1] << 8));
-				int16_t s2s = (int16_t)(currentSample[nextIdx * 2] | (currentSample[nextIdx * 2 + 1] << 8));
+				// Linear interpolate between floats (predecoded)
+				float sampleValue = currentSampleFloat[idx] + frac * (currentSampleFloat[nextIdx] - currentSampleFloat[idx]);
 
-				float s1 = (float)s1s / 32768.f;
-				float s2 = (float)s2s / 32768.f;
-
-				float sampleValue = s1 + frac * (s2 - s1);
-
-				float decayParam = params[DECAY_PARAM].getValue() + inputs[DECAYCVIN_INPUT].getVoltage();
-				decayParam = clamp(decayParam, 0.f, 1.f);
-
-				float minDecayTime = 0.005f;
-				float maxDecayTime = (float)numSamples / sampleSampleRate;
-
-				float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
-
-				float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
-
-				env = env * decayCoef;
+				env *= decayCoef;
 
 				output = sampleValue * env;
 			}
 		}
 
-float volumeCV = 5.f;
-if (inputs[VOLCVIN_INPUT].isConnected()) {
-	volumeCV = clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
-}
+		float volumeCV = 5.f;
+		if (inputs[VOLCVIN_INPUT].isConnected()) {
+			volumeCV = clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
+		}
 
-output *= volumeCV / 5.f;
+		output *= volumeCV / 5.f;
 
-outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.0f);	}
+		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.0f);
+	}
 };
 
 struct ClapWidget : ModuleWidget {
