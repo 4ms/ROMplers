@@ -91,90 +91,79 @@ struct Kick : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		float trigIn = inputs[TRIGIN_INPUT].getVoltage();
-		float buttonIn = params[PUSH_PARAM].getValue();
-
-		bool trigRising = (lastTrigValue <= 1.f && trigIn > 1.f);
-		bool buttonRising = (lastButtonValue <= 0.5f && buttonIn > 0.5f);
-
+		const float trigIn = inputs[TRIGIN_INPUT].getVoltage();
+		const float buttonIn = params[PUSH_PARAM].getValue();
+	
+		const bool trigRising = (lastTrigValue <= 1.f && trigIn > 1.f);
+		const bool buttonRising = (lastButtonValue <= 0.5f && buttonIn > 0.5f);
 		lastTrigValue = trigIn;
 		lastButtonValue = buttonIn;
-
-		bool triggered = trigRising || buttonRising;
-
-		if (triggered) {
-			kickLightBrightness = 1.0f;
-
-			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() + inputs[SAMPLECVIN_INPUT].getVoltage());
-			sampleIndex = clamp(sampleIndex, 0, (numSamples-1));
-
+	
+		if (trigRising || buttonRising) {
+			kickLightBrightness = 1.f;
+	
+			int sampleIndex = (int)(params[SAMPLE_PARAM].getValue() + 0.5f);  // avoid rounding unless needed
+			if (inputs[SAMPLECVIN_INPUT].isConnected())
+				sampleIndex += (int)(inputs[SAMPLECVIN_INPUT].getVoltage());
+	
+			sampleIndex = clamp(sampleIndex, 0, numSamples - 1);
 			currentSample = getSampleByIndex(sampleIndex);
 			sampleLength = getSampleLengthByIndex(sampleIndex);
 			samplePos = 0.f;
-
-			playing = (currentSample != nullptr && sampleLength > 1);
-
-			env = 1.0f;
+			playing = (currentSample && sampleLength > 1);
+			env = 1.f;
 		}
-
-		kickLightBrightness = std::max(0.f, kickLightBrightness - (float)(args.sampleTime * 10.f));
-		lights[KICK_LIGHT].setBrightnessSmooth(kickLightBrightness, args.sampleTime);
-
+	
+		kickLightBrightness -= args.sampleTime * 10.f;
+		if (kickLightBrightness < 0.f) kickLightBrightness = 0.f;
+		lights[KICK_LIGHT].setBrightness(kickLightBrightness);
+	
 		float output = 0.f;
-
+	
 		if (playing && currentSample) {
-			float pitchMod = params[PITCH_PARAM].getValue() + inputs[PITCHCVIN_INPUT].getVoltage();
+			float pitchMod = params[PITCH_PARAM].getValue();
+			if (inputs[PITCHCVIN_INPUT].isConnected())
+				pitchMod += inputs[PITCHCVIN_INPUT].getVoltage();
+	
 			pitchMod = clamp(pitchMod, -1.f, 1.f);
-
-			float normalizedPitch = (pitchMod + 1.f) / 2.f;
-			float pitchRatio = MIN_PLAYBACK_SPEED + normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
-
-			constexpr float sampleSampleRate = 44100.f;
-			float sampleRateRatio = sampleSampleRate / args.sampleRate;
-
-			samplePos += pitchRatio * sampleRateRatio;
-
-			int numSamples = sampleLength / 2;
-
-			if ((int)samplePos >= numSamples) {
+			float pitchRatio = MIN_PLAYBACK_SPEED + (pitchMod + 1.f) * 0.5f * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
+	
+			samplePos += pitchRatio * (44100.f / args.sampleRate);
+			const int numSamps = sampleLength >> 1;  // divide by 2
+	
+			if ((int)samplePos >= numSamps) {
 				playing = false;
 			} else {
 				int idx = (int)samplePos;
-				int nextIdx = (idx + 1 < numSamples) ? idx + 1 : idx;
+				int nextIdx = (idx + 1 < numSamps) ? idx + 1 : idx;
 				float frac = samplePos - idx;
-
-				int16_t s1s = (int16_t)(currentSample[idx * 2] | (currentSample[idx * 2 + 1] << 8));
-				int16_t s2s = (int16_t)(currentSample[nextIdx * 2] | (currentSample[nextIdx * 2 + 1] << 8));
-
-				float s1 = (float)s1s / 32768.f;
-				float s2 = (float)s2s / 32768.f;
-
-				float sampleValue = s1 + frac * (s2 - s1);
-
-				float decayParam = params[DECAY_PARAM].getValue() + inputs[DECAYCVIN_INPUT].getVoltage();
+	
+				const uint8_t* s = currentSample;
+				int16_t s1 = (int16_t)(s[idx * 2] | (s[idx * 2 + 1] << 8));
+				int16_t s2 = (int16_t)(s[nextIdx * 2] | (s[nextIdx * 2 + 1] << 8));
+	
+				float sampleValue = ((float)s1 + frac * (s2 - s1)) / 32768.f;
+	
+				float decayParam = params[DECAY_PARAM].getValue();
+				if (inputs[DECAYCVIN_INPUT].isConnected())
+					decayParam += inputs[DECAYCVIN_INPUT].getVoltage();
+	
 				decayParam = clamp(decayParam, 0.f, 1.f);
-
-				float minDecayTime = 0.005f;
-				float maxDecayTime = (float)numSamples / sampleSampleRate;
-
-				float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
-
-				float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
-
-				env = env * decayCoef;
-
+				const float decayTime = 0.005f + decayParam * ((float)numSamps / 44100.f - 0.005f);
+				const float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
+	
+				env *= decayCoef;
 				output = sampleValue * env;
 			}
 		}
-
-float volumeCV = 5.f;
-if (inputs[VOLCVIN_INPUT].isConnected()) {
-	volumeCV = clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
-}
-
-output *= volumeCV / 5.f;
-
-outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.0f);	}
+	
+		// Volume CV scaling
+		float volume = 1.f;
+		if (inputs[VOLCVIN_INPUT].isConnected())
+			volume = clamp(inputs[VOLCVIN_INPUT].getVoltage() / 5.f, 0.f, 1.f);
+	
+		outputs[AUDIOOUT_OUTPUT].setVoltage(output * volume * 5.f);
+	}	
 };
 
 struct KickWidget : ModuleWidget {
