@@ -149,25 +149,24 @@ struct SicksOh : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
+		// Precompute speed (scaled with CV), clamp and map to range
 		float knobSpeed = 0.01f + params[SPEED_PARAM].getValue() * (1.0f - 0.01f);
 		float speedCV = clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -5.f, 5.f);
-		float speedOffset = (speedCV / 5.f) * 0.5f;
-		float normSpeed = clamp(knobSpeed + speedOffset, 0.01f, 1.0f);
+		float normSpeed = clamp(knobSpeed + (speedCV / 5.f) * 0.5f, 0.01f, 1.0f);
 		float speed = SPEED_LOW + (normSpeed - 0.01f) * ((SPEED_HIGH - SPEED_LOW) / (1.0f - 0.01f));
-
+	
+		// Precompute length ratio similarly
 		float knobLength = params[LENGTH_PARAM].getValue();
 		float lengthCV = clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -5.f, 5.f);
-		float lengthOffset = (lengthCV / 5.f) * 0.5f;
-		float normLength = clamp(knobLength + lengthOffset, 0.1f, 1.0f);
+		float normLength = clamp(knobLength + (lengthCV / 5.f) * 0.5f, 0.1f, 1.0f);
 		float lengthRatio = LENGTH_MIN + (normLength - 0.1f) * ((LENGTH_MAX - LENGTH_MIN) / (1.0f - 0.1f));
-
+	
+		// Loop enabled logic
 		bool baseLoop = params[LOOP_PARAM].getValue() > 0.5f;
-		bool loopEnabled = baseLoop;
-
 		float loopCV = inputs[LOOPCVIN_INPUT].getVoltage();
-		if (!baseLoop && loopCV > 1.f) loopEnabled = true;
-		else if (baseLoop && loopCV < -1.f) loopEnabled = false;
-
+		bool loopEnabled = baseLoop || (!baseLoop && loopCV > 1.f);
+	
+		// Process each voice
 		processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, speed, lengthRatio, loopEnabled);
 		processVoice(args, snareVoice, SNARETRIGIN_INPUT, SNAREPUSH_PARAM, speed, lengthRatio, loopEnabled);
 		processVoice(args, tomLoVoice, TOMLTRIGIN_INPUT, TOMLPUSH_PARAM, speed, lengthRatio, loopEnabled);
@@ -176,53 +175,54 @@ struct SicksOh : Module {
 		processVoice(args, openHatVoice, OHTRIGIN_INPUT, OHPUSH_PARAM, speed, lengthRatio, loopEnabled);
 		processVoice(args, cymVoice, CYMTRIGIN_INPUT, CYMPUSH_PARAM, speed, lengthRatio, loopEnabled);
 	}
-
-	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId, float speed, float lengthRatio, bool loopEnabled) {
+	
+	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId,
+					  float speed, float lengthRatio, bool loopEnabled) {
 		bool inputTrig = inputs[trigInputId].getVoltage() > 1.f;
 		bool buttonTrig = params[pushParamId].getValue() > 0.5f;
 	
 		bool inputRising = inputTrig && !voice.lastInputTrigger;
 		bool buttonRising = buttonTrig && !voice.lastButtonTrigger;
-	
-		if (inputRising || buttonRising) {
-			voice.playing = true;
-			voice.samplePos = 0.f;
-	
-			if (voice.lightId >= 0)
-				lights[voice.lightId].setBrightness(1.0f);  // instant light on trigger
-		}
+		bool triggered = inputRising || buttonRising;
 	
 		voice.lastInputTrigger = inputTrig;
 		voice.lastButtonTrigger = buttonTrig;
 	
-		if (loopEnabled && !voice.playing) {
+		// On trigger or loop restart, start playing
+		if (triggered || (loopEnabled && !voice.playing)) {
 			voice.playing = true;
 			voice.samplePos = 0.f;
+	
+			if (voice.lightId >= 0)
+				lights[voice.lightId].setBrightness(1.f); // instant light on trigger
+		}
+	
+		if (!voice.playing) {
+			outputs[voice.outputId].setVoltage(0.f);
+			return;  // Early exit if not playing: minimal CPU
 		}
 	
 		int maxSamples = (int)(voice.sampleLength * lengthRatio);
+		int idx = (int)voice.samplePos;
 	
-		if (voice.playing) {
-			int idx = (int)voice.samplePos;
-			if (idx < maxSamples) {
-				int16_t s = voice.readSample16(idx);
-				float out = (float)s / 32768.f;
-				outputs[voice.outputId].setVoltage(out * 5.f);
-				voice.samplePos += speed;
-			} else {
-				if (loopEnabled)
-					voice.samplePos = 0.f;
-				else {
-					voice.playing = false;
-					outputs[voice.outputId].setVoltage(0.f);
-				}
-			}
+		if (idx < maxSamples) {
+			int16_t sample = voice.readSample16(idx);
+			float out = (float)sample / 32768.f * 5.f;
+			outputs[voice.outputId].setVoltage(out);
+			voice.samplePos += speed;
 		} else {
-			outputs[voice.outputId].setVoltage(0.f);
+			if (loopEnabled)
+				voice.samplePos = 0.f;  // Loop restart
+			else {
+				voice.playing = false;
+				outputs[voice.outputId].setVoltage(0.f);
+			}
 		}
 	
-		if (voice.lightId >= 0)
-			lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);  // smooth fade
+		// Smooth light fade out only if playing
+		if (voice.lightId >= 0) {
+			lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
+		}
 	}	
 };
 
