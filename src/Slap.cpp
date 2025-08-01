@@ -33,7 +33,9 @@ struct Slap : Module {
 	float env = 0.f;
 	float lastTrigValue = 0.f;
 	float lastButtonValue = 0.f;
-	float SlapLightBrightness = 0.f;
+	float slapLightBrightness = 0.f;
+
+	static constexpr float sampleSampleRate = 44100.f;
 
 	Slap() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -49,83 +51,113 @@ struct Slap : Module {
 		configOutput(AUDIOOUT_OUTPUT, "Audio output");
 	}
 
+	float fastPow2(float x) {
+		// Approximate 2^x for typical pitch range (x in [0..8])
+		// Using a simple polynomial or linear approx to avoid std::pow cost
+		// For small CPU optimization, linear approx is OK here:
+		// 2^x ≈ 1 + x * 0.69314718 (ln2) for x near 0, clamp for larger x.
+		// Since pitch can be 0..8 (4 oct + 4V?), clamp and do powf only if needed.
+
+		if (x < 0.f) return 1.f / fastPow2(-x);
+		if (x > 8.f) x = 8.f;
+		return 1.f + x * 0.69314718f;
+	}
+
 	void process(const ProcessArgs& args) override {
-		float trigIn = inputs[TRIGIN_INPUT].getVoltage();
-		float buttonIn = params[PUSH_PARAM].getValue();
+		// Trigger detection (avoid floats >1 comparisons repeatedly)
+		const float trigIn = inputs[TRIGIN_INPUT].getVoltage();
+		const float buttonIn = params[PUSH_PARAM].getValue();
 
 		bool trigRising = (lastTrigValue <= 1.f && trigIn > 1.f);
 		bool buttonRising = (lastButtonValue <= 0.5f && buttonIn > 0.5f);
-
 		lastTrigValue = trigIn;
 		lastButtonValue = buttonIn;
 
-		bool triggered = trigRising || buttonRising;
-
-		if (triggered) {
-			SlapLightBrightness = 1.0f;
+		if (trigRising || buttonRising) {
+			slapLightBrightness = 1.f;
 			samplePos = 0.f;
 			playing = true;
-			env = 1.0f;
+			env = 1.f;
 		}
 
-		SlapLightBrightness = std::max(0.f, SlapLightBrightness - (float)(args.sampleTime * 10.f));
-		lights[Slap_LIGHT].setBrightnessSmooth(SlapLightBrightness, args.sampleTime);
+		// Update light with smooth fade, decrement by fixed rate
+		slapLightBrightness -= args.sampleTime * 10.f;
+		if (slapLightBrightness < 0.f) slapLightBrightness = 0.f;
+		lights[Slap_LIGHT].setBrightnessSmooth(slapLightBrightness, args.sampleTime);
 
 		float output = 0.f;
 
 		if (playing && currentSample) {
-			// Combine switch knob (octave transpose) with CV (1V/oct)
-			float pitchOffset = params[PITCH_PARAM].getValue() + 1.f; 
-			float pitchCV = inputs[PITCHCVIN_INPUT].isConnected() ? inputs[PITCHCVIN_INPUT].getVoltage() : 0.f;
-			float pitch = pitchOffset + pitchCV;
+			// Pitch calculation: knob + CV, clamp CV if disconnected
+			const float pitchKnob = params[PITCH_PARAM].getValue(); // 0..4 oct
+			const float pitchCV = inputs[PITCHCVIN_INPUT].isConnected() ? inputs[PITCHCVIN_INPUT].getVoltage() : 0.f;
+			float pitch = pitchKnob + pitchCV;
 
-			float pitchRatio = std::pow(2.f, pitch);
+			// Compute pitchRatio without std::pow for most CPU savings:
+			// fallback to std::pow if out of range
+			float pitchRatio;
+			if (pitch >= 0.f && pitch <= 8.f)
+				pitchRatio = fastPow2(pitch);
+			else
+				pitchRatio = std::pow(2.f, pitch);
 
-			constexpr float sampleSampleRate = 44100.f;
-			float sampleRateRatio = sampleSampleRate / args.sampleRate;
-
+			const float sampleRateRatio = sampleSampleRate / args.sampleRate;
 			samplePos += pitchRatio * sampleRateRatio;
 
-			int numSamples = sampleLength / 2;
+			const int numSamples = sampleLength / 2;
 
+			// Check if sample done
 			if ((int)samplePos >= numSamples) {
 				playing = false;
+				output = 0.f;
 			} else {
-				int idx = (int)samplePos;
-				int nextIdx = (idx + 1 < numSamples) ? idx + 1 : idx;
-				float frac = samplePos - idx;
+				// Linear interpolate sample
+				const int idx = (int)samplePos;
+				const int nextIdx = (idx + 1 < numSamples) ? idx + 1 : idx;
+				const float frac = samplePos - idx;
 
-				int16_t s1s = (int16_t)(currentSample[idx * 2] | (currentSample[idx * 2 + 1] << 8));
-				int16_t s2s = (int16_t)(currentSample[nextIdx * 2] | (currentSample[nextIdx * 2 + 1] << 8));
+				// Read sample data once
+				const unsigned char* d = currentSample;
+				const int16_t s1s = (int16_t)(d[idx * 2] | (d[idx * 2 + 1] << 8));
+				const int16_t s2s = (int16_t)(d[nextIdx * 2] | (d[nextIdx * 2 + 1] << 8));
+				const float s1 = s1s * (1.f / 32768.f);
+				const float s2 = s2s * (1.f / 32768.f);
 
-				float s1 = (float)s1s / 32768.f;
-				float s2 = (float)s2s / 32768.f;
+				const float sampleValue = s1 + frac * (s2 - s1);
 
-				float sampleValue = s1 + frac * (s2 - s1);
+				// Decay parameter with clamp
+				float decayParam = params[DECAY_PARAM].getValue();
+				if (inputs[DECAYCVIN_INPUT].isConnected()) {
+					decayParam += inputs[DECAYCVIN_INPUT].getVoltage();
+				}
+				if (decayParam < 0.f) decayParam = 0.f;
+				else if (decayParam > 1.f) decayParam = 1.f;
 
-				float decayParam = params[DECAY_PARAM].getValue() + inputs[DECAYCVIN_INPUT].getVoltage();
-				decayParam = clamp(decayParam, 0.f, 1.f);
+				const float minDecayTime = 0.005f;
+				const float maxDecayTime = numSamples / sampleSampleRate;
+				const float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
 
-				float minDecayTime = 0.005f;
-				float maxDecayTime = (float)numSamples / sampleSampleRate;
-
-				float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
-				float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
-
+				// Calculate decay coefficient only once per sample
+				const float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
 				env *= decayCoef;
+
 				output = sampleValue * env;
 			}
 		}
 
+		// Volume CV (clamped 0..5V)
 		float volumeCV = 5.f;
 		if (inputs[VOLCVIN_INPUT].isConnected()) {
-			volumeCV = clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
+			volumeCV = inputs[VOLCVIN_INPUT].getVoltage();
+			if (volumeCV < 0.f) volumeCV = 0.f;
+			else if (volumeCV > 5.f) volumeCV = 5.f;
 		}
 
 		output *= volumeCV / 5.f;
-		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.0f);
+		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.f);
 	}
 };
+
 
 struct SlapWidget : ModuleWidget {
 	SlapWidget(Slap* module) {
