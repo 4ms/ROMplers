@@ -39,6 +39,8 @@ struct Rimshot : Module {
 	const float MIN_PLAYBACK_SPEED = 0.01f;
 	const float MAX_PLAYBACK_SPEED = 2.0f;
 
+	constexpr static float sampleSampleRate = 44100.f; // constant
+
 	int numSamples = 9;
 
 	Rimshot() {
@@ -46,7 +48,7 @@ struct Rimshot : Module {
 		std::vector<std::string> sampleChoices;
 		for (int i = 1; i <= numSamples; ++i)
 			sampleChoices.push_back(std::to_string(i));
-		configSwitch(SAMPLE_PARAM, 0.f, (numSamples-1), 0.f, "Sample", sampleChoices);
+		configSwitch(SAMPLE_PARAM, 0.f, (numSamples - 1), 0.f, "Sample", sampleChoices);
 		configParam(PITCH_PARAM, -1.f, 1.f, 0.f, "Pitch", "%", 0.f, 100.f);
 		configParam(DECAY_PARAM, 0.f, 1.f, 1.f, "Decay", "s");
 		configParam(PUSH_PARAM, 0.f, 1.f, 0.f, "Trigger button");
@@ -60,105 +62,99 @@ struct Rimshot : Module {
 
 	const unsigned char* getSampleByIndex(int index) {
 		switch (index) {
-			case 0: return Rimshot1; case 1: return Rimshot2; case 2: return Rimshot3; case 3: return Rimshot4; case 4: return Rimshot5; case 5: return Rimshot6;
-			case 6: return Rimshot7; case 7: return Rimshot8; case 8: return Rimshot9;
+			case 0: return Rimshot1; case 1: return Rimshot2; case 2: return Rimshot3; case 3: return Rimshot4; case 4: return Rimshot5;
+			case 5: return Rimshot6; case 6: return Rimshot7; case 7: return Rimshot8; case 8: return Rimshot9;
 			default: return nullptr;
 		}
 	}
 
 	int getSampleLengthByIndex(int index) {
 		switch (index) {
-			case 0: return Rimshot1_len; case 1: return Rimshot2_len; case 2: return Rimshot3_len; case 3: return Rimshot4_len; case 4: return Rimshot5_len; case 5: return Rimshot6_len;
-			case 6: return Rimshot7_len; case 7: return Rimshot8_len; case 8: return Rimshot9_len;
+			case 0: return Rimshot1_len; case 1: return Rimshot2_len; case 2: return Rimshot3_len; case 3: return Rimshot4_len; case 4: return Rimshot5_len;
+			case 5: return Rimshot6_len; case 6: return Rimshot7_len; case 7: return Rimshot8_len; case 8: return Rimshot9_len;
 			default: return 0;
 		}
 	}
 
 	void process(const ProcessArgs& args) override {
-		float trigIn = inputs[TRIGIN_INPUT].getVoltage();
-		float buttonIn = params[PUSH_PARAM].getValue();
+		const float trigIn = inputs[TRIGIN_INPUT].getVoltage();
+		const float buttonIn = params[PUSH_PARAM].getValue();
 
-		bool trigRising = (lastTrigValue <= 1.f && trigIn > 1.f);
-		bool buttonRising = (lastButtonValue <= 0.5f && buttonIn > 0.5f);
+		const bool trigRising = (lastTrigValue <= 1.f && trigIn > 1.f);
+		const bool buttonRising = (lastButtonValue <= 0.5f && buttonIn > 0.5f);
 
 		lastTrigValue = trigIn;
 		lastButtonValue = buttonIn;
 
-		bool triggered = trigRising || buttonRising;
-
-		if (triggered) {
+		if (trigRising || buttonRising) {
 			RimshotLightBrightness = 1.0f;
 
 			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() + inputs[SAMPLECVIN_INPUT].getVoltage());
-			sampleIndex = clamp(sampleIndex, 0, (numSamples-1));
+			sampleIndex = clamp(sampleIndex, 0, numSamples - 1);
 
 			currentSample = getSampleByIndex(sampleIndex);
 			sampleLength = getSampleLengthByIndex(sampleIndex);
 			samplePos = 0.f;
 
 			playing = (currentSample != nullptr && sampleLength > 1);
-
 			env = 1.0f;
 		}
 
-		RimshotLightBrightness = std::max(0.f, RimshotLightBrightness - (float)(args.sampleTime * 10.f));
+		// Decay the light brightness smoothly, cheaper to do once per frame
+		if (RimshotLightBrightness > 0.f) {
+			RimshotLightBrightness -= args.sampleTime * 10.f;
+			if (RimshotLightBrightness < 0.f)
+				RimshotLightBrightness = 0.f;
+		}
 		lights[RIMSHOT_LIGHT].setBrightnessSmooth(RimshotLightBrightness, args.sampleTime);
 
 		float output = 0.f;
 
 		if (playing && currentSample) {
-			float pitchMod = params[PITCH_PARAM].getValue() + inputs[PITCHCVIN_INPUT].getVoltage();
-			pitchMod = clamp(pitchMod, -1.f, 1.f);
-
-			float normalizedPitch = (pitchMod + 1.f) / 2.f;
-			float pitchRatio = MIN_PLAYBACK_SPEED + normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
-
-			constexpr float sampleSampleRate = 44100.f;
-			float sampleRateRatio = sampleSampleRate / args.sampleRate;
+			// Cache parameters to avoid repeated calls & clamp once
+			float pitchMod = clamp(params[PITCH_PARAM].getValue() + inputs[PITCHCVIN_INPUT].getVoltage(), -1.f, 1.f);
+			const float normalizedPitch = 0.5f * (pitchMod + 1.f);
+			const float pitchRatio = MIN_PLAYBACK_SPEED + normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
+			const float sampleRateRatio = sampleSampleRate / args.sampleRate;
 
 			samplePos += pitchRatio * sampleRateRatio;
 
-			int numSamples = sampleLength / 2;
+			const int numSamples = sampleLength / 2;
 
-			if ((int)samplePos >= numSamples) {
+			const int idx = (int)samplePos;
+			if (idx >= numSamples) {
 				playing = false;
+				output = 0.f;
 			} else {
-				int idx = (int)samplePos;
-				int nextIdx = (idx + 1 < numSamples) ? idx + 1 : idx;
-				float frac = samplePos - idx;
+				const int nextIdx = (idx + 1 < numSamples) ? idx + 1 : idx;
+				const float frac = samplePos - idx;
 
-				int16_t s1s = (int16_t)(currentSample[idx * 2] | (currentSample[idx * 2 + 1] << 8));
-				int16_t s2s = (int16_t)(currentSample[nextIdx * 2] | (currentSample[nextIdx * 2 + 1] << 8));
+				// Load samples as int16_t
+				const int16_t s1 = (int16_t)(currentSample[idx * 2] | (currentSample[idx * 2 + 1] << 8));
+				const int16_t s2 = (int16_t)(currentSample[nextIdx * 2] | (currentSample[nextIdx * 2 + 1] << 8));
 
-				float s1 = (float)s1s / 32768.f;
-				float s2 = (float)s2s / 32768.f;
+				const float sampleValue = (float)s1 + frac * ((float)s2 - (float)s1);
+				const float normalizedSample = sampleValue * (1.f / 32768.f);
 
-				float sampleValue = s1 + frac * (s2 - s1);
+				float decayParam = clamp(params[DECAY_PARAM].getValue() + inputs[DECAYCVIN_INPUT].getVoltage(), 0.f, 1.f);
+				const float minDecayTime = 0.005f;
+				const float maxDecayTime = (float)numSamples / sampleSampleRate;
+				const float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
+				const float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
 
-				float decayParam = params[DECAY_PARAM].getValue() + inputs[DECAYCVIN_INPUT].getVoltage();
-				decayParam = clamp(decayParam, 0.f, 1.f);
+				env *= decayCoef;
 
-				float minDecayTime = 0.005f;
-				float maxDecayTime = (float)numSamples / sampleSampleRate;
-
-				float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
-
-				float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
-
-				env = env * decayCoef;
-
-				output = sampleValue * env;
+				output = normalizedSample * env;
 			}
 		}
 
-float volumeCV = 5.f;
-if (inputs[VOLCVIN_INPUT].isConnected()) {
-	volumeCV = clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
-}
+		float volumeCV = 5.f;
+		if (inputs[VOLCVIN_INPUT].isConnected())
+			volumeCV = clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
 
-output *= volumeCV / 5.f;
-
-outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.0f);	}
+		output *= (volumeCV / 5.f);
+		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.0f);
+	}
 };
 
 struct RimshotWidget : ModuleWidget {

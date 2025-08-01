@@ -77,90 +77,104 @@ struct Ride : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		float trigIn = inputs[TRIGIN_INPUT].getVoltage();
-		float buttonIn = params[PUSH_PARAM].getValue();
-
-		bool trigRising = (lastTrigValue <= 1.f && trigIn > 1.f);
-		bool buttonRising = (lastButtonValue <= 0.5f && buttonIn > 0.5f);
-
+		// Cache sample time and sample rate for efficiency
+		const float sampleTime = args.sampleTime;
+		const float sampleRate = args.sampleRate;
+	
+		// Trigger detection (rising edge on trig or button)
+		const float trigIn = inputs[TRIGIN_INPUT].getVoltage();
+		const float buttonIn = params[PUSH_PARAM].getValue();
+	
+		const bool trigRising = (lastTrigValue <= 1.f && trigIn > 1.f);
+		const bool buttonRising = (lastButtonValue <= 0.5f && buttonIn > 0.5f);
+	
 		lastTrigValue = trigIn;
 		lastButtonValue = buttonIn;
-
-		bool triggered = trigRising || buttonRising;
-
-		if (triggered) {
-			RideLightBrightness = 1.0f;
-
+	
+		if (trigRising || buttonRising) {
+			RideLightBrightness = 1.f;
+	
+			// Determine sample index clamped to valid range
 			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() + inputs[SAMPLECVIN_INPUT].getVoltage());
-			sampleIndex = clamp(sampleIndex, 0, (numSamples-1));
-
+			sampleIndex = clamp(sampleIndex, 0, numSamples - 1);
+	
 			currentSample = getSampleByIndex(sampleIndex);
 			sampleLength = getSampleLengthByIndex(sampleIndex);
 			samplePos = 0.f;
-
+	
 			playing = (currentSample != nullptr && sampleLength > 1);
-
-			env = 1.0f;
+			env = 1.f;
 		}
-
-		RideLightBrightness = std::max(0.f, RideLightBrightness - (float)(args.sampleTime * 10.f));
-		lights[RIDE_LIGHT].setBrightnessSmooth(RideLightBrightness, args.sampleTime);
-
+	
+		// Light decay
+		RideLightBrightness -= sampleTime * 10.f;
+		if (RideLightBrightness < 0.f)
+			RideLightBrightness = 0.f;
+		lights[RIDE_LIGHT].setBrightnessSmooth(RideLightBrightness, sampleTime);
+	
 		float output = 0.f;
-
+	
 		if (playing && currentSample) {
+			// Pitch processing
 			float pitchMod = params[PITCH_PARAM].getValue() + inputs[PITCHCVIN_INPUT].getVoltage();
-			pitchMod = clamp(pitchMod, -1.f, 1.f);
-
-			float normalizedPitch = (pitchMod + 1.f) / 2.f;
+			pitchMod = (pitchMod < -1.f) ? -1.f : (pitchMod > 1.f ? 1.f : pitchMod);
+	
+			// Convert pitch modulation to playback speed ratio
+			float normalizedPitch = (pitchMod + 1.f) * 0.5f;
+			const float MIN_PLAYBACK_SPEED = 0.01f;
+			const float MAX_PLAYBACK_SPEED = 2.0f;
 			float pitchRatio = MIN_PLAYBACK_SPEED + normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
-
+	
 			constexpr float sampleSampleRate = 44100.f;
-			float sampleRateRatio = sampleSampleRate / args.sampleRate;
-
+			float sampleRateRatio = sampleSampleRate / sampleRate;
+	
 			samplePos += pitchRatio * sampleRateRatio;
-
-			int numSamples = sampleLength / 2;
-
-			if ((int)samplePos >= numSamples) {
+	
+			const int numSamplesInSample = sampleLength / 2; // 16-bit samples, 2 bytes each
+			if ((int)samplePos >= numSamplesInSample) {
 				playing = false;
 			} else {
 				int idx = (int)samplePos;
-				int nextIdx = (idx + 1 < numSamples) ? idx + 1 : idx;
+				int nextIdx = (idx + 1 < numSamplesInSample) ? idx + 1 : idx;
 				float frac = samplePos - idx;
-
-				int16_t s1s = (int16_t)(currentSample[idx * 2] | (currentSample[idx * 2 + 1] << 8));
-				int16_t s2s = (int16_t)(currentSample[nextIdx * 2] | (currentSample[nextIdx * 2 + 1] << 8));
-
-				float s1 = (float)s1s / 32768.f;
-				float s2 = (float)s2s / 32768.f;
-
-				float sampleValue = s1 + frac * (s2 - s1);
-
+	
+				// Read samples (little-endian)
+				int16_t s1 = (int16_t)(currentSample[idx * 2] | (currentSample[idx * 2 + 1] << 8));
+				int16_t s2 = (int16_t)(currentSample[nextIdx * 2] | (currentSample[nextIdx * 2 + 1] << 8));
+	
+				// Linear interpolation
+				float sampleValue = s1 * (1.f - frac) + s2 * frac;
+				sampleValue /= 32768.f;
+	
+				// Decay envelope
 				float decayParam = params[DECAY_PARAM].getValue() + inputs[DECAYCVIN_INPUT].getVoltage();
-				decayParam = clamp(decayParam, 0.f, 1.f);
-
-				float minDecayTime = 0.005f;
-				float maxDecayTime = (float)numSamples / sampleSampleRate;
-
+				decayParam = (decayParam < 0.f) ? 0.f : (decayParam > 1.f ? 1.f : decayParam);
+	
+				// Precalculate decay time range
+				constexpr float minDecayTime = 0.005f;
+				float maxDecayTime = (float)numSamplesInSample / sampleSampleRate;
 				float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
-
-				float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
-
-				env = env * decayCoef;
-
+	
+				// Calculate decay coefficient once per sample frame
+				float decayCoef = expf(-1.f / (decayTime * sampleRate));
+	
+				env *= decayCoef;
+	
 				output = sampleValue * env;
 			}
 		}
-
-float volumeCV = 5.f;
-if (inputs[VOLCVIN_INPUT].isConnected()) {
-	volumeCV = clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
-}
-
-output *= volumeCV / 5.f;
-
-outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.0f);	}
+	
+		// Volume CV processing (default to 1.0 if no input)
+		float volumeCV = 1.f;
+		if (inputs[VOLCVIN_INPUT].isConnected()) {
+			volumeCV = inputs[VOLCVIN_INPUT].getVoltage();
+			if (volumeCV < 0.f) volumeCV = 0.f;
+			else if (volumeCV > 5.f) volumeCV = 5.f;
+			volumeCV /= 5.f;
+		}
+	
+		outputs[AUDIOOUT_OUTPUT].setVoltage(output * volumeCV * 5.f);
+	}	
 };
 
 struct RideWidget : ModuleWidget {
