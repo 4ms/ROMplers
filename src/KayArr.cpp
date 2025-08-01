@@ -3,84 +3,51 @@
 
 struct KayArr : Module {
 	enum ParamId {
-		SPEED_PARAM,
-		LENGTH_PARAM,
-		LOOP_PARAM,
-		KICKPUSH_PARAM,
-		SNAREPUSH_PARAM,
-		TOMPUSH_PARAM,
-		CLPUSH_PARAM,
-		OHPUSH_PARAM,
-		CLAVEPUSH_PARAM,
-		RIMSHOTPUSH_PARAM,
-		COWBELLPUSH_PARAM,
-		CYMPUSH_PARAM,
-		CONGAPUSH_PARAM,
-		PARAMS_LEN
+		SPEED_PARAM, LENGTH_PARAM, LOOP_PARAM,
+		KICKPUSH_PARAM, SNAREPUSH_PARAM, TOMPUSH_PARAM,
+		CLPUSH_PARAM, OHPUSH_PARAM, CLAVEPUSH_PARAM,
+		RIMSHOTPUSH_PARAM, COWBELLPUSH_PARAM, CYMPUSH_PARAM,
+		CONGAPUSH_PARAM, PARAMS_LEN
 	};
 	enum InputId {
-		SPEEDCVIN_INPUT,
-		LENGTHCVIN_INPUT,
-		LOOPCVIN_INPUT,
-		KICKTRIGIN_INPUT,
-		SNARETRIGIN_INPUT,
-		TOMTRIG_INPUT,
-		CLTRIG_INPUT,
-		OHTRIG_INPUT,
-		CLAVETRIG_INPUT,
-		RIMSHOTTRIG_INPUT,
-		COWBELLTRIG_INPUT,
-		CYMBALTRIG_INPUT,
-		CONGATRIG_INPUT,
-		INPUTS_LEN
+		SPEEDCVIN_INPUT, LENGTHCVIN_INPUT, LOOPCVIN_INPUT,
+		KICKTRIGIN_INPUT, SNARETRIGIN_INPUT, TOMTRIG_INPUT,
+		CLTRIG_INPUT, OHTRIG_INPUT, CLAVETRIG_INPUT,
+		RIMSHOTTRIG_INPUT, COWBELLTRIG_INPUT, CYMBALTRIG_INPUT,
+		CONGATRIG_INPUT, INPUTS_LEN
 	};
 	enum OutputId {
-		KICKOUT_OUTPUT,
-		SNAREOUT_OUTPUT,
-		TOMOUT_OUTPUT,
-		CLOUT_OUTPUT,
-		OHOUT_OUTPUT,
-		CLAVEOUT_OUTPUT,
-		RIMSHOTOUT_OUTPUT,
-		COWBELLOUT_OUTPUT,
-		CYMBALOUT_OUTPUT,
-		CONGAOUT_OUTPUT,
-		OUTPUTS_LEN
+		KICKOUT_OUTPUT, SNAREOUT_OUTPUT, TOMOUT_OUTPUT,
+		CLOUT_OUTPUT, OHOUT_OUTPUT, CLAVEOUT_OUTPUT,
+		RIMSHOTOUT_OUTPUT, COWBELLOUT_OUTPUT, CYMBALOUT_OUTPUT,
+		CONGAOUT_OUTPUT, OUTPUTS_LEN
 	};
 	enum LightId {
-		KICK_LIGHT,
-		SNARE_LIGHT,
-		TOM_LIGHT,
-		CL_LIGHT,
-		OH_LIGHT,
-		CLAVE_LIGHT,
-		RIMSHOT_LIGHT,
-		COWBELL_LIGHT,
-		CYMBAL_LIGHT,
-		CONGA_LIGHT,
-		LIGHTS_LEN
+		KICK_LIGHT, SNARE_LIGHT, TOM_LIGHT,
+		CL_LIGHT, OH_LIGHT, CLAVE_LIGHT,
+		RIMSHOT_LIGHT, COWBELL_LIGHT, CYMBAL_LIGHT,
+		CONGA_LIGHT, LIGHTS_LEN
 	};
 
 	struct Voice {
+		const uint8_t* rawData = nullptr;
+		int sampleLength = 0;
+		int outputId = -1;
+		int lightId = -1;
+		int trigInputId = -1;
+		int pushParamId = -1;
+
 		bool lastInputTrigger = false;
 		bool lastButtonTrigger = false;
-	
 		float samplePos = 0.f;
 		bool playing = false;
-		const unsigned char* rawData = nullptr;
-		int sampleLength = 0;
-		int outputId = 0;
-		int lightId = -1; 
-	
-		int16_t readSample16(int index) {
+
+		inline int16_t readSample16(int index) {
 			return (int16_t)(rawData[2 * index] | (rawData[2 * index + 1] << 8));
 		}
 	};
-	
 
-	Voice kickVoice, snareVoice, tomVoice;
-	Voice closedHatVoice, openHatVoice;
-	Voice claveVoice, rimshotVoice, cowbellVoice, cymbalVoice, congaVoice;
+	Voice voices[10];
 
 	const float SPEED_LOW = 0.05f;
 	const float SPEED_HIGH = 3.0f;
@@ -90,141 +57,105 @@ struct KayArr : Module {
 	KayArr() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
-		configParam(SPEED_PARAM, 0.f, 1.f, 0.33f, "Speed", "%", 0.f, 100.f);
-		configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length", "%", 0.f, 100.f);
+		configParam(SPEED_PARAM, 0.f, 1.f, 0.33f, "Speed");
+		configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length");
 		configSwitch(LOOP_PARAM, 0.f, 1.f, 0.f, "Loop", {"Off", "On"});
 
-		configSwitch(KICKPUSH_PARAM, 0.f, 1.f, 0.f, "Kick Trig", {"Off", "On"});
-		configSwitch(SNAREPUSH_PARAM, 0.f, 1.f, 0.f, "Snare Trig", {"Off", "On"});
-		configSwitch(TOMPUSH_PARAM, 0.f, 1.f, 0.f, "Tom Trig", {"Off", "On"});
-		configSwitch(CLPUSH_PARAM, 0.f, 1.f, 0.f, "Closed Hat Trig", {"Off", "On"});
-		configSwitch(OHPUSH_PARAM, 0.f, 1.f, 0.f, "Open Hat Trig", {"Off", "On"});
-		configSwitch(CLAVEPUSH_PARAM, 0.f, 1.f, 0.f, "Clave Trig", {"Off", "On"});
-		configSwitch(RIMSHOTPUSH_PARAM, 0.f, 1.f, 0.f, "Rimshot Trig", {"Off", "On"});
-		configSwitch(COWBELLPUSH_PARAM, 0.f, 1.f, 0.f, "Cowbell Trig", {"Off", "On"});
-		configSwitch(CYMPUSH_PARAM, 0.f, 1.f, 0.f, "Cymbal Trig", {"Off", "On"});
-		configSwitch(CONGAPUSH_PARAM, 0.f, 1.f, 0.f, "Conga Trig", {"Off", "On"});
+		for (int i = KICKPUSH_PARAM; i <= CONGAPUSH_PARAM; i++)
+			configSwitch(i, 0.f, 1.f, 0.f, "Trigger", {"Off", "On"});
 
-		configInput(SPEEDCVIN_INPUT, "Speed CV");
-		configInput(LENGTHCVIN_INPUT, "Length CV");
-		configInput(LOOPCVIN_INPUT, "Loop Gate");
+		for (int i = SPEEDCVIN_INPUT; i < INPUTS_LEN; i++)
+			configInput(i, "Input");
 
-		configInput(KICKTRIGIN_INPUT, "Kick Trig");
-		configInput(SNARETRIGIN_INPUT, "Snare Trig");
-		configInput(TOMTRIG_INPUT, "Tom Trig");
-		configInput(CLTRIG_INPUT, "Closed Hat Trig");
-		configInput(OHTRIG_INPUT, "Open Hat Trig");
-		configInput(CLAVETRIG_INPUT, "Clave Trig");
-		configInput(RIMSHOTTRIG_INPUT, "Rimshot Trig");
-		configInput(COWBELLTRIG_INPUT, "Cowbell Trig");
-		configInput(CYMBALTRIG_INPUT, "Cymbal Trig");
-		configInput(CONGATRIG_INPUT, "Conga Trig");
+		for (int i = KICKOUT_OUTPUT; i < OUTPUTS_LEN; i++)
+			configOutput(i, "Output");
 
-		configOutput(KICKOUT_OUTPUT, "Kick");
-		configOutput(SNAREOUT_OUTPUT, "Snare");
-		configOutput(TOMOUT_OUTPUT, "Tom");
-		configOutput(CLOUT_OUTPUT, "Closed Hat");
-		configOutput(OHOUT_OUTPUT, "Open Hat");
-		configOutput(CLAVEOUT_OUTPUT, "Clave");
-		configOutput(RIMSHOTOUT_OUTPUT, "Rimshot");
-		configOutput(COWBELLOUT_OUTPUT, "Cowbell");
-		configOutput(CYMBALOUT_OUTPUT, "Cymbal");
-		configOutput(CONGAOUT_OUTPUT, "Conga");
+		static const struct {
+			const uint8_t* data;
+			int dataSize;
+			int trigInput;
+			int pushParam;
+			int output;
+			int light;
+		} voiceMap[10] = {
+			{ KRKick, sizeof(KRKick), KICKTRIGIN_INPUT, KICKPUSH_PARAM, KICKOUT_OUTPUT, KICK_LIGHT },
+			{ KRSnare, sizeof(KRSnare), SNARETRIGIN_INPUT, SNAREPUSH_PARAM, SNAREOUT_OUTPUT, SNARE_LIGHT },
+			{ KRTom, sizeof(KRTom), TOMTRIG_INPUT, TOMPUSH_PARAM, TOMOUT_OUTPUT, TOM_LIGHT },
+			{ KRClosedHat, sizeof(KRClosedHat), CLTRIG_INPUT, CLPUSH_PARAM, CLOUT_OUTPUT, CL_LIGHT },
+			{ KROpenHat, sizeof(KROpenHat), OHTRIG_INPUT, OHPUSH_PARAM, OHOUT_OUTPUT, OH_LIGHT },
+			{ KRClave, sizeof(KRClave), CLAVETRIG_INPUT, CLAVEPUSH_PARAM, CLAVEOUT_OUTPUT, CLAVE_LIGHT },
+			{ KRRimshot, sizeof(KRRimshot), RIMSHOTTRIG_INPUT, RIMSHOTPUSH_PARAM, RIMSHOTOUT_OUTPUT, RIMSHOT_LIGHT },
+			{ KRCowbell, sizeof(KRCowbell), COWBELLTRIG_INPUT, COWBELLPUSH_PARAM, COWBELLOUT_OUTPUT, COWBELL_LIGHT },
+			{ KRCymbal, sizeof(KRCymbal), CYMBALTRIG_INPUT, CYMPUSH_PARAM, CYMBALOUT_OUTPUT, CYMBAL_LIGHT },
+			{ KRConga, sizeof(KRConga), CONGATRIG_INPUT, CONGAPUSH_PARAM, CONGAOUT_OUTPUT, CONGA_LIGHT }
+		};
 
-		kickVoice      = createVoice(KRKick, sizeof(KRKick), KICKOUT_OUTPUT, KICK_LIGHT);
-		snareVoice     = createVoice(KRSnare, sizeof(KRSnare), SNAREOUT_OUTPUT, SNARE_LIGHT);
-		tomVoice       = createVoice(KRTom, sizeof(KRTom), TOMOUT_OUTPUT, TOM_LIGHT);
-		closedHatVoice = createVoice(KRClosedHat, sizeof(KRClosedHat), CLOUT_OUTPUT, CL_LIGHT);
-		openHatVoice   = createVoice(KROpenHat, sizeof(KROpenHat), OHOUT_OUTPUT, OH_LIGHT);
-		claveVoice     = createVoice(KRClave, sizeof(KRClave), CLAVEOUT_OUTPUT, CLAVE_LIGHT);
-		rimshotVoice   = createVoice(KRRimshot, sizeof(KRRimshot), RIMSHOTOUT_OUTPUT, RIMSHOT_LIGHT);
-		cowbellVoice   = createVoice(KRCowbell, sizeof(KRCowbell), COWBELLOUT_OUTPUT, COWBELL_LIGHT);
-		cymbalVoice    = createVoice(KRCymbal, sizeof(KRCymbal), CYMBALOUT_OUTPUT, CYMBAL_LIGHT);
-		congaVoice     = createVoice(KRConga, sizeof(KRConga), CONGAOUT_OUTPUT, CONGA_LIGHT);
-		
+		for (int i = 0; i < 10; i++) {
+			voices[i].rawData = voiceMap[i].data;
+			voices[i].sampleLength = voiceMap[i].dataSize / 2;
+			voices[i].outputId = voiceMap[i].output;
+			voices[i].lightId = voiceMap[i].light;
+			voices[i].trigInputId = voiceMap[i].trigInput;
+			voices[i].pushParamId = voiceMap[i].pushParam;
+		}
 	}
-
-	Voice createVoice(const unsigned char* data, size_t size, int outputId, int lightId) {
-		Voice v;
-		v.rawData = data;
-		v.sampleLength = size / 2;
-		v.outputId = outputId;
-		v.lightId = lightId; 
-		return v;
-	}
-	
 
 	void process(const ProcessArgs& args) override {
-		float knobSpeed = 0.01f + params[SPEED_PARAM].getValue() * (1.0f - 0.01f);
-		float speedCV = clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -5.f, 5.f);
-		float speedOffset = (speedCV / 5.f) * 0.5f;
-		float normSpeed = clamp(knobSpeed + speedOffset, 0.01f, 1.0f);
-		float speed = SPEED_LOW + (normSpeed - 0.01f) * ((SPEED_HIGH - SPEED_LOW) / (1.0f - 0.01f));
+		const float speedKnob = params[SPEED_PARAM].getValue();
+		const float speedCV = clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -5.f, 5.f);
+		float speed = SPEED_LOW + ((speedKnob + speedCV / 10.f) - 0.01f) * (SPEED_HIGH - SPEED_LOW);
 
-		float knobLength = params[LENGTH_PARAM].getValue();
-		float lengthCV = clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -5.f, 5.f);
-		float lengthOffset = (lengthCV / 5.f) * 0.5f;
-		float normLength = clamp(knobLength + lengthOffset, 0.1f, 1.0f);
-		float lengthRatio = LENGTH_MIN + (normLength - 0.1f) * ((LENGTH_MAX - LENGTH_MIN) / (1.0f - 0.1f));
+		const float lengthKnob = params[LENGTH_PARAM].getValue();
+		const float lengthCV = clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -5.f, 5.f);
+		float lengthRatio = LENGTH_MIN + ((lengthKnob + lengthCV / 10.f) - 0.1f) * (LENGTH_MAX - LENGTH_MIN);
 
-		bool baseLoop = params[LOOP_PARAM].getValue() > 0.5f;
-		float loopCV = inputs[LOOPCVIN_INPUT].getVoltage();
-		bool loopEnabled = baseLoop || (!baseLoop && loopCV > 1.f);
+		bool loopButton = params[LOOP_PARAM].getValue() > 0.5f;
+		bool loopCV = inputs[LOOPCVIN_INPUT].getVoltage() > 1.f;
+		bool loopEnabled = loopButton || loopCV;
 
-		processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, snareVoice, SNARETRIGIN_INPUT, SNAREPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, tomVoice, TOMTRIG_INPUT, TOMPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, closedHatVoice, CLTRIG_INPUT, CLPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, openHatVoice, OHTRIG_INPUT, OHPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, claveVoice, CLAVETRIG_INPUT, CLAVEPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, rimshotVoice, RIMSHOTTRIG_INPUT, RIMSHOTPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, cowbellVoice, COWBELLTRIG_INPUT, COWBELLPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, cymbalVoice, CYMBALTRIG_INPUT, CYMPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, congaVoice, CONGATRIG_INPUT, CONGAPUSH_PARAM, speed, lengthRatio, loopEnabled);
-	}
+		for (int i = 0; i < 10; i++) {
+			Voice& v = voices[i];
 
-	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId, float speed, float lengthRatio, bool loopEnabled) {
-		bool inputTrigger = inputs[trigInputId].getVoltage() > 1.0f;
-		bool buttonTrigger = params[pushParamId].getValue() > 0.5f;
+			bool inputTrig = inputs[v.trigInputId].getVoltage() > 1.f;
+			bool buttonTrig = params[v.pushParamId].getValue() > 0.5f;
+			bool inputRising = inputTrig && !v.lastInputTrigger;
+			bool buttonRising = buttonTrig && !v.lastButtonTrigger;
 
-		bool inputRising = inputTrigger && !voice.lastInputTrigger;
-		bool buttonRising = buttonTrigger && !voice.lastButtonTrigger;
+			bool retrigger = inputRising || buttonRising || (loopEnabled && !v.playing);
 
-		if (inputRising || buttonRising || (loopEnabled && !voice.playing)) {
-			voice.playing = true;
-			voice.samplePos = 0.f;
-		}
+			if (retrigger) {
+				v.samplePos = 0.f;
+				v.playing = true;
+			}
 
-		voice.lastInputTrigger = inputTrigger;
-		voice.lastButtonTrigger = buttonTrigger;
+			v.lastInputTrigger = inputTrig;
+			v.lastButtonTrigger = buttonTrig;
 
-		int maxSamplesToPlay = (int)(voice.sampleLength * lengthRatio);
+			const int maxSamples = (int)(v.sampleLength * lengthRatio);
 
-		if (voice.playing) {
-			int idx = (int)voice.samplePos;
-			if (idx < maxSamplesToPlay) {
-				int16_t sampleInt = voice.readSample16(idx);
-				float sample = (float)sampleInt / 32768.f;
-				outputs[voice.outputId].setVoltage(sample * 5.f);
-				voice.samplePos += speed;
-			} else {
-				if (loopEnabled) {
-					voice.samplePos = 0.f;
+			if (v.playing) {
+				int idx = (int)v.samplePos;
+				if (idx < maxSamples) {
+					float sample = v.readSample16(idx) / 32768.f;
+					outputs[v.outputId].setVoltage(sample * 5.f);
+					v.samplePos += speed;
 				} else {
-					voice.playing = false;
-					outputs[voice.outputId].setVoltage(0.f);
+					if (loopEnabled) {
+						v.samplePos = 0.f;
+					} else {
+						v.playing = false;
+						outputs[v.outputId].setVoltage(0.f);
+					}
 				}
+			} else {
+				outputs[v.outputId].setVoltage(0.f);
 			}
-		} else {
-			outputs[voice.outputId].setVoltage(0.f);
-		}
-		if (voice.lightId >= 0) {
-			if ((inputRising || buttonRising || (loopEnabled && !voice.playing))) {
-				lights[voice.lightId].setBrightness(1.f); 
+
+			// Efficient light fade
+			if (v.lightId >= 0) {
+				lights[v.lightId].setBrightnessSmooth(retrigger ? 1.f : 0.f, args.sampleTime);
 			}
-			lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
 		}
-		
 	}
 };
 struct KayArrWidget : ModuleWidget {
