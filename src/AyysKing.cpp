@@ -3,84 +3,60 @@
 
 struct AyysKing : Module {
 	enum ParamId {
-		SPEED__PARAM,
-		LENGTH_PARAM,
-		LOOP_PARAM,
-		KICKPUSH_PARAM,
-		SNARE1PUSH_PARAM,
-		SNARE2PUSH_PARAM,
-		CLOSEDHATPUSH_PARAM,
-		OPENHATPUSH_PARAM,
-		BONGO1PUSH_PARAM,
-		BONGO2PUSH_PARAM,
-		BONGO3PUSH_PARAM,
-		CLAVEPUSH_PARAM,
-		CYMPUSH_PARAM,
+		SPEED__PARAM, LENGTH_PARAM, LOOP_PARAM,
+		KICKPUSH_PARAM, SNARE1PUSH_PARAM, SNARE2PUSH_PARAM,
+		CLOSEDHATPUSH_PARAM, OPENHATPUSH_PARAM,
+		BONGO1PUSH_PARAM, BONGO2PUSH_PARAM, BONGO3PUSH_PARAM,
+		CLAVEPUSH_PARAM, CYMPUSH_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId {
-		SPEEDCVIN_INPUT,
-		LENGTHCVIN_INPUT,
-		LOOPCVIN_INPUT,
-		KICKTRIGIN_INPUT,
-		SNARE1TRIGIN_INPUT,
-		SNARE2TRIGIN_INPUT,
-		CLOSEDHATTRIGIN_INPUT,
-		OPENHATTRIGIN_INPUT,
-		BONGO1TRIGIN_INPUT,
-		BONGO2TRIGIN_INPUT,
-		BONGO3TRIGIN_INPUT,
-		CLAVETRIGIN_INPUT,
-		CYMTRIGIN_INPUT,
+		SPEEDCVIN_INPUT, LENGTHCVIN_INPUT, LOOPCVIN_INPUT,
+		KICKTRIGIN_INPUT, SNARE1TRIGIN_INPUT, SNARE2TRIGIN_INPUT,
+		CLOSEDHATTRIGIN_INPUT, OPENHATTRIGIN_INPUT,
+		BONGO1TRIGIN_INPUT, BONGO2TRIGIN_INPUT, BONGO3TRIGIN_INPUT,
+		CLAVETRIGIN_INPUT, CYMTRIGIN_INPUT,
 		INPUTS_LEN
 	};
 	enum OutputId {
-		KICKOUT_OUTPUT,
-		SNARE1OUT_OUTPUT,
-		SNARE2OUT_OUTPUT,
-		CLOSEDHATOUT_OUTPUT,
-		OPENHATOUT_OUTPUT,
-		BONGO1OUT_OUTPUT,
-		BONGO2OUT_OUTPUT,
-		BONGO3OUT_OUTPUT,
-		CLAVEOUT_OUTPUT,
-		CYMOUT_OUTPUT,
+		KICKOUT_OUTPUT, SNARE1OUT_OUTPUT, SNARE2OUT_OUTPUT,
+		CLOSEDHATOUT_OUTPUT, OPENHATOUT_OUTPUT,
+		BONGO1OUT_OUTPUT, BONGO2OUT_OUTPUT, BONGO3OUT_OUTPUT,
+		CLAVEOUT_OUTPUT, CYMOUT_OUTPUT,
 		OUTPUTS_LEN
 	};
 	enum LightId {
-		KICK_LIGHT,
-		SNARE1_LIGHT,
-		SNARE2_LIGHT,
-		CLOSEDHAT_LIGHT,
-		OPENHAT_LIGHT,
-		BONGO1_LIGHT,
-		BONGO2_LIGHT,
-		BONGO3_LIGHT,
-		CLAVE_LIGHT,
-		CYMBAL_LIGHT,
+		KICK_LIGHT, SNARE1_LIGHT, SNARE2_LIGHT,
+		CLOSEDHAT_LIGHT, OPENHAT_LIGHT,
+		BONGO1_LIGHT, BONGO2_LIGHT, BONGO3_LIGHT,
+		CLAVE_LIGHT, CYMBAL_LIGHT,
 		LIGHTS_LEN
 	};
 
 	struct Voice {
 		bool lastInputTrigger = false;
 		bool lastButtonTrigger = false;
-
-		float samplePos = 0.f;
 		bool playing = false;
+
 		const unsigned char* rawData = nullptr;
 		int sampleLength = 0;
+		float samplePos = 0.f;
 		int outputId = 0;
 		int lightId = -1;
 
-		int16_t readSample16(int index) {
-			return (int16_t)(rawData[2 * index] | (rawData[2 * index + 1] << 8));
+		// 5/32768 scale factor, precomputed once per Voice instance
+		static constexpr float scaleFactor = 5.f / 32768.f;
+
+		inline int16_t readSample16(int idx) const {
+			return (int16_t)(rawData[2 * idx] | (rawData[2 * idx + 1] << 8));
+		}
+
+		inline float getSample(int idx) const {
+			return readSample16(idx) * scaleFactor;
 		}
 	};
 
-	Voice kickVoice, snare1Voice, snare2Voice;
-	Voice closedHatVoice, openHatVoice;
-	Voice bongo1Voice, bongo2Voice, bongo3Voice;
-	Voice claveVoice, cymbalVoice;
+	Voice voices[10];
 
 	const float SPEED_LOW = 0.05f;
 	const float SPEED_HIGH = 3.0f;
@@ -92,87 +68,73 @@ struct AyysKing : Module {
 		configParam(SPEED__PARAM, 0.f, 1.f, 0.33f, "Speed", "%", 0.f, 100.f);
 		configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length", "%", 0.f, 100.f);
 		configSwitch(LOOP_PARAM, 0.f, 1.f, 0.f, "Loop", {"Off", "On"});
-		configSwitch(KICKPUSH_PARAM, 0.f, 1.f, 0.f, "Kick Trig", {"Off", "On"});
-		configSwitch(SNARE1PUSH_PARAM, 0.f, 1.f, 0.f, "Snare 1 Trig", {"Off", "On"});
-		configSwitch(SNARE2PUSH_PARAM, 0.f, 1.f, 0.f, "Snare 2 Trig", {"Off", "On"});
-		configSwitch(CLOSEDHATPUSH_PARAM, 0.f, 1.f, 0.f, "Closed Hat Trig", {"Off", "On"});
-		configSwitch(OPENHATPUSH_PARAM, 0.f, 1.f, 0.f, "Open Hat Trig", {"Off", "On"});
-		configSwitch(BONGO1PUSH_PARAM, 0.f, 1.f, 0.f, "Bongo 1 Trig", {"Off", "On"});
-		configSwitch(BONGO2PUSH_PARAM, 0.f, 1.f, 0.f, "Bongo 2 Trig", {"Off", "On"});
-		configSwitch(BONGO3PUSH_PARAM, 0.f, 1.f, 0.f, "Bongo 3 Trig", {"Off", "On"});
-		configSwitch(CLAVEPUSH_PARAM, 0.f, 1.f, 0.f, "Clave Trig", {"Off", "On"});
-		configSwitch(CYMPUSH_PARAM, 0.f, 1.f, 0.f, "Cymbal Trig", {"Off", "On"});
+
+		static const char* labels[10] = {
+			"Kick", "Snare 1", "Snare 2", "Closed Hat", "Open Hat",
+			"Bongo 1", "Bongo 2", "Bongo 3", "Clave", "Cymbal"
+		};
+		for (int i = 0; i < 10; i++) {
+			configSwitch(KICKPUSH_PARAM + i, 0.f, 1.f, 0.f, string::f("%s Trig", labels[i]), {"Off", "On"});
+			configInput(KICKTRIGIN_INPUT + i, string::f("%s Trig", labels[i]));
+			configOutput(KICKOUT_OUTPUT + i, labels[i]);
+		}
 
 		configInput(SPEEDCVIN_INPUT, "Speed CV");
 		configInput(LENGTHCVIN_INPUT, "Length CV");
 		configInput(LOOPCVIN_INPUT, "Loop CV");
-		configInput(KICKTRIGIN_INPUT, "Kick Trig");
-		configInput(SNARE1TRIGIN_INPUT, "Snare 1 Trig");
-		configInput(SNARE2TRIGIN_INPUT, "Snare 2 Trig");
-		configInput(CLOSEDHATTRIGIN_INPUT, "Closed Hat Trig");
-		configInput(OPENHATTRIGIN_INPUT, "Open Hat Trig");
-		configInput(BONGO1TRIGIN_INPUT, "Bongo 1 Trig");
-		configInput(BONGO2TRIGIN_INPUT, "Bongo 2 Trig");
-		configInput(BONGO3TRIGIN_INPUT, "Bongo 3 Trig");
-		configInput(CLAVETRIGIN_INPUT, "Clave Trig");
-		configInput(CYMTRIGIN_INPUT, "Cymbal Trig");
 
-		configOutput(KICKOUT_OUTPUT, "Kick");
-		configOutput(SNARE1OUT_OUTPUT, "Snare 1");
-		configOutput(SNARE2OUT_OUTPUT, "Snare 2");
-		configOutput(CLOSEDHATOUT_OUTPUT, "Closed Hat");
-		configOutput(OPENHATOUT_OUTPUT, "Open Hat");
-		configOutput(BONGO1OUT_OUTPUT, "Bongo 1");
-		configOutput(BONGO2OUT_OUTPUT, "Bongo 2");
-		configOutput(BONGO3OUT_OUTPUT, "Bongo 3");
-		configOutput(CLAVEOUT_OUTPUT, "Clave");
-		configOutput(CYMOUT_OUTPUT, "Cymbal");
-
-		// Initialize sample players
-		kickVoice      = createVoice(AKKick,         sizeof(AKKick),         KICKOUT_OUTPUT,      KICK_LIGHT);
-		snare1Voice    = createVoice(AKSnare,        sizeof(AKSnare),        SNARE1OUT_OUTPUT,    SNARE1_LIGHT);
-		snare2Voice    = createVoice(AKSnare2,       sizeof(AKSnare2),       SNARE2OUT_OUTPUT,    SNARE2_LIGHT);
-		closedHatVoice = createVoice(AKClosedHiHat,  sizeof(AKClosedHiHat),  CLOSEDHATOUT_OUTPUT, CLOSEDHAT_LIGHT);
-		openHatVoice   = createVoice(AKOpenHiHat,    sizeof(AKOpenHiHat),    OPENHATOUT_OUTPUT,   OPENHAT_LIGHT);
-		bongo1Voice    = createVoice(AKBongo,        sizeof(AKBongo),        BONGO1OUT_OUTPUT,    BONGO1_LIGHT);
-		bongo2Voice    = createVoice(AKBongo2,       sizeof(AKBongo2),       BONGO2OUT_OUTPUT,    BONGO2_LIGHT);
-		bongo3Voice    = createVoice(AKBongo3,       sizeof(AKBongo3),       BONGO3OUT_OUTPUT,    BONGO3_LIGHT);
-		claveVoice     = createVoice(AKWood,         sizeof(AKWood),         CLAVEOUT_OUTPUT,     CLAVE_LIGHT);
-		cymbalVoice    = createVoice(AKCrash,        sizeof(AKCrash),        CYMOUT_OUTPUT,       CYMBAL_LIGHT);
+		voices[0] = createVoice(AKKick,        sizeof(AKKick),        KICKOUT_OUTPUT,      KICK_LIGHT);
+		voices[1] = createVoice(AKSnare,       sizeof(AKSnare),       SNARE1OUT_OUTPUT,    SNARE1_LIGHT);
+		voices[2] = createVoice(AKSnare2,      sizeof(AKSnare2),      SNARE2OUT_OUTPUT,    SNARE2_LIGHT);
+		voices[3] = createVoice(AKClosedHiHat, sizeof(AKClosedHiHat), CLOSEDHATOUT_OUTPUT, CLOSEDHAT_LIGHT);
+		voices[4] = createVoice(AKOpenHiHat,   sizeof(AKOpenHiHat),   OPENHATOUT_OUTPUT,   OPENHAT_LIGHT);
+		voices[5] = createVoice(AKBongo,       sizeof(AKBongo),       BONGO1OUT_OUTPUT,    BONGO1_LIGHT);
+		voices[6] = createVoice(AKBongo2,      sizeof(AKBongo2),      BONGO2OUT_OUTPUT,    BONGO2_LIGHT);
+		voices[7] = createVoice(AKBongo3,      sizeof(AKBongo3),      BONGO3OUT_OUTPUT,    BONGO3_LIGHT);
+		voices[8] = createVoice(AKWood,        sizeof(AKWood),        CLAVEOUT_OUTPUT,     CLAVE_LIGHT);
+		voices[9] = createVoice(AKCrash,       sizeof(AKCrash),       CYMOUT_OUTPUT,       CYMBAL_LIGHT);
 	}
 
-	Voice createVoice(const unsigned char* data, size_t size, int outputId, int lightId) {
+	Voice createVoice(const unsigned char* data, size_t size, int outId, int lightId) {
 		Voice v;
 		v.rawData = data;
 		v.sampleLength = size / 2;
-		v.outputId = outputId;
+		v.outputId = outId;
 		v.lightId = lightId;
 		return v;
 	}
 
-	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId, float speed, float lengthRatio, bool loopEnabled) {
-		bool inputTrigger = inputs[trigInputId].getVoltage() > 1.0f;
-		bool buttonTrigger = params[pushParamId].getValue() > 0.5f;
-		bool inputRising = inputTrigger && !voice.lastInputTrigger;
-		bool buttonRising = buttonTrigger && !voice.lastButtonTrigger;
-		if (inputRising || buttonRising || (loopEnabled && !voice.playing)) {
+	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId, float speed, int maxSamples, bool loop) {
+		// Skip processing if output not connected for efficiency
+		if (!outputs[voice.outputId].isConnected())
+			return;
+
+		const bool trig = inputs[trigInputId].getVoltage() > 1.f;
+		const bool btn = params[pushParamId].getValue() > 0.5f;
+
+		const bool trigRise = trig && !voice.lastInputTrigger;
+		const bool btnRise = btn && !voice.lastButtonTrigger;
+		const bool trigger = trigRise || btnRise || (loop && !voice.playing);
+
+		voice.lastInputTrigger = trig;
+		voice.lastButtonTrigger = btn;
+
+		if (trigger) {
 			voice.playing = true;
 			voice.samplePos = 0.f;
+			if (voice.lightId >= 0)
+				lights[voice.lightId].setBrightness(1.f);
 		}
-		voice.lastInputTrigger = inputTrigger;
-		voice.lastButtonTrigger = buttonTrigger;
 
-		int maxSamplesToPlay = (int)(voice.sampleLength * lengthRatio);
 		if (voice.playing) {
 			int idx = (int)voice.samplePos;
-			if (idx < maxSamplesToPlay) {
-				int16_t sampleInt = voice.readSample16(idx);
-				float sample = (float)sampleInt / 32768.f;
-				outputs[voice.outputId].setVoltage(sample * 5.f);
+			if (idx < maxSamples) {
+				outputs[voice.outputId].setVoltage(voice.getSample(idx));
 				voice.samplePos += speed;
 			} else {
-				if (loopEnabled) {
+				if (loop) {
 					voice.samplePos = 0.f;
+					outputs[voice.outputId].setVoltage(voice.getSample(0));
 				} else {
 					voice.playing = false;
 					outputs[voice.outputId].setVoltage(0.f);
@@ -181,38 +143,26 @@ struct AyysKing : Module {
 		} else {
 			outputs[voice.outputId].setVoltage(0.f);
 		}
-		if (voice.lightId >= 0) {
-			if (inputRising || buttonRising || (loopEnabled && !voice.playing)) {
-				lights[voice.lightId].setBrightness(1.f);
-			}
+
+		// Fade light brightness smoothly off every sample to save CPU
+		if (voice.lightId >= 0)
 			lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
-		}
 	}
 
 	void process(const ProcessArgs& args) override {
-		float knobSpeed = 0.01f + params[SPEED__PARAM].getValue() * (1.0f - 0.01f);
-		float speedCV = clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -5.f, 5.f);
-		float normSpeed = clamp(knobSpeed + (speedCV / 5.f) * 0.5f, 0.01f, 1.0f);
-		float speed = SPEED_LOW + (normSpeed - 0.01f) * ((SPEED_HIGH - SPEED_LOW) / (1.0f - 0.01f));
+		// Compute speed and length once per process call
+		float speedInput = clamp(params[SPEED__PARAM].getValue() + inputs[SPEEDCVIN_INPUT].getVoltage() * 0.1f, 0.f, 1.f);
+		float speed = SPEED_LOW + speedInput * (SPEED_HIGH - SPEED_LOW);
 
-		float knobLength = params[LENGTH_PARAM].getValue();
-		float lengthCV = clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -5.f, 5.f);
-		float normLength = clamp(knobLength + (lengthCV / 5.f) * 0.5f, 0.1f, 1.0f);
-		float lengthRatio = LENGTH_MIN + (normLength - 0.1f) * ((LENGTH_MAX - LENGTH_MIN) / (1.0f - 0.1f));
+		float lengthInput = clamp(params[LENGTH_PARAM].getValue() + inputs[LENGTHCVIN_INPUT].getVoltage() * 0.1f, 0.f, 1.f);
+		float lengthRatio = LENGTH_MIN + lengthInput * (LENGTH_MAX - LENGTH_MIN);
 
-		bool baseLoop = params[LOOP_PARAM].getValue() > 0.5f;
-		bool loopEnabled = baseLoop || (!baseLoop && inputs[LOOPCVIN_INPUT].getVoltage() > 1.f);
+		const int maxSamples = int(voices[0].sampleLength * lengthRatio);
+		bool loop = params[LOOP_PARAM].getValue() > 0.5f || inputs[LOOPCVIN_INPUT].getVoltage() > 1.f;
 
-		processVoice(args, kickVoice,      KICKTRIGIN_INPUT,      KICKPUSH_PARAM,      speed, lengthRatio, loopEnabled);
-		processVoice(args, snare1Voice,    SNARE1TRIGIN_INPUT,    SNARE1PUSH_PARAM,    speed, lengthRatio, loopEnabled);
-		processVoice(args, snare2Voice,    SNARE2TRIGIN_INPUT,    SNARE2PUSH_PARAM,    speed, lengthRatio, loopEnabled);
-		processVoice(args, closedHatVoice, CLOSEDHATTRIGIN_INPUT, CLOSEDHATPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, openHatVoice,   OPENHATTRIGIN_INPUT,   OPENHATPUSH_PARAM,   speed, lengthRatio, loopEnabled);
-		processVoice(args, bongo1Voice,    BONGO1TRIGIN_INPUT,    BONGO1PUSH_PARAM,    speed, lengthRatio, loopEnabled);
-		processVoice(args, bongo2Voice,    BONGO2TRIGIN_INPUT,    BONGO2PUSH_PARAM,    speed, lengthRatio, loopEnabled);
-		processVoice(args, bongo3Voice,    BONGO3TRIGIN_INPUT,    BONGO3PUSH_PARAM,    speed, lengthRatio, loopEnabled);
-		processVoice(args, claveVoice,     CLAVETRIGIN_INPUT,     CLAVEPUSH_PARAM,     speed, lengthRatio, loopEnabled);
-		processVoice(args, cymbalVoice,    CYMTRIGIN_INPUT,       CYMPUSH_PARAM,       speed, lengthRatio, loopEnabled);
+		for (int i = 0; i < 10; i++) {
+			processVoice(args, voices[i], KICKTRIGIN_INPUT + i, KICKPUSH_PARAM + i, speed, maxSamples, loop);
+		}
 	}
 };
 
