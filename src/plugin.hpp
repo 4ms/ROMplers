@@ -27,7 +27,7 @@ extern Model* modelSinSahnix;
 extern Model* modelSlap;
 extern Model* modelSnare;
 extern Model* modelTom;
-
+extern Model* modelOrchHits;
 
 struct _9mmKnob : RoundKnob {
     _9mmKnob() {

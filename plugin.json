@@ -12,8 +12,7 @@
   "sourceUrl": "https://github.com/4ms/ROMplers/",
   "donateUrl": "",
   "changelogUrl": "https://github.com/4ms/ROMplers/blob/main/CHANGELOG.md",
-  "modules": 
-  [
+  "modules": [
     {
       "slug": "AyysKing",
       "name": "AyysKing",
@@ -165,6 +164,15 @@
       "tags": [
         "Drum"
       ]
+    },
+    {
+      "slug": "OrchHits",
+      "name": "OrchHits",
+      "description": "Orchestra hits ",
+      "tags": [
+        "drum",
+        "synth voice"
+      ]
     }
-  ]  
+  ]
 }

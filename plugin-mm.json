@@ -83,6 +83,10 @@
 	{
 	  "slug": "Tom",
 	  "name": "Tom"
+	},
+	{
+	  "slug": "OrchHits",
+	  "name": "OrchHits"
 	}
   ]  
 }
