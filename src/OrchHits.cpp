@@ -50,16 +50,16 @@ struct OrchHits : Module {
 		for (int i = 1; i <= numSamples; ++i)
 			sampleChoices.push_back(std::to_string(i));
 		configSwitch(SAMPLE_PARAM, 0.f, (numSamples - 1), 0.f, "Sample", sampleChoices);
-		configSwitch(PITCH_PARAM, 0.f, 4.f, 0.f, "Octave transpose", {"Unison", "+1", "+2", "+3", "+4"});
+		configSwitch(PITCH_PARAM, 0.f, 4.f, 2.f, "Octave transpose", {"-2", "-1", "Unison", "+1", "+2"});
 		configParam(DECAY_PARAM, 0.1f, 5.f, 0.1f, "Decay", "s");
 		configParam(PUSH_PARAM, 0.f, 1.f, 0.f, "Trigger button");
-
+	
 		configInput(PITCHCVIN_INPUT, "Pitch CV (1V/oct)");
 		configInput(DECAYCVIN_INPUT, "Decay CV");
 		configInput(TRIGIN_INPUT, "Trig");
 		configInput(VOLCVIN_INPUT, "Volume CV");
 		configOutput(AUDIOOUT_OUTPUT, "Audio output");
-	}
+	}	
 
 	float fastPow2(float x) {
 		if (x < 0.f) return 1.f / fastPow2(-x);
