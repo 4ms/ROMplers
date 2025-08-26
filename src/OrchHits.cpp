@@ -41,6 +41,9 @@ struct OrchHits : Module {
 
 	int numSamples = 17;
 
+	const float minDecayTime = 0.1f;
+	const float maxDecayTime = 5.f; 
+
 	OrchHits() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		std::vector<std::string> sampleChoices;
@@ -48,7 +51,7 @@ struct OrchHits : Module {
 			sampleChoices.push_back(std::to_string(i));
 		configSwitch(SAMPLE_PARAM, 0.f, (numSamples - 1), 0.f, "Sample", sampleChoices);
 		configSwitch(PITCH_PARAM, 0.f, 4.f, 0.f, "Octave transpose", {"Unison", "+1", "+2", "+3", "+4"});
-		configParam(DECAY_PARAM, 0.f, 1.f, 1.f, "Decay", "s");
+		configParam(DECAY_PARAM, 0.1f, 5.f, 0.1f, "Decay", "s");
 		configParam(PUSH_PARAM, 0.f, 1.f, 0.f, "Trigger button");
 
 		configInput(PITCHCVIN_INPUT, "Pitch CV (1V/oct)");
@@ -144,18 +147,14 @@ struct OrchHits : Module {
 
 				const float sampleValue = s1 + frac * (s2 - s1);
 
-				float decayParam = params[DECAY_PARAM].getValue();
-				if (inputs[DECAYCVIN_INPUT].isConnected()) {
+				float knobDecayTime = params[DECAY_PARAM].getValue();
+				float decayParam = (knobDecayTime - minDecayTime) / (maxDecayTime - minDecayTime);
+				if (inputs[DECAYCVIN_INPUT].isConnected())
 					decayParam += inputs[DECAYCVIN_INPUT].getVoltage();
-				}
 				decayParam = clamp(decayParam, 0.f, 1.f);
-
-				const float minDecayTime = 0.005f;
-				const float maxDecayTime = numSamples / sampleSampleRate;
-				const float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
-
+				float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
 				const float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
-				env *= decayCoef;
+				env *= decayCoef;				
 
 				output = sampleValue * env;
 			}
