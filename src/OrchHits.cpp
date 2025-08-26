@@ -5,7 +5,7 @@
 struct OrchHits : Module {
 	enum ParamId {
 		SAMPLE_PARAM,
-		PITCH_PARAM,
+		OCTAVE_PARAM,
 		DECAY_PARAM,
 		PUSH_PARAM,
 		PARAMS_LEN
@@ -50,7 +50,7 @@ struct OrchHits : Module {
 		for (int i = 1; i <= numSamples; ++i)
 			sampleChoices.push_back(std::to_string(i));
 		configSwitch(SAMPLE_PARAM, 0.f, (numSamples - 1), 0.f, "Sample", sampleChoices);
-		configSwitch(PITCH_PARAM, 0.f, 4.f, 2.f, "Octave transpose", {"-2", "-1", "Unison", "+1", "+2"});
+		configSwitch(OCTAVE_PARAM, 0.f, 4.f, 2.f, "Octave transpose", {"-2", "-1", "Unison", "+1", "+2"});
 		configParam(DECAY_PARAM, 0.1f, 5.f, 5.f, "Decay", "s");
 		configParam(PUSH_PARAM, 0.f, 1.f, 0.f, "Trigger button");
 	
@@ -118,7 +118,7 @@ struct OrchHits : Module {
 		float output = 0.f;
 	
 		if (playing && currentSample) {
-			float pitchKnob = params[PITCH_PARAM].getValue();   
+			float pitchKnob = params[OCTAVE_PARAM].getValue();   
 			float octaveOffset = pitchKnob - 2.f;               
 			float pitchCV = inputs[PITCHCVIN_INPUT].isConnected() ? inputs[PITCHCVIN_INPUT].getVoltage() : 0.f;
 			float totalVolts = octaveOffset + pitchCV;
@@ -175,7 +175,7 @@ struct OrchHitsWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 16.052)), module, OrchHits::SAMPLE_PARAM));
-		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 39.468)), module, OrchHits::PITCH_PARAM));
+		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 39.468)), module, OrchHits::OCTAVE_PARAM));
 		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 63.5)), module, OrchHits::DECAY_PARAM));
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 88.812)), module, OrchHits::PUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(10.16, 88.812)), module, OrchHits::ORCHHITS_LIGHT));
