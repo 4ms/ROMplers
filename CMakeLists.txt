@@ -40,7 +40,9 @@ target_sources(4ms-ROMplers PRIVATE
     ${SOURCE_DIR}/src/Kick.cpp     
     ${SOURCE_DIR}/src/KickSamples.hpp                                      
     ${SOURCE_DIR}/src/OpenHat.cpp 
-    ${SOURCE_DIR}/src/OpenHatSamples.hpp                                          
+    ${SOURCE_DIR}/src/OpenHatSamples.hpp          
+    ${SOURCE_DIR}/src/OrchHits.cpp 
+    ${SOURCE_DIR}/src/OrchHitsSamples.hpp          
     ${SOURCE_DIR}/src/Percussion.cpp  
     ${SOURCE_DIR}/src/PercussionSamples.hpp                                      
     ${SOURCE_DIR}/src/Ride.cpp  

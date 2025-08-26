@@ -1,5 +1,6 @@
 #include "plugin.hpp"
-
+#include "OrchHitsSamples.hpp"
+#include <cmath>
 
 struct OrchHits : Module {
 	enum ParamId {
@@ -22,42 +23,133 @@ struct OrchHits : Module {
 		OUTPUTS_LEN
 	};
 	enum LightId {
+		ORCHHITS_LIGHT,
 		LIGHTS_LEN
 	};
 
+	const unsigned char* currentSample = Orch1;
+	int sampleLength = Orch1_len;
+	float samplePos = 0.f;
+	bool playing = false;
+
+	float env = 0.f;
+	float lastTrigValue = 0.f;
+	float lastButtonValue = 0.f;
+	float OrchHitsLightBrightness = 0.f;
+
+	static constexpr float sampleSampleRate = 44100.f;
+
+	int numSamples = 17;
+
 	OrchHits() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam(SAMPLE_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(PITCH_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(DECAY_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(PUSH_PARAM, 0.f, 1.f, 0.f, "");
-		configInput(SAMPLECVIN_INPUT, "");
-		configInput(PITCHCVIN_INPUT, "");
-		configInput(DECAYCVIN_INPUT, "");
-		configInput(TRIGIN_INPUT, "");
-		configInput(VOLCVIN_INPUT, "");
-		configOutput(AUDIOOUT_OUTPUT, "");
+		std::vector<std::string> sampleChoices;
+		for (int i = 1; i <= numSamples; ++i)
+			sampleChoices.push_back(std::to_string(i));
+		configSwitch(SAMPLE_PARAM, 0.f, (numSamples - 1), 0.f, "Sample", sampleChoices);
+		configSwitch(PITCH_PARAM, 0.f, 4.f, 0.f, "Octave transpose", {"Unison", "+1", "+2", "+3", "+4"});
+		configParam(DECAY_PARAM, 0.f, 1.f, 1.f, "Decay", "s");
+		configParam(PUSH_PARAM, 0.f, 1.f, 0.f, "Trigger button");
+
+		configInput(PITCHCVIN_INPUT, "Pitch CV (1V/oct)");
+		configInput(DECAYCVIN_INPUT, "Decay CV");
+		configInput(TRIGIN_INPUT, "Trig");
+		configInput(VOLCVIN_INPUT, "Volume CV");
+		configOutput(AUDIOOUT_OUTPUT, "Audio output");
+	}
+
+	float fastPow2(float x) {
+		if (x < 0.f) return 1.f / fastPow2(-x);
+		if (x > 8.f) x = 8.f;
+		return 1.f + x * 0.69314718f;
 	}
 
 	void process(const ProcessArgs& args) override {
+		const float trigIn = inputs[TRIGIN_INPUT].getVoltage();
+		const float buttonIn = params[PUSH_PARAM].getValue();
+
+		bool trigRising = (lastTrigValue <= 1.f && trigIn > 1.f);
+		bool buttonRising = (lastButtonValue <= 0.5f && buttonIn > 0.5f);
+		lastTrigValue = trigIn;
+		lastButtonValue = buttonIn;
+
+		if (trigRising || buttonRising) {
+			OrchHitsLightBrightness = 1.f;
+			samplePos = 0.f;
+			playing = true;
+			env = 1.f;
+		}
+
+		OrchHitsLightBrightness -= args.sampleTime * 10.f;
+		if (OrchHitsLightBrightness < 0.f) OrchHitsLightBrightness = 0.f;
+		lights[ORCHHITS_LIGHT].setBrightnessSmooth(OrchHitsLightBrightness, args.sampleTime);
+
+		float output = 0.f;
+
+		if (playing && currentSample) {
+			const float pitchKnob = params[PITCH_PARAM].getValue();
+			const float pitchCV = inputs[PITCHCVIN_INPUT].isConnected() ? inputs[PITCHCVIN_INPUT].getVoltage() : 0.f;
+			float pitch = pitchKnob + pitchCV;
+
+			float pitchRatio = (pitch >= 0.f && pitch <= 8.f) ? fastPow2(pitch) : std::pow(2.f, pitch);
+
+			const float sampleRateRatio = sampleSampleRate / args.sampleRate;
+			samplePos += pitchRatio * sampleRateRatio;
+
+			const int numSamples = sampleLength / 2;
+
+			if ((int)samplePos >= numSamples) {
+				playing = false;
+				output = 0.f;
+			} else {
+				const int idx = (int)samplePos;
+				const int nextIdx = (idx + 1 < numSamples) ? idx + 1 : idx;
+				const float frac = samplePos - idx;
+
+				const unsigned char* d = currentSample;
+				const int16_t s1s = (int16_t)(d[idx * 2] | (d[idx * 2 + 1] << 8));
+				const int16_t s2s = (int16_t)(d[nextIdx * 2] | (d[nextIdx * 2 + 1] << 8));
+				const float s1 = s1s * (1.f / 32768.f);
+				const float s2 = s2s * (1.f / 32768.f);
+
+				const float sampleValue = s1 + frac * (s2 - s1);
+
+				float decayParam = params[DECAY_PARAM].getValue();
+				if (inputs[DECAYCVIN_INPUT].isConnected()) {
+					decayParam += inputs[DECAYCVIN_INPUT].getVoltage();
+				}
+				decayParam = clamp(decayParam, 0.f, 1.f);
+
+				const float minDecayTime = 0.005f;
+				const float maxDecayTime = numSamples / sampleSampleRate;
+				const float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
+
+				const float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
+				env *= decayCoef;
+
+				output = sampleValue * env;
+			}
+		}
+
+		float volumeCV = inputs[VOLCVIN_INPUT].isConnected() ? clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f) : 5.f;
+		output *= volumeCV / 5.f;
+		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.f);
 	}
 };
-
 
 struct OrchHitsWidget : ModuleWidget {
 	OrchHitsWidget(OrchHits* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/OrchHits_info.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.16, 16.052)), module, OrchHits::SAMPLE_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.16, 39.468)), module, OrchHits::PITCH_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.16, 63.5)), module, OrchHits::DECAY_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.16, 88.812)), module, OrchHits::PUSH_PARAM));
+		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 16.052)), module, OrchHits::SAMPLE_PARAM));
+		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 39.468)), module, OrchHits::PITCH_PARAM));
+		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 63.5)), module, OrchHits::DECAY_PARAM));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 88.812)), module, OrchHits::PUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(10.16, 89.342)), module, OrchHits::ORCHHITS_LIGHT));
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 30.138)), module, OrchHits::SAMPLECVIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 53.553)), module, OrchHits::PITCHCVIN_INPUT));
