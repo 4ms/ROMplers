@@ -44,7 +44,7 @@ struct Snare : Module {
 		Snare79
 	};
 
-	int sampleLengths[79] = {
+	unsigned int sampleLengths[79] = {
 		Snare1_len, Snare2_len, Snare3_len, Snare4_len, Snare5_len, Snare6_len,
 		Snare7_len, Snare8_len, Snare9_len, Snare10_len, Snare11_len, Snare12_len,
 		Snare13_len, Snare14_len, Snare15_len, Snare16_len, Snare17_len, Snare18_len,
