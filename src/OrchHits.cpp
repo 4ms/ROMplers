@@ -65,6 +65,36 @@ struct OrchHits : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
+
+		float sampleParam = params[SAMPLE_PARAM].getValue();
+	if (inputs[SAMPLECVIN_INPUT].isConnected()) {
+	sampleParam += inputs[SAMPLECVIN_INPUT].getVoltage();
+	}
+	sampleParam = clamp(sampleParam, 0.f, static_cast<float>(numSamples - 1));
+
+	int selectedIndex = static_cast<int>(std::round(sampleParam));
+
+	switch (selectedIndex) {
+		case 0:  currentSample = Orch1;  sampleLength = Orch1_len;  break;
+		case 1:  currentSample = Orch2;  sampleLength = Orch2_len;  break;
+		case 2:  currentSample = Orch3;  sampleLength = Orch3_len;  break;
+		case 3:  currentSample = Orch4;  sampleLength = Orch4_len;  break;
+		case 4:  currentSample = Orch5;  sampleLength = Orch5_len;  break;
+		case 5:  currentSample = Orch6;  sampleLength = Orch6_len;  break;
+		case 6:  currentSample = Orch7;  sampleLength = Orch7_len;  break;
+		case 7:  currentSample = Orch8;  sampleLength = Orch8_len;  break;
+		case 8:  currentSample = Orch9;  sampleLength = Orch9_len;  break;
+		case 9:  currentSample = Orch10; sampleLength = Orch10_len; break;
+		case 10: currentSample = Orch11; sampleLength = Orch11_len; break;
+		case 11: currentSample = Orch12; sampleLength = Orch12_len; break;
+		case 12: currentSample = Orch13; sampleLength = Orch13_len; break;
+		case 13: currentSample = Orch14; sampleLength = Orch14_len; break;
+		case 14: currentSample = Orch15; sampleLength = Orch15_len; break;
+		case 15: currentSample = Orch16; sampleLength = Orch16_len; break;
+		case 16: currentSample = Orch17; sampleLength = Orch17_len; break;
+		default: currentSample = Orch1;  sampleLength = Orch1_len;  break;
+	}
+
 		const float trigIn = inputs[TRIGIN_INPUT].getVoltage();
 		const float buttonIn = params[PUSH_PARAM].getValue();
 
