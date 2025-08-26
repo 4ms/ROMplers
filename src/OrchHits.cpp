@@ -51,7 +51,7 @@ struct OrchHits : Module {
 			sampleChoices.push_back(std::to_string(i));
 		configSwitch(SAMPLE_PARAM, 0.f, (numSamples - 1), 0.f, "Sample", sampleChoices);
 		configSwitch(PITCH_PARAM, 0.f, 4.f, 2.f, "Octave transpose", {"-2", "-1", "Unison", "+1", "+2"});
-		configParam(DECAY_PARAM, 0.1f, 5.f, 0.1f, "Decay", "s");
+		configParam(DECAY_PARAM, 0.1f, 5.f, 5.f, "Decay", "s");
 		configParam(PUSH_PARAM, 0.f, 1.f, 0.f, "Trigger button");
 	
 		configInput(PITCHCVIN_INPUT, "Pitch CV (1V/oct)");
@@ -118,10 +118,12 @@ struct OrchHits : Module {
 		float output = 0.f;
 	
 		if (playing && currentSample) {
-			float pitchKnob = params[PITCH_PARAM].getValue();
+			float pitchKnob = params[PITCH_PARAM].getValue();   
+			float octaveOffset = pitchKnob - 2.f;               
 			float pitchCV = inputs[PITCHCVIN_INPUT].isConnected() ? inputs[PITCHCVIN_INPUT].getVoltage() : 0.f;
-			float totalVolts = pitchKnob + pitchCV;
+			float totalVolts = octaveOffset + pitchCV;
 			float pitchRatio = std::pow(2.f, totalVolts);
+			
 	
 			float sampleRateRatio = sampleSampleRate / args.sampleRate;
 			samplePos += pitchRatio * sampleRateRatio;
