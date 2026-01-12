@@ -168,24 +168,25 @@ outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.0f);	}
 struct CrashWidget : ModuleWidget {
 	CrashWidget(Crash* module) {
 		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/Crash_info.svg")));
+		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/Crash.svg")));
 
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 15.971)), module, Crash::SAMPLE_PARAM));
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 39.997)), module, Crash::PITCH_PARAM));
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 64.029)), module, Crash::DECAY_PARAM));
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 89.342)), module, Crash::PUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(10.16, 89.342)), module, Crash::CRASH_LIGHT));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 12.45)), module, Crash::SAMPLE_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 36.199)), module, Crash::PITCH_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 60.001)), module, Crash::DECAY_PARAM));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 84.3)), module, Crash::PUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(10.16, 84.3)), module, Crash::CRASH_LIGHT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 29.578)), module, Crash::SAMPLECVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 54.083)), module, Crash::PITCHCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 79.658)), module, Crash::DECAYCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.469, 105.481)), module, Crash::TRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.994, 105.481)), module, Crash::VOLCVIN_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.16, 119.24)), module, Crash::AUDIOOUT_OUTPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 25.15)), module, Crash::SAMPLECVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 49.001)), module, Crash::PITCHCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 72.701)), module, Crash::DECAYCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.5, 98.002)), module, Crash::TRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.799, 98.002)), module, Crash::VOLCVIN_INPUT));
+
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.16, 112.0)), module, Crash::AUDIOOUT_OUTPUT));
 	}
 };
 
