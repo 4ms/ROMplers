@@ -96,7 +96,7 @@ struct Snare : Module {
 	}
 
 	void triggerSample(int sampleIndex) {
-		sampleIndex = clamp(sampleIndex, 0, numSamples - 1);
+		sampleIndex = std::clamp(sampleIndex, 0, numSamples - 1);
 		currentSample = samples[sampleIndex];
 		sampleLength = sampleLengths[sampleIndex];
 		samplePos = 0.f;
@@ -117,7 +117,7 @@ struct Snare : Module {
 		if (trigRising || buttonRising) {
 			SnareLightBrightness = 1.0f;
 			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() + inputs[SAMPLECVIN_INPUT].getVoltage());
-			sampleIndex = clamp(sampleIndex, 0, numSamples - 1);
+			sampleIndex = std::clamp(sampleIndex, 0, numSamples - 1);
 			triggerSample(sampleIndex);
 		}
 
@@ -128,7 +128,7 @@ struct Snare : Module {
 		float output = 0.f;
 
 		if (playing && currentSample) {
-			float pitchMod = clamp(params[PITCH_PARAM].getValue() + inputs[PITCHCVIN_INPUT].getVoltage(), -1.f, 1.f);
+			float pitchMod = std::clamp(params[PITCH_PARAM].getValue() + inputs[PITCHCVIN_INPUT].getVoltage(), -1.f, 1.f);
 			float normalizedPitch = (pitchMod + 1.f) * 0.5f;
 			float pitchRatio = MIN_PLAYBACK_SPEED + normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
 
@@ -153,7 +153,7 @@ struct Snare : Module {
 
 				const float sampleValue = s1 + frac * (s2 - s1);
 
-				float decayParam = clamp(params[DECAY_PARAM].getValue() + inputs[DECAYCVIN_INPUT].getVoltage(), 0.f, 1.f);
+				float decayParam = std::clamp(params[DECAY_PARAM].getValue() + inputs[DECAYCVIN_INPUT].getVoltage(), 0.f, 1.f);
 
 				const float minDecayTime = 0.005f;
 				const float maxDecayTime = (float)numSampleFrames / sampleSampleRate;
@@ -168,7 +168,7 @@ struct Snare : Module {
 
 		float volumeCV = 5.f;
 		if (inputs[VOLCVIN_INPUT].isConnected()) {
-			volumeCV = clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
+			volumeCV = std::clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
 		}
 
 		output *= volumeCV / 5.f;

@@ -55,8 +55,8 @@ struct Slap : Module {
 		// Approximate 2^x for typical pitch range (x in [0..8])
 		// Using a simple polynomial or linear approx to avoid std::pow cost
 		// For small CPU optimization, linear approx is OK here:
-		// 2^x ≈ 1 + x * 0.69314718 (ln2) for x near 0, clamp for larger x.
-		// Since pitch can be 0..8 (4 oct + 4V?), clamp and do powf only if needed.
+		// 2^x ≈ 1 + x * 0.69314718 (ln2) for x near 0, std::clamp for larger x.
+		// Since pitch can be 0..8 (4 oct + 4V?), std::clamp and do powf only if needed.
 
 		if (x < 0.f) return 1.f / fastPow2(-x);
 		if (x > 8.f) x = 8.f;
@@ -88,7 +88,7 @@ struct Slap : Module {
 		float output = 0.f;
 
 		if (playing && currentSample) {
-			// Pitch calculation: knob + CV, clamp CV if disconnected
+			// Pitch calculation: knob + CV, std::clamp CV if disconnected
 			const float pitchKnob = params[PITCH_PARAM].getValue(); // 0..4 oct
 			const float pitchCV = inputs[PITCHCVIN_INPUT].isConnected() ? inputs[PITCHCVIN_INPUT].getVoltage() : 0.f;
 			float pitch = pitchKnob + pitchCV;
@@ -125,7 +125,7 @@ struct Slap : Module {
 
 				const float sampleValue = s1 + frac * (s2 - s1);
 
-				// Decay parameter with clamp
+				// Decay parameter with std::clamp
 				float decayParam = params[DECAY_PARAM].getValue();
 				if (inputs[DECAYCVIN_INPUT].isConnected()) {
 					decayParam += inputs[DECAYCVIN_INPUT].getVoltage();
@@ -145,7 +145,7 @@ struct Slap : Module {
 			}
 		}
 
-		// Volume CV (clamped 0..5V)
+		// Volume CV (std::clamped 0..5V)
 		float volumeCV = 5.f;
 		if (inputs[VOLCVIN_INPUT].isConnected()) {
 			volumeCV = inputs[VOLCVIN_INPUT].getVoltage();

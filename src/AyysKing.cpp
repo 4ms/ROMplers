@@ -151,10 +151,10 @@ struct AyysKing : Module {
 
 	void process(const ProcessArgs& args) override {
 		// Compute speed and length once per process call
-		float speedInput = clamp(params[SPEED__PARAM].getValue() + inputs[SPEEDCVIN_INPUT].getVoltage() * 0.1f, 0.f, 1.f);
+		float speedInput = std::clamp(params[SPEED__PARAM].getValue() + inputs[SPEEDCVIN_INPUT].getVoltage() * 0.1f, 0.f, 1.f);
 		float speed = SPEED_LOW + speedInput * (SPEED_HIGH - SPEED_LOW);
 
-		float lengthInput = clamp(params[LENGTH_PARAM].getValue() + inputs[LENGTHCVIN_INPUT].getVoltage() * 0.1f, 0.f, 1.f);
+		float lengthInput = std::clamp(params[LENGTH_PARAM].getValue() + inputs[LENGTHCVIN_INPUT].getVoltage() * 0.1f, 0.f, 1.f);
 		float lengthRatio = LENGTH_MIN + lengthInput * (LENGTH_MAX - LENGTH_MIN);
 
 		const int maxSamples = int(voices[0].sampleLength * lengthRatio);

@@ -143,11 +143,11 @@ struct KayOne : Module {
 		static const float lengthCVScale = 0.1f;
 	
 		float knobSpeed = 0.01f + params[SPEED_PARAM].getValue() * (1.0f - 0.01f);
-		float normSpeed = clamp(knobSpeed + inputs[SPEEDCVIN_INPUT].getVoltage() * speedCVScale, 0.01f, 1.0f);
+		float normSpeed = std::clamp(knobSpeed + inputs[SPEEDCVIN_INPUT].getVoltage() * speedCVScale, 0.01f, 1.0f);
 		float speed = SPEED_LOW + (normSpeed - 0.01f) * ((SPEED_HIGH - SPEED_LOW) / (1.0f - 0.01f));
 	
 		float knobLength = params[LENGTH_PARAM].getValue();
-		float normLength = clamp(knobLength + inputs[LENGTHCVIN_INPUT].getVoltage() * lengthCVScale, 0.1f, 1.0f);
+		float normLength = std::clamp(knobLength + inputs[LENGTHCVIN_INPUT].getVoltage() * lengthCVScale, 0.1f, 1.0f);
 		float lengthRatio = LENGTH_MIN + (normLength - 0.1f) * ((LENGTH_MAX - LENGTH_MIN) / (1.0f - 0.1f));
 	
 		bool baseLoop = params[LOOP_PARAM].getValue() > 0.5f;

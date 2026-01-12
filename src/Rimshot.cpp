@@ -90,7 +90,7 @@ struct Rimshot : Module {
 			RimshotLightBrightness = 1.0f;
 
 			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() + inputs[SAMPLECVIN_INPUT].getVoltage());
-			sampleIndex = clamp(sampleIndex, 0, numSamples - 1);
+			sampleIndex = std::clamp(sampleIndex, 0, numSamples - 1);
 
 			currentSample = getSampleByIndex(sampleIndex);
 			sampleLength = getSampleLengthByIndex(sampleIndex);
@@ -111,8 +111,8 @@ struct Rimshot : Module {
 		float output = 0.f;
 
 		if (playing && currentSample) {
-			// Cache parameters to avoid repeated calls & clamp once
-			float pitchMod = clamp(params[PITCH_PARAM].getValue() + inputs[PITCHCVIN_INPUT].getVoltage(), -1.f, 1.f);
+			// Cache parameters to avoid repeated calls & std::clamp once
+			float pitchMod = std::clamp(params[PITCH_PARAM].getValue() + inputs[PITCHCVIN_INPUT].getVoltage(), -1.f, 1.f);
 			const float normalizedPitch = 0.5f * (pitchMod + 1.f);
 			const float pitchRatio = MIN_PLAYBACK_SPEED + normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
 			const float sampleRateRatio = sampleSampleRate / args.sampleRate;
@@ -136,7 +136,7 @@ struct Rimshot : Module {
 				const float sampleValue = (float)s1 + frac * ((float)s2 - (float)s1);
 				const float normalizedSample = sampleValue * (1.f / 32768.f);
 
-				float decayParam = clamp(params[DECAY_PARAM].getValue() + inputs[DECAYCVIN_INPUT].getVoltage(), 0.f, 1.f);
+				float decayParam = std::clamp(params[DECAY_PARAM].getValue() + inputs[DECAYCVIN_INPUT].getVoltage(), 0.f, 1.f);
 				const float minDecayTime = 0.005f;
 				const float maxDecayTime = (float)numSamples / sampleSampleRate;
 				const float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
@@ -150,7 +150,7 @@ struct Rimshot : Module {
 
 		float volumeCV = 5.f;
 		if (inputs[VOLCVIN_INPUT].isConnected())
-			volumeCV = clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
+			volumeCV = std::clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
 
 		output *= (volumeCV / 5.f);
 		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.0f);

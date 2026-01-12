@@ -203,10 +203,10 @@ struct SehvenToo : Module {
     void process(const ProcessArgs& args) override {
         float speed = rescale(params[SPEED__PARAM].getValue(), 0.f, 1.f, 0.05f, 2.f);
         if (inputs[SPEEDCVIN_INPUT].isConnected())
-            speed *= clamp(inputs[SPEEDCVIN_INPUT].getVoltage() / 10.f, 0.f, 1.f);
+            speed *= std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage() / 10.f, 0.f, 1.f);
         float lengthRatio = rescale(params[LENGTH_PARAM].getValue(), 0.f, 1.f, 0.1f, 1.f);
         if (inputs[LENGTHCVIN_INPUT].isConnected())
-            lengthRatio *= clamp(inputs[LENGTHCVIN_INPUT].getVoltage() / 10.f, 0.f, 1.f);
+            lengthRatio *= std::clamp(inputs[LENGTHCVIN_INPUT].getVoltage() / 10.f, 0.f, 1.f);
         bool loop = (params[LOOP_PARAM].getValue() > 0.5f)
                    || (inputs[LOOPCVIN_INPUT].isConnected() && inputs[LOOPCVIN_INPUT].getVoltage() > 1.f);
 

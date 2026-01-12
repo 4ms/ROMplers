@@ -149,16 +149,16 @@ struct SicksOh : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		// Precompute speed (scaled with CV), clamp and map to range
+		// Precompute speed (scaled with CV), std::clamp and map to range
 		float knobSpeed = 0.01f + params[SPEED_PARAM].getValue() * (1.0f - 0.01f);
-		float speedCV = clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -5.f, 5.f);
-		float normSpeed = clamp(knobSpeed + (speedCV / 5.f) * 0.5f, 0.01f, 1.0f);
+		float speedCV = std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -5.f, 5.f);
+		float normSpeed = std::clamp(knobSpeed + (speedCV / 5.f) * 0.5f, 0.01f, 1.0f);
 		float speed = SPEED_LOW + (normSpeed - 0.01f) * ((SPEED_HIGH - SPEED_LOW) / (1.0f - 0.01f));
 	
 		// Precompute length ratio similarly
 		float knobLength = params[LENGTH_PARAM].getValue();
-		float lengthCV = clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -5.f, 5.f);
-		float normLength = clamp(knobLength + (lengthCV / 5.f) * 0.5f, 0.1f, 1.0f);
+		float lengthCV = std::clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -5.f, 5.f);
+		float normLength = std::clamp(knobLength + (lengthCV / 5.f) * 0.5f, 0.1f, 1.0f);
 		float lengthRatio = LENGTH_MIN + (normLength - 0.1f) * ((LENGTH_MAX - LENGTH_MIN) / (1.0f - 0.1f));
 	
 		// Loop enabled logic

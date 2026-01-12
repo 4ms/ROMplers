@@ -72,7 +72,7 @@ struct OrchHits : Module {
 		if (inputs[SAMPLECVIN_INPUT].isConnected()) {
 			sampleParam += inputs[SAMPLECVIN_INPUT].getVoltage();
 		}
-		sampleParam = clamp(sampleParam, 0.f, static_cast<float>(numSamples - 1));
+		sampleParam = std::clamp(sampleParam, 0.f, static_cast<float>(numSamples - 1));
 		int selectedIndex = static_cast<int>(std::round(sampleParam));
 	
 		switch (selectedIndex) {
@@ -150,7 +150,7 @@ struct OrchHits : Module {
 				float decayParam = (knobDecayTime - minDecayTime) / (maxDecayTime - minDecayTime);
 				if (inputs[DECAYCVIN_INPUT].isConnected())
 					decayParam += inputs[DECAYCVIN_INPUT].getVoltage();
-				decayParam = clamp(decayParam, 0.f, 1.f);
+				decayParam = std::clamp(decayParam, 0.f, 1.f);
 				float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
 	
 				float decayCoef = std::exp(-1.f / (decayTime * args.sampleRate));
@@ -160,7 +160,7 @@ struct OrchHits : Module {
 			}
 		}
 	
-		float volumeCV = inputs[VOLCVIN_INPUT].isConnected() ? clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f) : 5.f;
+		float volumeCV = inputs[VOLCVIN_INPUT].isConnected() ? std::clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f) : 5.f;
 		output *= volumeCV / 5.f;
 		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.f);
 	}	

@@ -135,7 +135,7 @@ struct Percussion : Module {
 			PercussionLightBrightness = 1.0f;
 
 			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() + inputs[SAMPLECVIN_INPUT].getVoltage());
-			sampleIndex = clamp(sampleIndex, 0, (numSamples-1));
+			sampleIndex = std::clamp(sampleIndex, 0, (numSamples-1));
 
 			currentSample = getSampleByIndex(sampleIndex);
 			sampleLength = getSampleLengthByIndex(sampleIndex);
@@ -153,7 +153,7 @@ struct Percussion : Module {
 
 		if (playing && currentSample) {
 			float pitchMod = params[PITCH_PARAM].getValue() + inputs[PITCHCVIN_INPUT].getVoltage();
-			pitchMod = clamp(pitchMod, -1.f, 1.f);
+			pitchMod = std::clamp(pitchMod, -1.f, 1.f);
 
 			float normalizedPitch = (pitchMod + 1.f) / 2.f;
 			float pitchRatio = MIN_PLAYBACK_SPEED + normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
@@ -181,7 +181,7 @@ struct Percussion : Module {
 				float sampleValue = s1 + frac * (s2 - s1);
 
 				float decayParam = params[DECAY_PARAM].getValue() + inputs[DECAYCVIN_INPUT].getVoltage();
-				decayParam = clamp(decayParam, 0.f, 1.f);
+				decayParam = std::clamp(decayParam, 0.f, 1.f);
 
 				float minDecayTime = 0.005f;
 				float maxDecayTime = (float)numSamples / sampleSampleRate;
@@ -198,7 +198,7 @@ struct Percussion : Module {
 
 float volumeCV = 5.f;
 if (inputs[VOLCVIN_INPUT].isConnected()) {
-	volumeCV = clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
+	volumeCV = std::clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
 }
 
 output *= volumeCV / 5.f;

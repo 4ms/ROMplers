@@ -112,14 +112,14 @@ struct DeeArr : Module {
 	void process(const ProcessArgs& args) override {
 		// Precalculate speed with CV
 		const float knobSpeed = params[SPEED_PARAM].getValue();
-		const float speedCV = clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -5.f, 5.f);
-		const float normSpeed = clamp(knobSpeed + (speedCV / 5.f) * 0.5f, 0.01f, 1.0f);
+		const float speedCV = std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -5.f, 5.f);
+		const float normSpeed = std::clamp(knobSpeed + (speedCV / 5.f) * 0.5f, 0.01f, 1.0f);
 		const float speed = SPEED_LOW + (normSpeed - 0.01f) * ((SPEED_HIGH - SPEED_LOW) / (1.0f - 0.01f));
 
 		// Precalculate length with CV
 		const float knobLength = params[LENGTH_PARAM].getValue();
-		const float lengthCV = clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -5.f, 5.f);
-		const float normLength = clamp(knobLength + (lengthCV / 5.f) * 0.5f, 0.1f, 1.0f);
+		const float lengthCV = std::clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -5.f, 5.f);
+		const float normLength = std::clamp(knobLength + (lengthCV / 5.f) * 0.5f, 0.1f, 1.0f);
 		const float lengthRatio = LENGTH_MIN + (normLength - 0.1f) * ((LENGTH_MAX - LENGTH_MIN) / (1.0f - 0.1f));
 
 		const bool baseLoop = params[LOOP_PARAM].getValue() > 0.5f;

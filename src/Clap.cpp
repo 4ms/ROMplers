@@ -131,7 +131,7 @@ struct Clap : Module {
 			ClapLightBrightness = 1.0f;
 
 			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() + inputs[SAMPLECVIN_INPUT].getVoltage());
-			sampleIndex = clamp(sampleIndex, 0, numSamples - 1);
+			sampleIndex = std::clamp(sampleIndex, 0, numSamples - 1);
 
 			loadSample(sampleIndex);
 
@@ -148,14 +148,14 @@ struct Clap : Module {
 
 		if (playing && currentSampleFloat) {
 			// Cache parameters once
-			float pitchMod = clamp(params[PITCH_PARAM].getValue() + inputs[PITCHCVIN_INPUT].getVoltage(), -1.f, 1.f);
+			float pitchMod = std::clamp(params[PITCH_PARAM].getValue() + inputs[PITCHCVIN_INPUT].getVoltage(), -1.f, 1.f);
 			float normalizedPitch = (pitchMod + 1.f) * 0.5f;
 			float pitchRatio = MIN_PLAYBACK_SPEED + normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
 
 			constexpr float sampleSampleRate = 44100.f;
 			float sampleRateRatio = sampleSampleRate / args.sampleRate;
 
-			float decayParam = clamp(params[DECAY_PARAM].getValue() + inputs[DECAYCVIN_INPUT].getVoltage(), 0.f, 1.f);
+			float decayParam = std::clamp(params[DECAY_PARAM].getValue() + inputs[DECAYCVIN_INPUT].getVoltage(), 0.f, 1.f);
 			float minDecayTime = 0.005f;
 			float maxDecayTime = (float)decodedSampleLength / sampleSampleRate;
 			float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
@@ -182,7 +182,7 @@ struct Clap : Module {
 
 		float volumeCV = 5.f;
 		if (inputs[VOLCVIN_INPUT].isConnected()) {
-			volumeCV = clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
+			volumeCV = std::clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
 		}
 
 		output *= volumeCV / 5.f;

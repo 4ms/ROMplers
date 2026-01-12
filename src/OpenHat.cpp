@@ -92,7 +92,7 @@ struct OpenHat : Module {
 			if (inputs[SAMPLECVIN_INPUT].isConnected())
 				sampleIndex += (int)(inputs[SAMPLECVIN_INPUT].getVoltage());
 	
-			sampleIndex = clamp(sampleIndex, 0, numSamples - 1);
+			sampleIndex = std::clamp(sampleIndex, 0, numSamples - 1);
 	
 			currentSample = getSampleByIndex(sampleIndex);
 			sampleLength = getSampleLengthByIndex(sampleIndex);
@@ -112,7 +112,7 @@ struct OpenHat : Module {
 			float pitchMod = params[PITCH_PARAM].getValue();
 			if (inputs[PITCHCVIN_INPUT].isConnected())
 				pitchMod += inputs[PITCHCVIN_INPUT].getVoltage();
-			pitchMod = clamp(pitchMod, -1.f, 1.f);
+			pitchMod = std::clamp(pitchMod, -1.f, 1.f);
 	
 			float pitchRatio = MIN_PLAYBACK_SPEED + ((pitchMod + 1.f) * 0.5f * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED));
 			const float sampleRateRatio = 44100.f / args.sampleRate;
@@ -137,7 +137,7 @@ struct OpenHat : Module {
 				float decayParam = params[DECAY_PARAM].getValue();
 				if (inputs[DECAYCVIN_INPUT].isConnected())
 					decayParam += inputs[DECAYCVIN_INPUT].getVoltage();
-				decayParam = clamp(decayParam, 0.f, 1.f);
+				decayParam = std::clamp(decayParam, 0.f, 1.f);
 	
 				const float decayTime = 0.005f + decayParam * ((float)numSamps / 44100.f - 0.005f);
 				const float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
@@ -150,7 +150,7 @@ struct OpenHat : Module {
 		// Volume scaling
 		float volume = 1.f;
 		if (inputs[VOLCVIN_INPUT].isConnected())
-			volume = clamp(inputs[VOLCVIN_INPUT].getVoltage() / 5.f, 0.f, 1.f);
+			volume = std::clamp(inputs[VOLCVIN_INPUT].getVoltage() / 5.f, 0.f, 1.f);
 	
 		outputs[AUDIOOUT_OUTPUT].setVoltage(output * volume * 5.f);
 	}	

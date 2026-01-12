@@ -89,7 +89,7 @@ struct ClosedHat : Module {
 		const float sampleCV = inputs[SAMPLECVIN_INPUT].getVoltage();
 		const float pitchCV = inputs[PITCHCVIN_INPUT].getVoltage();
 		const float decayCV = inputs[DECAYCVIN_INPUT].getVoltage();
-		const float volCV = inputs[VOLCVIN_INPUT].isConnected() ? clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f) : 5.f;
+		const float volCV = inputs[VOLCVIN_INPUT].isConnected() ? std::clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f) : 5.f;
 
 		// Trigger detection
 		bool trigRising = (lastTrigValue <= 1.f && trigIn > 1.f);
@@ -103,7 +103,7 @@ struct ClosedHat : Module {
 			ClosedHatLightBrightness = 1.0f;
 
 			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() + sampleCV);
-			sampleIndex = clamp(sampleIndex, 0, numSamples - 1);
+			sampleIndex = std::clamp(sampleIndex, 0, numSamples - 1);
 
 			currentSample = getSampleByIndex(sampleIndex);
 			sampleLength = getSampleLengthByIndex(sampleIndex);
@@ -113,14 +113,14 @@ struct ClosedHat : Module {
 			env = 1.0f;
 
 			// Precompute decay coefficient
-			float decayParam = clamp(params[DECAY_PARAM].getValue() + decayCV, 0.f, 1.f);
+			float decayParam = std::clamp(params[DECAY_PARAM].getValue() + decayCV, 0.f, 1.f);
 			const float minDecayTime = 0.005f;
 			const float maxDecayTime = (float)(sampleLength / 2) / 44100.f;
 			float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
 			decayCoef = expf(-1.f / (decayTime * args.sampleRate));
 
 			// Precompute pitch ratio
-			float pitchMod = clamp(params[PITCH_PARAM].getValue() + pitchCV, -1.f, 1.f);
+			float pitchMod = std::clamp(params[PITCH_PARAM].getValue() + pitchCV, -1.f, 1.f);
 			float normalizedPitch = (pitchMod + 1.f) / 2.f;
 			pitchRatio = MIN_PLAYBACK_SPEED + normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
 			pitchRatio *= 44100.f / args.sampleRate;

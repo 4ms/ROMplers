@@ -94,9 +94,9 @@ struct Ride : Module {
 		if (trigRising || buttonRising) {
 			RideLightBrightness = 1.f;
 	
-			// Determine sample index clamped to valid range
+			// Determine sample index std::clamped to valid range
 			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() + inputs[SAMPLECVIN_INPUT].getVoltage());
-			sampleIndex = clamp(sampleIndex, 0, numSamples - 1);
+			sampleIndex = std::clamp(sampleIndex, 0, numSamples - 1);
 	
 			currentSample = getSampleByIndex(sampleIndex);
 			sampleLength = getSampleLengthByIndex(sampleIndex);

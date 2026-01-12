@@ -105,7 +105,7 @@ struct Tom : Module {
 		const float sampleCV = inputs[SAMPLECVIN_INPUT].isConnected() ? inputs[SAMPLECVIN_INPUT].getVoltage() : 0.f;
 		const float pitchCV = inputs[PITCHCVIN_INPUT].isConnected() ? inputs[PITCHCVIN_INPUT].getVoltage() : 0.f;
 		const float decayCV = inputs[DECAYCVIN_INPUT].isConnected() ? inputs[DECAYCVIN_INPUT].getVoltage() : 0.f;
-		const float volCV = inputs[VOLCVIN_INPUT].isConnected() ? clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f) : 5.f;
+		const float volCV = inputs[VOLCVIN_INPUT].isConnected() ? std::clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f) : 5.f;
 
 		bool trigRising = (lastTrigValue <= 1.f && trigIn > 1.f);
 		bool buttonRising = (lastButtonValue <= 0.5f && buttonIn > 0.5f);
@@ -119,7 +119,7 @@ struct Tom : Module {
 			TomLightBrightness = 1.0f;
 
 			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() + sampleCV);
-			sampleIndex = clamp(sampleIndex, 0, numSamples - 1);
+			sampleIndex = std::clamp(sampleIndex, 0, numSamples - 1);
 
 			currentSample = getSampleByIndex(sampleIndex);
 			int sampleLengthBytes = getSampleLengthByIndex(sampleIndex);
@@ -138,7 +138,7 @@ struct Tom : Module {
 		float output = 0.f;
 
 		if (playing) {
-			float pitchMod = clamp(params[PITCH_PARAM].getValue() + pitchCV, -1.f, 1.f);
+			float pitchMod = std::clamp(params[PITCH_PARAM].getValue() + pitchCV, -1.f, 1.f);
 			float normalizedPitch = (pitchMod + 1.f) * 0.5f;
 			float pitchRatio = MIN_PLAYBACK_SPEED + normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
 
@@ -158,7 +158,7 @@ struct Tom : Module {
 
 				float sampleValue = (s1 + frac * (s2 - s1)) * (1.0f / 32768.0f);
 
-				float decayParam = clamp(params[DECAY_PARAM].getValue() + decayCV, 0.f, 1.f);
+				float decayParam = std::clamp(params[DECAY_PARAM].getValue() + decayCV, 0.f, 1.f);
 				const float minDecayTime = 0.005f;
 				const float maxDecayTime = (float)sampleLengthSamples / SAMPLE_SAMPLE_RATE;
 				float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);

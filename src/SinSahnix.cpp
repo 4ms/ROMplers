@@ -140,16 +140,16 @@ struct SinSahnix : Module {
         float baseSpeedParam = params[SPEED_PARAM].getValue();
         float knobSpeed = 0.01f + baseSpeedParam * 0.99f;
 
-        float speedCV = clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -5.f, 5.f);
+        float speedCV = std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -5.f, 5.f);
         float speedOffset = (speedCV * 0.1f);  // pre-multiplied 0.5/5 = 0.1
-        float normSpeed = clamp(knobSpeed + speedOffset, 0.01f, 1.0f);
+        float normSpeed = std::clamp(knobSpeed + speedOffset, 0.01f, 1.0f);
         float speed = SPEED_LOW + (normSpeed - 0.01f) * ((SPEED_HIGH - SPEED_LOW) * (1.0f / 0.99f));
 
         // Length (pre-calculated constants)
         float knobLength = params[LENGTH_PARAM].getValue();
-        float lengthCV = clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -5.f, 5.f);
+        float lengthCV = std::clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -5.f, 5.f);
         float lengthOffset = lengthCV * 0.1f; // same factor as speed for consistency
-        float normLength = clamp(knobLength + lengthOffset, 0.1f, 1.0f);
+        float normLength = std::clamp(knobLength + lengthOffset, 0.1f, 1.0f);
         float lengthRatio = LENGTH_MIN + (normLength - 0.1f) * ((LENGTH_MAX - LENGTH_MIN) * (1.0f / 0.9f));
 
         bool baseLoop = params[LOOP_PARAM].getValue() > 0.5f;
