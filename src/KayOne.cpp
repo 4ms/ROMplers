@@ -217,50 +217,51 @@ struct KayOne : Module {
 struct KayOneWidget : ModuleWidget {
 	KayOneWidget(KayOne* module) {
 		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/KayOne_info.svg")));
+		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/KayOne.svg")));
 
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(20.32, 15.958)), module, KayOne::SPEED_PARAM));
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(8.867, 35.67)), module, KayOne::LENGTH_PARAM));
-		addParam(createParamCentered<Switch2Pos>(mm2px(Vec(30.511, 35.67)), module, KayOne::LOOP_PARAM));
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 63.771)), module, KayOne::KICKPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 63.771)), module, KayOne::KICK_LIGHT));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(7.751, 12.45)), module, KayOne::LENGTH_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(27.002, 12.45)), module, KayOne::SPEED_PARAM));
+		addParam(createParam<Switch2Pos>(mm2px(Vec(41.4, 9.451)), module, KayOne::LOOP_PARAM));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 73.417)), module, KayOne::SNAREPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 73.417)), module, KayOne::SNARE_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 37.0)), module, KayOne::KICKPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 37.0)), module, KayOne::KICK_LIGHT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 83.302)), module, KayOne::TOMLPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 83.302)), module, KayOne::TOML_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 52.0)), module, KayOne::SNAREPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 52.0)), module, KayOne::SNARE_LIGHT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 93.19)), module, KayOne::TOMHPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 93.19)), module, KayOne::TOMH_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 67.0)), module, KayOne::TOMLPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 67.0)), module, KayOne::TOML_LIGHT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 103.551)), module, KayOne::CLPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 103.551)), module, KayOne::CL_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 82.0)), module, KayOne::TOMHPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 82.0)), module, KayOne::TOMH_LIGHT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 114.064)), module, KayOne::OHPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 114.064)), module, KayOne::OH_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 97.0)), module, KayOne::CLPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 97.0)), module, KayOne::CL_LIGHT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.32, 29.153)), module, KayOne::SPEEDCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.867, 49.49)), module, KayOne::LENGTHCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(30.511, 49.49)), module, KayOne::LOOPCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 63.771)), module, KayOne::KICKTRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 73.417)), module, KayOne::SNARETRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 83.302)), module, KayOne::TOMLTRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 93.19)), module, KayOne::TOMHTRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 103.551)), module, KayOne::CLTRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 114.064)), module, KayOne::OHTRIG_INPUT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 112.0)), module, KayOne::OHPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 112.0)), module, KayOne::OH_LIGHT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 63.771)), module, KayOne::KICKOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 73.417)), module, KayOne::SNAREOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 83.302)), module, KayOne::TOMLOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 93.19)), module, KayOne::TOMHOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 103.551)), module, KayOne::CLOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 114.064)), module, KayOne::OHOUT_OUTPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.751, 26.0)), module, KayOne::LENGTHCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(27.002, 26.0)), module, KayOne::SPEEDCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(44.2, 26.0)), module, KayOne::LOOPCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 37.0)), module, KayOne::KICKTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 52.0)), module, KayOne::SNARETRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 67.0)), module, KayOne::TOMLTRIG_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 82.0)), module, KayOne::TOMHTRIG_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 97.0)), module, KayOne::CLTRIG_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 112.0)), module, KayOne::OHTRIG_INPUT));
+
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 37.0)), module, KayOne::KICKOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 52.0)), module, KayOne::SNAREOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 67.0)), module, KayOne::TOMLOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 82.0)), module, KayOne::TOMHOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 97.0)), module, KayOne::CLOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 112.0)), module, KayOne::OHOUT_OUTPUT));
 	}
 };
 
