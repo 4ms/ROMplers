@@ -158,74 +158,76 @@ struct KayArr : Module {
 		}
 	}
 };
+
 struct KayArrWidget : ModuleWidget {
 	KayArrWidget(KayArr* module) {
 		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/KayArr_info.svg")));
+		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/KayArr.svg")));
 
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(25.4, 21.308)), module, KayArr::SPEED_PARAM));
-		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(11.24, 33.508)), module, KayArr::LENGTH_PARAM));
-		addParam(createParamCentered<Switch2Pos>(mm2px(Vec(41.683, 33.508)), module, KayArr::LOOP_PARAM));
+		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(11.24, 15.501)), module, KayArr::LENGTH_PARAM));
+		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(31.249, 15.501)), module, KayArr::SPEED_PARAM));
+		addParam(createParam<Switch2Pos>(mm2px(Vec(47, 12.499)), module, KayArr::LOOP_PARAM));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.0, 59.14)), module, KayArr::KICKPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.0, 59.14)), module, KayArr::KICK_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(6.999, 42.002)), module, KayArr::KICKPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(6.999, 42.002)), module, KayArr::KICK_LIGHT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(16.49, 59.14)), module, KayArr::SNAREPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(16.49, 59.14)), module, KayArr::SNARE_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(18.75, 42.002)), module, KayArr::SNAREPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(18.75, 42.002)), module, KayArr::SNARE_LIGHT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(25.4, 59.14)), module, KayArr::CLPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(25.4, 59.14)), module, KayArr::CL_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(30.501, 42.002)), module, KayArr::CLPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(30.501, 42.002)), module, KayArr::CL_LIGHT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(35.318, 59.14)), module, KayArr::OHPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(35.318, 59.14)), module, KayArr::OH_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(42.249, 42.002)), module, KayArr::OHPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(42.249, 42.002)), module, KayArr::OH_LIGHT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(44.699, 59.14)), module, KayArr::TOMPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(44.699, 59.14)), module, KayArr::TOM_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(54.0, 42.002)), module, KayArr::TOMPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(54.0, 42.002)), module, KayArr::TOM_LIGHT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.0, 94.743)), module, KayArr::CONGAPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.0, 94.743)), module, KayArr::CONGA_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(6.999, 84.999)), module, KayArr::CONGAPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(6.999, 84.999)), module, KayArr::CONGA_LIGHT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(16.49, 94.743)), module, KayArr::CLAVEPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(16.49, 94.743)), module, KayArr::CLAVE_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(18.75, 84.999)), module, KayArr::CLAVEPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(18.75, 84.999)), module, KayArr::CLAVE_LIGHT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(25.4, 94.743)), module, KayArr::RIMSHOTPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(25.4, 94.743)), module, KayArr::RIMSHOT_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(30.501, 84.999)), module, KayArr::RIMSHOTPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(30.501, 84.999)), module, KayArr::RIMSHOT_LIGHT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(35.318, 94.743)), module, KayArr::COWBELLPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(35.318, 94.743)), module, KayArr::COWBELL_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(42.249, 84.999)), module, KayArr::COWBELLPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(42.249, 84.999)), module, KayArr::COWBELL_LIGHT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(44.699, 94.743)), module, KayArr::CYMPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(44.699, 94.743)), module, KayArr::CYMBAL_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(54.0, 84.999)), module, KayArr::CYMPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(54.0, 84.999)), module, KayArr::CYMBAL_LIGHT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.4, 33.97)), module, KayArr::SPEEDCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.24, 45.349)), module, KayArr::LENGTHCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(41.683, 45.349)), module, KayArr::LOOPCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.0, 71.357)), module, KayArr::KICKTRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.49, 71.357)), module, KayArr::SNARETRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.4, 71.357)), module, KayArr::CLTRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(35.318, 71.357)), module, KayArr::OHTRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(44.699, 71.357)), module, KayArr::TOMTRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.0, 106.959)), module, KayArr::CONGATRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.49, 106.959)), module, KayArr::CLAVETRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.4, 106.959)), module, KayArr::RIMSHOTTRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(35.318, 106.959)), module, KayArr::COWBELLTRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(44.699, 106.959)), module, KayArr::CYMBALTRIG_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.0, 83.813)), module, KayArr::KICKOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(16.49, 83.813)), module, KayArr::SNAREOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(25.4, 83.813)), module, KayArr::CLOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(35.318, 83.813)), module, KayArr::OHOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(44.699, 83.813)), module, KayArr::TOMOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.0, 118.357)), module, KayArr::CONGAOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(16.49, 118.357)), module, KayArr::CLAVEOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(25.4, 118.357)), module, KayArr::RIMSHOTOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(35.318, 118.357)), module, KayArr::COWBELLOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(44.699, 118.357)), module, KayArr::CYMBALOUT_OUTPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.24, 30.801)), module, KayArr::LENGTHCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31.249, 30.801)), module, KayArr::SPEEDCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(49.731, 30.801)), module, KayArr::LOOPCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.999, 56.0)), module, KayArr::KICKTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(18.75, 56.0)), module, KayArr::SNARETRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(30.501, 56.0)), module, KayArr::CLTRIG_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(42.249, 56.0)), module, KayArr::OHTRIG_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(54.0, 56.0)), module, KayArr::TOMTRIG_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.999, 99.001)), module, KayArr::CONGATRIG_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(18.75, 99.001)), module, KayArr::CLAVETRIG_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(30.501, 99.001)), module, KayArr::RIMSHOTTRIG_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(42.249, 99.001)), module, KayArr::COWBELLTRIG_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(54.0, 99.001)), module, KayArr::CYMBALTRIG_INPUT));
+
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(6.999, 70.002)), module, KayArr::KICKOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.75, 70.002)), module, KayArr::SNAREOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(30.501, 70.002)), module, KayArr::CLOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(42.249, 70.002)), module, KayArr::OHOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(54.0, 70.002)), module, KayArr::TOMOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(6.999, 112.999)), module, KayArr::CONGAOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.75, 112.999)), module, KayArr::CLAVEOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(30.501, 112.999)), module, KayArr::RIMSHOTOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(42.249, 112.999)), module, KayArr::COWBELLOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(54.0, 112.999)), module, KayArr::CYMBALOUT_OUTPUT));
 	}
 };
 
