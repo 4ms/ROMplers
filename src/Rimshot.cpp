@@ -165,9 +165,9 @@ struct RimshotWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 15.971)), module, Rimshot::SAMPLE_PARAM));
-		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 39.997)), module, Rimshot::PITCH_PARAM));
-		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 64.029)), module, Rimshot::DECAY_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 15.971)), module, Rimshot::SAMPLE_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 39.997)), module, Rimshot::PITCH_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 64.029)), module, Rimshot::DECAY_PARAM));
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 89.342)), module, Rimshot::PUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(10.16, 89.342)), module, Rimshot::RIMSHOT_LIGHT));
 

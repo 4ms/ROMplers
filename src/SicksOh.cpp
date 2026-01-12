@@ -236,9 +236,9 @@ struct SicksOhWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(20.32, 15.958)), module, SicksOh::SPEED_PARAM));
-		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(8.867, 24.557)), module, SicksOh::LENGTH_PARAM));
-		addParam(createParamCentered<_2Pos>(mm2px(Vec(30.511, 24.557)), module, SicksOh::LOOP_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(20.32, 15.958)), module, SicksOh::SPEED_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(8.867, 24.557)), module, SicksOh::LENGTH_PARAM));
+		addParam(createParamCentered<Switch2Pos>(mm2px(Vec(30.511, 24.557)), module, SicksOh::LOOP_PARAM));
 
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 53.187)), module, SicksOh::KICKPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 53.187)), module, SicksOh::KICK_LIGHT));

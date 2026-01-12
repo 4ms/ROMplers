@@ -178,7 +178,7 @@ struct AyysKingWidget : ModuleWidget {
 
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(25.4, 21.308)), module, AyysKing::SPEED__PARAM));
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(11.24, 33.508)), module, AyysKing::LENGTH_PARAM));
-		addParam(createParamCentered<_2Pos>(mm2px(Vec(41.683, 33.508)), module, AyysKing::LOOP_PARAM));
+		addParam(createParamCentered<Switch2Pos>(mm2px(Vec(41.683, 33.508)), module, AyysKing::LOOP_PARAM));
 
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.0, 59.14)), module, AyysKing::KICKPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.0, 59.14)), module, AyysKing::KICK_LIGHT));

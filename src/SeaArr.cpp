@@ -245,7 +245,7 @@ struct SeaArrWidget : ModuleWidget {
 
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(30.48, 21.308)), module, SeaArr::SPEED__PARAM));
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(16.002, 33.508)), module, SeaArr::LENGTH_PARAM));
-		addParam(createParamCentered<_2Pos>(mm2px(Vec(46.446, 33.508)), module, SeaArr::LOOP_PARAM));
+		addParam(createParamCentered<Switch2Pos>(mm2px(Vec(46.446, 33.508)), module, SeaArr::LOOP_PARAM));
 		
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.0, 59.14)), module, SeaArr::KICKPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.0, 59.14)), module, SeaArr::KICK_LIGHT));

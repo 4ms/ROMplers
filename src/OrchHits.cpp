@@ -174,9 +174,9 @@ struct OrchHitsWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 16.052)), module, OrchHits::SAMPLE_PARAM));
-		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 39.468)), module, OrchHits::OCTAVE_PARAM));
-		addParam(createParamCentered<_9mmKnob>(mm2px(Vec(10.16, 63.5)), module, OrchHits::DECAY_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 16.052)), module, OrchHits::SAMPLE_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 39.468)), module, OrchHits::OCTAVE_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 63.5)), module, OrchHits::DECAY_PARAM));
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 88.812)), module, OrchHits::PUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(10.16, 88.812)), module, OrchHits::ORCHHITS_LIGHT));
 
