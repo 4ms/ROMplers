@@ -187,41 +187,41 @@ struct DeeArr : Module {
 struct DeeArrWidget : ModuleWidget {
 	DeeArrWidget(DeeArr* module) {
 		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/DeeArr_info.svg")));
+		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/DeeArr.svg")));
 
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(20.32, 15.958)), module, DeeArr::SPEED_PARAM));
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(8.867, 35.67)), module, DeeArr::LENGTH_PARAM));
-		addParam(createParamCentered<Switch2Pos>(mm2px(Vec(30.511, 35.67)), module, DeeArr::LOOP_PARAM));
+		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(25.4, 19.001)), module, DeeArr::SPEED_PARAM));
+		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(9.751, 29.2)), module, DeeArr::LENGTH_PARAM));
+		addParam(createParam<Switch2Pos>(mm2px(Vec(38.3, 27.499)), module, DeeArr::LOOP_PARAM));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 63.771)), module, DeeArr::KICKPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 63.771)), module, DeeArr::KICK_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 67.0)), module, DeeArr::KICKPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 67.0)), module, DeeArr::KICK_LIGHT));
 		
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 73.417)), module, DeeArr::SNAREPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 73.471)), module, DeeArr::SNARE_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 82.0)), module, DeeArr::SNAREPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 82.0)), module, DeeArr::SNARE_LIGHT));
+		
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 97.0)), module, DeeArr::HATPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 97.0)), module, DeeArr::HAT_LIGHT));
+		
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 112.0)), module, DeeArr::RIMPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 112.0)), module, DeeArr::RIM_LIGHT));
+		
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.4, 36.499)), module, DeeArr::SPEEDCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.751, 47.001)), module, DeeArr::LENGTHCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(41.25, 47.001)), module, DeeArr::LOOPCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 67.0)), module, DeeArr::KICKTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 82.0)), module, DeeArr::SNARETRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 97.0)), module, DeeArr::HATTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 112.0)), module, DeeArr::RIMTRIGIN_INPUT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 83.302)), module, DeeArr::HATPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 83.302)), module, DeeArr::HAT_LIGHT));
-
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 93.19)), module, DeeArr::RIMPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 93.19)), module, DeeArr::RIM_LIGHT));
-
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.32, 29.153)), module, DeeArr::SPEEDCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.867, 49.49)), module, DeeArr::LENGTHCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(30.511, 49.49)), module, DeeArr::LOOPCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 63.771)), module, DeeArr::KICKTRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 73.417)), module, DeeArr::SNARETRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 83.302)), module, DeeArr::HATTRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 93.19)), module, DeeArr::RIMTRIGIN_INPUT));
-
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 63.771)), module, DeeArr::KICKOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 73.417)), module, DeeArr::SNAREOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 83.302)), module, DeeArr::HATOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 93.19)), module, DeeArr::RIMOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 67.0)), module, DeeArr::KICKOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 82.0)), module, DeeArr::SNAREOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 97.0)), module, DeeArr::HATOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 112.0)), module, DeeArr::RIMOUT_OUTPUT));
 	}
 };
 
