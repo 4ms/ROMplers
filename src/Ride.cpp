@@ -180,24 +180,24 @@ struct Ride : Module {
 struct RideWidget : ModuleWidget {
 	RideWidget(Ride* module) {
 		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/Ride_info.svg")));
+		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/Ride.svg")));
 
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 15.971)), module, Ride::SAMPLE_PARAM));
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 39.997)), module, Ride::PITCH_PARAM));
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 64.029)), module, Ride::DECAY_PARAM));
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 89.342)), module, Ride::PUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(10.16, 89.342)), module, Ride::RIDE_LIGHT));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 12.45)), module, Ride::SAMPLE_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 36.199)), module, Ride::PITCH_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 60.001)), module, Ride::DECAY_PARAM));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 84.3)), module, Ride::PUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(10.16, 84.3)), module, Ride::RIDE_LIGHT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 29.578)), module, Ride::SAMPLECVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 54.083)), module, Ride::PITCHCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 79.658)), module, Ride::DECAYCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.469, 105.481)), module, Ride::TRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.994, 105.481)), module, Ride::VOLCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 25.15)), module, Ride::SAMPLECVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 49.001)), module, Ride::PITCHCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 72.701)), module, Ride::DECAYCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.5, 98.002)), module, Ride::TRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.799, 98.002)), module, Ride::VOLCVIN_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.16, 119.24)), module, Ride::AUDIOOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.16, 112.0)), module, Ride::AUDIOOUT_OUTPUT));
 	}
 };
 
