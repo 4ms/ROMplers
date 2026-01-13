@@ -180,8 +180,8 @@ struct OrchHitsWidget : ModuleWidget {
 		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 12.45)), module, OrchHits::SAMPLE_PARAM));
 		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 36.199)), module, OrchHits::OCTAVE_PARAM));
 		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 62.001)), module, OrchHits::DECAY_PARAM));
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 85.5)), module, OrchHits::PUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(10.16, 85.5)), module, OrchHits::ORCHHITS_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 84.3)), module, OrchHits::PUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(10.16, 84.3)), module, OrchHits::ORCHHITS_LIGHT));
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 25.15)), module, OrchHits::SAMPLECVIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.5, 49.001)), module, OrchHits::OCTAVECVIN_INPUT));
