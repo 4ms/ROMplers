@@ -109,46 +109,55 @@ struct AyysKing : Module {
 		return v;
 	}
 
-	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId, float speed, int maxSamples, bool loop) {
+	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId,
+		float speed, int maxSamples, bool loop) {
+
 		const bool trig = inputs[trigInputId].getVoltage() > 1.f;
-		const bool btn = params[pushParamId].getValue() > 0.5f;
+		const bool btn  = params[pushParamId].getValue() > 0.5f;
 
 		const bool trigRise = trig && !voice.lastInputTrigger;
-		const bool btnRise = btn && !voice.lastButtonTrigger;
-		const bool trigger = trigRise || btnRise || (loop && !voice.playing);
-
+		const bool btnRise  = btn  && !voice.lastButtonTrigger;
+		const bool trigger  = trigRise || btnRise || (loop && !voice.playing);
+			
 		voice.lastInputTrigger = trig;
-		voice.lastButtonTrigger = btn;
+		voice.lastButtonTrigger = btn;	
 
+		bool loopReset = false; // ← NEW: light-only pulse source
+			
 		if (trigger) {
-			voice.playing = true;
-			voice.samplePos = 0.f;
-			if (voice.lightId >= 0)
-				lights[voice.lightId].setBrightness(1.f);
+		voice.playing = true;
+		voice.samplePos = 0.f;
+		if (voice.lightId >= 0)
+		  lights[voice.lightId].setBrightness(1.f);
 		}
 
 		if (voice.playing) {
-			int idx = (int)voice.samplePos;
-			if (idx < maxSamples) {
-				outputs[voice.outputId].setVoltage(voice.getSample(idx));
-				voice.samplePos += speed;
-			} else {
-				if (loop) {
-					voice.samplePos = 0.f;
-					outputs[voice.outputId].setVoltage(voice.getSample(0));
-				} else {
-					voice.playing = false;
-					outputs[voice.outputId].setVoltage(0.f);
-				}
-			}
+		int idx = (int)voice.samplePos;
+
+		if (idx < maxSamples) {
+		  outputs[voice.outputId].setVoltage(voice.getSample(idx));
+		  voice.samplePos += speed;
 		} else {
-			outputs[voice.outputId].setVoltage(0.f);
+		  if (loop) {
+			  voice.samplePos = 0.f;
+			  outputs[voice.outputId].setVoltage(voice.getSample(0));
+			  loopReset = true; // 🔴 detect wrap
+		  } else {
+			  voice.playing = false;
+			  outputs[voice.outputId].setVoltage(0.f);
+		  }
+		}
+		} else {
+		outputs[voice.outputId].setVoltage(0.f);
 		}
 
-		// Fade light brightness smoothly off every sample to save CPU
-		if (voice.lightId >= 0)
-			lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
-	}
+		// --- Light handling (additive, non-invasive) ---
+		if (voice.lightId >= 0) {
+		if (loopReset)
+		  lights[voice.lightId].setBrightness(1.f);
+		lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
+		}
+		}
 
 	void process(const ProcessArgs& args) override {
 		// --- Speed ---
