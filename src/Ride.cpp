@@ -152,8 +152,11 @@ struct Ride : Module {
 				float sampleValue = s1 * (1.f - frac) + s2 * frac;
 				sampleValue /= 32768.f;
 	
-				float decayParam = params[DECAY_PARAM].getValue() + inputs[DECAYCVIN_INPUT].getVoltage();
-				decayParam = std::clamp(decayParam, 0.f, 1.f);
+			// Decay with ±5V CV
+			float decayParam = params[DECAY_PARAM].getValue();
+			if (inputs[DECAYCVIN_INPUT].isConnected())
+				decayParam += inputs[DECAYCVIN_INPUT].getVoltage() / 10.f; // ±5V → ±0.5
+			decayParam = std::clamp(decayParam, 0.f, 1.f);
 	
 				constexpr float minDecayTime = 0.005f;
 				float maxDecayTime = (float)numSamplesInSample / sampleSampleRate;
