@@ -207,13 +207,13 @@ struct Percussion : Module {
 		}
 	
 		// Volume with ±5V CV
-		float volumeCV = 1.f;
+		float volumeCV = 5.f;
 		if (inputs[VOLCVIN_INPUT].isConnected())
-			volumeCV = std::clamp((inputs[VOLCVIN_INPUT].getVoltage() + 5.f) / 10.f, 0.f, 1.f); // ±5V → 0–1
+			volumeCV = std::clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
 	
 		output *= volumeCV;
 	
-		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.0f);
+		outputs[AUDIOOUT_OUTPUT].setVoltage(output);
 	}
 };	
 
