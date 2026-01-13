@@ -66,6 +66,7 @@ struct SehvenToo : Module {
         MARACA_LIGHT,
         CABASA_LIGHT,
         WHISTLE_LIGHT,
+        LOOP_LIGHT, 
         LIGHTS_LEN
     };
 
@@ -162,7 +163,7 @@ struct SehvenToo : Module {
     }
 
     void processVoice(const ProcessArgs& args, Voice& v, int trigInId, int pushParamId,
-                      float speed, float lengthRatio, bool loopEnabled) {
+        float speed, float lengthRatio, bool loopEnabled) {
         bool inTrig = inputs[trigInId].getVoltage() > 1.f;
         bool btnTrig = params[pushParamId].getValue() > 0.5f;
         bool rising = (inTrig && !v.lastInputTrigger) || (btnTrig && !v.lastButtonTrigger);
@@ -200,6 +201,10 @@ struct SehvenToo : Module {
         }
     }
 
+    bool loopState = false;           // the current loopState on/off state
+	bool lastLoopButton = false;      // previous frame state for the button
+	bool lastLoopCVTrigger = false;   // previous frame state for the CV
+
     void process(const ProcessArgs& args) override {
         // --- Speed ---
         float knobSpeed = params[SPEED_PARAM].getValue() * 5.f;  // 0-1 → 0-5
@@ -217,21 +222,33 @@ struct SehvenToo : Module {
         float normLength = std::clamp(combinedLength / 5.f, 0.f, 1.f); // normalize 0-1
         float lengthRatio = LENGTH_MIN + normLength * (LENGTH_MAX - LENGTH_MIN);
     
-        bool loop = (params[LOOP_PARAM].getValue() > 0.5f)
-                    || (inputs[LOOPCVIN_INPUT].isConnected() && inputs[LOOPCVIN_INPUT].getVoltage() > 1.f);
+	    // --- Loop mode ---
+        bool loopButton = params[LOOP_PARAM].getValue() > 0.5f;
+        float loopCV = inputs[LOOPCVIN_INPUT].isConnected() ? inputs[LOOPCVIN_INPUT].getVoltage() : 0.f;
+        bool loopButtonRising = loopButton && !lastLoopButton;
+        if (loopButtonRising) {
+            loopState = !loopState;
+        }
+        if (!loopState && loopCV > 1.f) {       // OFF → ON with positive CV
+            loopState = true;
+        } else if (loopState && loopCV < -1.f) { // ON → OFF with negative CV
+            loopState = false;
+        }
+        lastLoopButton = loopButton;
+        lights[LOOP_LIGHT].setBrightnessSmooth(loopState, args.sampleTime);
     
-        processVoice(args, congaLVoice, CONGALTRIGIN_INPUT, CONGALPUSH_PARAM, speed, lengthRatio, loop);
-        processVoice(args, congaHVoice, CONGAHTRIGIN_INPUT, CONGAHPUSH_PARAM, speed, lengthRatio, loop);
-        processVoice(args, congaHMVoice, CONGAHMTRIGIN_INPUT, CONGAHMPUSH_PARAM, speed, lengthRatio, loop);
-        processVoice(args, bongoLVoice, BONGOLTRIGIN_INPUT, BONGOLPUSH_PARAM, speed, lengthRatio, loop);
-        processVoice(args, bongoHVoice, BONGOHTRIGIN_INPUT, BONGOHPUSH_PARAM, speed, lengthRatio, loop);
-        processVoice(args, timbaleLVoice, TIMBALELTRIGIN_INPUT, TIMBALELPUSH_PARAM, speed, lengthRatio, loop);
-        processVoice(args, timbaleHVoice, TIMBALEHTRIGIN_INPUT, TIMBALEHPUSH_PARAM, speed, lengthRatio, loop);
-        processVoice(args, agogoLVoice, AGOGOLTRIGIN_INPUT, AGOGOLPUSH_PARAM, speed, lengthRatio, loop);
-        processVoice(args, agogoHVoice, AGOGOHTRIGIN_INPUT, AGOGOHPUSH_PARAM, speed, lengthRatio, loop);
-        processVoice(args, maracaVoice, MARACATRIGIN_INPUT, MARACAPUSH_PARAM, speed, lengthRatio, loop);
-        processVoice(args, cabasaVoice, CABASATRIGIN_INPUT, CABASAPUSH_PARAM, speed, lengthRatio, loop);
-        processVoice(args, whistleVoice, WHISTLETRIGIN_INPUT, WHISTLEPUSH_PARAM, speed, lengthRatio, loop);
+        processVoice(args, congaLVoice, CONGALTRIGIN_INPUT, CONGALPUSH_PARAM, speed, lengthRatio, loopState);
+        processVoice(args, congaHVoice, CONGAHTRIGIN_INPUT, CONGAHPUSH_PARAM, speed, lengthRatio, loopState);
+        processVoice(args, congaHMVoice, CONGAHMTRIGIN_INPUT, CONGAHMPUSH_PARAM, speed, lengthRatio, loopState);
+        processVoice(args, bongoLVoice, BONGOLTRIGIN_INPUT, BONGOLPUSH_PARAM, speed, lengthRatio, loopState);
+        processVoice(args, bongoHVoice, BONGOHTRIGIN_INPUT, BONGOHPUSH_PARAM, speed, lengthRatio, loopState);
+        processVoice(args, timbaleLVoice, TIMBALELTRIGIN_INPUT, TIMBALELPUSH_PARAM, speed, lengthRatio, loopState);
+        processVoice(args, timbaleHVoice, TIMBALEHTRIGIN_INPUT, TIMBALEHPUSH_PARAM, speed, lengthRatio, loopState);
+        processVoice(args, agogoLVoice, AGOGOLTRIGIN_INPUT, AGOGOLPUSH_PARAM, speed, lengthRatio, loopState);
+        processVoice(args, agogoHVoice, AGOGOHTRIGIN_INPUT, AGOGOHPUSH_PARAM, speed, lengthRatio, loopState);
+        processVoice(args, maracaVoice, MARACATRIGIN_INPUT, MARACAPUSH_PARAM, speed, lengthRatio, loopState);
+        processVoice(args, cabasaVoice, CABASATRIGIN_INPUT, CABASAPUSH_PARAM, speed, lengthRatio, loopState);
+        processVoice(args, whistleVoice, WHISTLETRIGIN_INPUT, WHISTLEPUSH_PARAM, speed, lengthRatio, loopState);
     }
 };    
 
@@ -245,9 +262,11 @@ struct SehvenTooWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParam<Switch2Pos>(mm2px(Vec(56.4, 12.002)), module, SehvenToo::LOOP_PARAM));
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(16.799, 15.501)), module, SehvenToo::LENGTH_PARAM));
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(38.799, 15.501)), module, SehvenToo::SPEED_PARAM));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(59.351, 15.501)), module, SehvenToo::LOOP_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(59.351, 15.501)), module, SehvenToo::LOOP_LIGHT));
 
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(8.798, 42.002)), module, SehvenToo::CONGALPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(8.798, 42.002)), module, SehvenToo::CONGAL_LIGHT));
