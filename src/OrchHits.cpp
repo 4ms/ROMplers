@@ -52,7 +52,7 @@ struct OrchHits : Module {
 			sampleChoices.push_back(std::to_string(i));
 		configSwitch(SAMPLE_PARAM, 0.f, (numSamples - 1), 0.f, "Sample", sampleChoices);
 		configSwitch(OCTAVE_PARAM, 0.f, 4.f, 2.f, "Octave transpose", {"-2", "-1", "Unison", "+1", "+2"});
-		configParam(DECAY_PARAM, 0.1f, 5.f, 5.f, "Decay", "s");
+		configParam(DECAY_PARAM, 0.01f, 5.f, 5.f, "Decay", "s");
 		configParam(PUSH_PARAM, 0.f, 1.f, 0.f, "Trigger button");
 
 		configInput(SAMPLECVIN_INPUT, "Sample Select CV");
@@ -170,7 +170,7 @@ struct OrchHits : Module {
 				float decayParam = std::clamp(combined / 5.f, 0.f, 1.f);
 				
 				float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
-				float decayCoef = std::exp(-1.f / (decayTime * args.sampleRate));
+				float decayCoef = std::exp(-5.f / (decayTime * args.sampleRate));
 				env *= decayCoef;
 				
 				output = sampleValue * env;
