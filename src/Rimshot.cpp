@@ -145,11 +145,10 @@ struct Rimshot : Module {
 				float sampleValue = s1 + frac * (s2 - s1);
 				float normalizedSample = sampleValue / 32768.f;
 	
-				float decayParam = params[DECAY_PARAM].getValue();
-				if (inputs[DECAYCVIN_INPUT].isConnected()) {
-					float cv = inputs[DECAYCVIN_INPUT].getVoltage();
-					decayParam += cv / 5.f; // ±5V → ±1 for decay
-				}
+			// Decay with ±5V CV
+			float decayParam = params[DECAY_PARAM].getValue();
+			if (inputs[DECAYCVIN_INPUT].isConnected())
+				decayParam += inputs[DECAYCVIN_INPUT].getVoltage() / 10.f; // ±5V → ±0.5
 				decayParam = std::clamp(decayParam, 0.f, 1.f);
 	
 				const float minDecayTime = 0.005f;
