@@ -151,12 +151,24 @@ struct AyysKing : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		// Compute speed and length once per process call
-		float speedInput = std::clamp(params[SPEED_PARAM].getValue() + inputs[SPEEDCVIN_INPUT].getVoltage() * 0.1f, 0.f, 1.f);
-		float speed = SPEED_LOW + speedInput * (SPEED_HIGH - SPEED_LOW);
+		// --- Speed ---
+		float speedKnobV = params[SPEED_PARAM].getValue() * 5.f; // 0–1 → 0–5 V
+		float speedCVV = 0.f;
+		if (inputs[SPEEDCVIN_INPUT].isConnected()) {
+		    speedCVV = std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -10.f, 10.f) * 0.5f; // -10..10 → -5..5
+		}
+		float speedNorm = std::clamp(speedKnobV + speedCVV, 0.f, 5.f) / 5.f; // back to 0–1
+		float speed = SPEED_LOW + speedNorm * (SPEED_HIGH - SPEED_LOW);
 
-		float lengthInput = std::clamp(params[LENGTH_PARAM].getValue() + inputs[LENGTHCVIN_INPUT].getVoltage() * 0.1f, 0.f, 1.f);
-		float lengthRatio = LENGTH_MIN + lengthInput * (LENGTH_MAX - LENGTH_MIN);
+		// --- Length ---
+		float lengthKnobV = params[LENGTH_PARAM].getValue() * 5.f; // 0–1 → 0–5 V
+		float lengthCVV = 0.f;
+		if (inputs[LENGTHCVIN_INPUT].isConnected()) {
+		    lengthCVV = std::clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -10.f, 10.f) * 0.5f; // -10..10 → -5..5
+		}
+		float lengthNorm = std::clamp(lengthKnobV + lengthCVV, 0.f, 5.f) / 5.f; // back to 0–1
+		float lengthRatio = LENGTH_MIN + lengthNorm * (LENGTH_MAX - LENGTH_MIN);
+
 
 		const int maxSamples = int(voices[0].sampleLength * lengthRatio);
 			// --- Loop mode ---
