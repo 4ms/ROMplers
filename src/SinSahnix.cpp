@@ -186,56 +186,57 @@ struct SinSahnix : Module {
         // Read inputs once
         const bool inputTrigger = inputs[trigInputId].getVoltage() > 1.0f;
         const bool buttonTrigger = params[pushParamId].getValue() > 0.5f;
-
+    
         const bool inputRising = inputTrigger && !voice.lastInputTrigger;
         const bool buttonRising = buttonTrigger && !voice.lastButtonTrigger;
-
+    
+        // Track last states
         voice.lastInputTrigger = inputTrigger;
         voice.lastButtonTrigger = buttonTrigger;
-
-        // Start playing only on trigger or loop start (loop on silent)
-        if (inputRising || buttonRising) {
+    
+        bool fired = inputRising || buttonRising; // light trigger
+    
+        // Start playing on trigger or loop start
+        if (fired || (loopEnabled && !voice.playing)) {
             voice.playing = true;
             voice.samplePos = 0.f;
-            if (voice.lightId >= 0) {
-                lights[voice.lightId].setBrightness(1.0f);
-            }
-        } else if (loopEnabled && !voice.playing) {
-            // Start loop if enabled and not playing already
-            voice.playing = true;
-            voice.samplePos = 0.f;
+            fired = true; // ensure light blinks for loop restart
         }
-
+    
         if (!voice.playing) {
-            // Early out: not playing
             outputs[voice.outputId].setVoltage(0.f);
             if (voice.lightId >= 0)
                 lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
             return;
         }
-
+    
         const int maxSamplesToPlay = (int)(voice.sampleLength * lengthRatio);
-        const int idx = (int)voice.samplePos;
-
+        int idx = (int)voice.samplePos;
+    
         if (idx < maxSamplesToPlay) {
-            // Read sample once, convert to float, set output voltage
             const int16_t sampleInt = voice.readSample16(idx);
-            const float sample = (float)sampleInt * (1.f / 32768.f);
+            const float sample = (float)sampleInt / 32768.f;
             outputs[voice.outputId].setVoltage(sample * 5.f);
             voice.samplePos += speed;
         } else {
             if (loopEnabled) {
-                voice.samplePos = 0.f;
+                voice.samplePos = 0.f; 
+                fired = true; // 🔴 loop restart triggers light
             } else {
                 voice.playing = false;
                 outputs[voice.outputId].setVoltage(0.f);
             }
         }
-
-        if (voice.lightId >= 0)
-            lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
+    
+        // Light handling: blink on trigger or loop restart
+        if (voice.lightId >= 0) {
+            if (fired)
+                lights[voice.lightId].setBrightness(1.f);
+            else
+                lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
+        }
     }
-};
+};    
 
 struct SinSahnixWidget : ModuleWidget {
 	SinSahnixWidget(SinSahnix* module) {
