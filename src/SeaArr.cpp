@@ -222,13 +222,14 @@ struct SeaArr : Module {
 	bool lastLoopCVTrigger = false;   // previous frame state for the CV
 
 	void process(const ProcessArgs& args) override {
-	   // --- Speed ---
-	   float knobSpeed = params[SPEED_PARAM].getValue();  // 0-1
-	   float speedCV = inputs[SPEEDCVIN_INPUT].isConnected() ? inputs[SPEEDCVIN_INPUT].getVoltage() : 0.f;
-	   speedCV = std::clamp(speedCV * 0.5f, -5.f, 5.f); // scale -10..10V -> -5..5
-	   float normSpeed = std::clamp(knobSpeed + speedCV / 10.f, 0.f, 1.f); // sum knob + CV (-5..5)/10 -> -0.5..0.5
-	   float speed = SPEED_MIN + normSpeed * (SPEED_MAX - SPEED_MIN);
-
+		// --- Precalculate speed with CV ---
+		float knobSpeedV = params[SPEED_PARAM].getValue() * 5.f;  // 0–1 → 0–5V
+		float speedCVV = 0.f;
+		if (inputs[SPEEDCVIN_INPUT].isConnected())
+			speedCVV = std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -10.f, 10.f) * 0.5f; // -10..10 → -5..5
+		float normSpeed = std::clamp(knobSpeedV + speedCVV, 0.f, 5.f) / 5.f; // 0–1 normalized
+		float speed = SPEED_MIN + normSpeed * (SPEED_MAX - SPEED_MIN);
+		
 		// --- Length ---
 		float knobLength = params[LENGTH_PARAM].getValue() * 5.f;       // convert knob 0-1 → 0-5
 		float lengthCV = inputs[LENGTHCVIN_INPUT].isConnected() ? inputs[LENGTHCVIN_INPUT].getVoltage() : 0.f;
