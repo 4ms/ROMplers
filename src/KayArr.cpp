@@ -101,13 +101,17 @@ struct KayArr : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		const float speedKnob = params[SPEED_PARAM].getValue();
-		const float speedCV = std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -5.f, 5.f);
-		float speed = SPEED_LOW + ((speedKnob + speedCV / 10.f) - 0.01f) * (SPEED_HIGH - SPEED_LOW);
-
-		const float lengthKnob = params[LENGTH_PARAM].getValue();
-		const float lengthCV = std::clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -5.f, 5.f);
-		float lengthRatio = LENGTH_MIN + ((lengthKnob + lengthCV / 10.f) - 0.1f) * (LENGTH_MAX - LENGTH_MIN);
+	    // --- Speed parameter ---
+		float speedKnobV = params[SPEED_PARAM].getValue() * 5.f; // knob 0-1 → 0-5V
+		float speedCVV = inputs[SPEEDCVIN_INPUT].isConnected() ? std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -10.f, 10.f) * 0.5f : 0.f; // -10..10 → -5..5
+		float normSpeed = std::clamp(speedKnobV + speedCVV, 0.f, 5.f) / 5.f; // 0-1 normalized
+		float speed = SPEED_LOW + normSpeed * (SPEED_HIGH - SPEED_LOW);
+	
+		// --- Length parameter ---
+		float lengthKnobV = params[LENGTH_PARAM].getValue() * 5.f; // knob 0-1 → 0-5V
+		float lengthCVV = inputs[LENGTHCVIN_INPUT].isConnected() ? std::clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -10.f, 10.f) * 0.5f : 0.f; // -10..10 → -5..5
+		float normLength = std::clamp(lengthKnobV + lengthCVV, 0.f, 5.f) / 5.f; // 0-1 normalized
+		float lengthRatio = LENGTH_MIN + normLength * (LENGTH_MAX - LENGTH_MIN);
 
 		bool loopButton = params[LOOP_PARAM].getValue() > 0.5f;
 		bool loopCV = inputs[LOOPCVIN_INPUT].getVoltage() > 1.f;
