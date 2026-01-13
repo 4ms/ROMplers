@@ -4,7 +4,7 @@
 
 struct Slap : Module {
 	enum ParamId {
-		PITCH_PARAM,
+		OCTAVE_PARAM,
 		DECAY_PARAM,
 		PUSH_PARAM,
 		PARAMS_LEN
@@ -14,6 +14,7 @@ struct Slap : Module {
 		DECAYCVIN_INPUT,
 		TRIGIN_INPUT,
 		VOLCVIN_INPUT,
+		OCTAVECVIN_INPUT,
 		INPUTS_LEN
 	};
 	enum OutputId {
@@ -21,7 +22,7 @@ struct Slap : Module {
 		OUTPUTS_LEN
 	};
 	enum LightId {
-		Slap_LIGHT,
+		SLAP_LIGHT,
 		LIGHTS_LEN
 	};
 
@@ -40,15 +41,16 @@ struct Slap : Module {
 	Slap() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
-		configSwitch(PITCH_PARAM, 0.f, 4.f, 0.f, "Octave transpose", {"Unison", "+1", "+2", "+3", "+4"});
+		configSwitch(OCTAVE_PARAM, 0.f, 4.f, 0.f, "Octave transpose", {"Unison", "+1", "+2", "+3", "+4"});
 		configParam(DECAY_PARAM, 0.f, 1.f, 1.f, "Decay", "s");
 		configParam(PUSH_PARAM, 0.f, 1.f, 0.f, "Trigger button");
 
+		configInput(OCTAVECVIN_INPUT, "Octave CV");
 		configInput(PITCHCVIN_INPUT, "Pitch CV (1V/oct)");
 		configInput(DECAYCVIN_INPUT, "Decay CV");
 		configInput(TRIGIN_INPUT, "Trig");
 		configInput(VOLCVIN_INPUT, "Volume CV");
-		configOutput(AUDIOOUT_OUTPUT, "Audio output");
+		configOutput(AUDIOOUT_OUTPUT, "Audio");
 	}
 
 	float fastPow2(float x) {
@@ -83,13 +85,13 @@ struct Slap : Module {
 		// Update light with smooth fade, decrement by fixed rate
 		slapLightBrightness -= args.sampleTime * 10.f;
 		if (slapLightBrightness < 0.f) slapLightBrightness = 0.f;
-		lights[Slap_LIGHT].setBrightnessSmooth(slapLightBrightness, args.sampleTime);
+		lights[SLAP_LIGHT].setBrightnessSmooth(slapLightBrightness, args.sampleTime);
 
 		float output = 0.f;
 
 		if (playing && currentSample) {
 			// Pitch calculation: knob + CV, std::clamp CV if disconnected
-			const float pitchKnob = params[PITCH_PARAM].getValue(); // 0..4 oct
+			const float pitchKnob = params[OCTAVE_PARAM].getValue(); // 0..4 oct
 			const float pitchCV = inputs[PITCHCVIN_INPUT].isConnected() ? inputs[PITCHCVIN_INPUT].getVoltage() : 0.f;
 			float pitch = pitchKnob + pitchCV;
 
@@ -162,23 +164,25 @@ struct Slap : Module {
 struct SlapWidget : ModuleWidget {
 	SlapWidget(Slap* module) {
 		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/Slap_info.svg")));
+		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/Slap.svg")));
 
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 23.593)), module, Slap::PITCH_PARAM));
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 47.625)), module, Slap::DECAY_PARAM));
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 72.937)), module, Slap::PUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(10.16, 72.937)), module, Slap::Slap_LIGHT));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 12.45)), module, Slap::OCTAVE_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 55.002)), module, Slap::DECAY_PARAM));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 84.3)), module, Slap::PUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(10.16, 84.3)), module, Slap::SLAP_LIGHT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 37.678)), module, Slap::PITCHCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 63.254)), module, Slap::DECAYCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.469, 89.077)), module, Slap::TRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.994, 89.077)), module, Slap::VOLCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 25.15)), module, Slap::OCTAVECVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 38.199)), module, Slap::PITCHCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 67.702)), module, Slap::DECAYCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.5, 98.002)), module, Slap::TRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.799, 98.002)), module, Slap::VOLCVIN_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.16, 102.835)), module, Slap::AUDIOOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.16, 112.0)), module, Slap::AUDIOOUT_OUTPUT));
 	}
 };
+
 
 Model* modelSlap = createModel<Slap, SlapWidget>("Slap");
