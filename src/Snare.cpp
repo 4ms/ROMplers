@@ -117,16 +117,13 @@ struct Snare : Module {
 		if (trigRising || buttonRising) {
 			SnareLightBrightness = 1.0f;
 	
-			// Sample CV ±5V mapping
+			// Sample index with ±5V CV mapping
 			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue());
 			if (inputs[SAMPLECVIN_INPUT].isConnected()) {
 				float cv = std::clamp(inputs[SAMPLECVIN_INPUT].getVoltage(), -5.f, 5.f);
-			
-				// Map -5V…+5V to -numSamples…+numSamples
-				int cvOffset = (int)round((cv / 5.f) * numSamples); 
-				sampleIndex += cvOffset;
-			}			
-			sampleIndex = std::clamp(sampleIndex, 0, numSamples - 1);
+				sampleIndex += (int)round(cv); // ±5V → ±5 indices
+			}
+			sampleIndex = std::clamp(sampleIndex, 0, numSamples - 1);	
 			triggerSample(sampleIndex);
 		}
 	
@@ -137,7 +134,7 @@ struct Snare : Module {
 		float output = 0.f;
 	
 		if (playing && currentSample) {
-			// Pitch CV ±5V mapping
+			// Pitch CV properly mapped from ±5V
 			float pitchMod = params[PITCH_PARAM].getValue();
 			if (inputs[PITCHCVIN_INPUT].isConnected()) {
 				float cv = std::clamp(inputs[PITCHCVIN_INPUT].getVoltage(), -5.f, 5.f);
@@ -145,10 +142,10 @@ struct Snare : Module {
 			}
 			pitchMod = std::clamp(pitchMod, -1.f, 1.f);
 	
-			float normalizedPitch = 0.5f * (pitchMod + 1.f);
-			float pitchRatio = MIN_PLAYBACK_SPEED + normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
-	
+			const float normalizedPitch = 0.5f * (pitchMod + 1.f);
+			const float pitchRatio = MIN_PLAYBACK_SPEED + normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
 			const float sampleRateRatio = sampleSampleRate / args.sampleRate;
+	
 			samplePos += pitchRatio * sampleRateRatio;
 	
 			const int numSampleFrames = sampleLength / 2;
@@ -168,12 +165,10 @@ struct Snare : Module {
 	
 				float sampleValue = s1 + frac * (s2 - s1);
 	
-				// Decay CV ±5V mapping
-				float decayParam = params[DECAY_PARAM].getValue();
-				if (inputs[DECAYCVIN_INPUT].isConnected()) {
-					float cv = std::clamp(inputs[DECAYCVIN_INPUT].getVoltage(), -5.f, 5.f);
-					decayParam += cv / 5.f; // ±5V → ±1
-				}
+			// Decay with ±5V CV
+			float decayParam = params[DECAY_PARAM].getValue();
+			if (inputs[DECAYCVIN_INPUT].isConnected())
+				decayParam += inputs[DECAYCVIN_INPUT].getVoltage() / 10.f; // ±5V → ±0.5
 				decayParam = std::clamp(decayParam, 0.f, 1.f);
 	
 				const float minDecayTime = 0.005f;
