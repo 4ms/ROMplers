@@ -105,10 +105,6 @@ struct AyysKing : Module {
 	}
 
 	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId, float speed, int maxSamples, bool loop) {
-		// Skip processing if output not connected for efficiency
-		if (!outputs[voice.outputId].isConnected())
-			return;
-
 		const bool trig = inputs[trigInputId].getVoltage() > 1.f;
 		const bool btn = params[pushParamId].getValue() > 0.5f;
 
