@@ -107,74 +107,96 @@ struct Snare : Module {
 	void process(const ProcessArgs& args) override {
 		const float trigIn = inputs[TRIGIN_INPUT].getVoltage();
 		const float buttonIn = params[PUSH_PARAM].getValue();
-
+	
 		const bool trigRising = (lastTrigValue <= 1.f && trigIn > 1.f);
 		const bool buttonRising = (lastButtonValue <= 0.5f && buttonIn > 0.5f);
-
+	
 		lastTrigValue = trigIn;
 		lastButtonValue = buttonIn;
-
+	
 		if (trigRising || buttonRising) {
 			SnareLightBrightness = 1.0f;
-			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() + inputs[SAMPLECVIN_INPUT].getVoltage());
+	
+			// Sample CV ±5V mapping
+			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue());
+			if (inputs[SAMPLECVIN_INPUT].isConnected()) {
+				float cv = std::clamp(inputs[SAMPLECVIN_INPUT].getVoltage(), -5.f, 5.f);
+			
+				// Map -5V…+5V to -numSamples…+numSamples
+				int cvOffset = (int)round((cv / 5.f) * numSamples); 
+				sampleIndex += cvOffset;
+			}			
 			sampleIndex = std::clamp(sampleIndex, 0, numSamples - 1);
 			triggerSample(sampleIndex);
 		}
-
-		// Decay Snare light brightness smoothly
+	
+		// Decay Snare light
 		SnareLightBrightness = std::max(0.f, SnareLightBrightness - args.sampleTime * 10.f);
 		lights[SNARE_LIGHT].setBrightnessSmooth(SnareLightBrightness, args.sampleTime);
-
+	
 		float output = 0.f;
-
+	
 		if (playing && currentSample) {
-			float pitchMod = std::clamp(params[PITCH_PARAM].getValue() + inputs[PITCHCVIN_INPUT].getVoltage(), -1.f, 1.f);
-			float normalizedPitch = (pitchMod + 1.f) * 0.5f;
+			// Pitch CV ±5V mapping
+			float pitchMod = params[PITCH_PARAM].getValue();
+			if (inputs[PITCHCVIN_INPUT].isConnected()) {
+				float cv = std::clamp(inputs[PITCHCVIN_INPUT].getVoltage(), -5.f, 5.f);
+				pitchMod += cv / 5.f; // scale ±5V → ±1
+			}
+			pitchMod = std::clamp(pitchMod, -1.f, 1.f);
+	
+			float normalizedPitch = 0.5f * (pitchMod + 1.f);
 			float pitchRatio = MIN_PLAYBACK_SPEED + normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
-
+	
 			const float sampleRateRatio = sampleSampleRate / args.sampleRate;
 			samplePos += pitchRatio * sampleRateRatio;
-
-			// sampleLength is bytes, each sample 2 bytes (16bit PCM)
+	
 			const int numSampleFrames = sampleLength / 2;
-
+	
 			if ((int)samplePos >= numSampleFrames) {
 				playing = false;
 			} else {
-				const int idx = (int)samplePos;
-				const int nextIdx = (idx + 1 < numSampleFrames) ? idx + 1 : idx;
-				const float frac = samplePos - idx;
-
-				const int16_t s1s = (int16_t)(currentSample[idx * 2] | (currentSample[idx * 2 + 1] << 8));
-				const int16_t s2s = (int16_t)(currentSample[nextIdx * 2] | (currentSample[nextIdx * 2 + 1] << 8));
-
-				const float s1 = s1s / 32768.f;
-				const float s2 = s2s / 32768.f;
-
-				const float sampleValue = s1 + frac * (s2 - s1);
-
-				float decayParam = std::clamp(params[DECAY_PARAM].getValue() + inputs[DECAYCVIN_INPUT].getVoltage(), 0.f, 1.f);
-
+				int idx = (int)samplePos;
+				int nextIdx = (idx + 1 < numSampleFrames) ? idx + 1 : idx;
+				float frac = samplePos - idx;
+	
+				int16_t s1s = (int16_t)(currentSample[idx * 2] | (currentSample[idx * 2 + 1] << 8));
+				int16_t s2s = (int16_t)(currentSample[nextIdx * 2] | (currentSample[nextIdx * 2 + 1] << 8));
+	
+				float s1 = s1s / 32768.f;
+				float s2 = s2s / 32768.f;
+	
+				float sampleValue = s1 + frac * (s2 - s1);
+	
+				// Decay CV ±5V mapping
+				float decayParam = params[DECAY_PARAM].getValue();
+				if (inputs[DECAYCVIN_INPUT].isConnected()) {
+					float cv = std::clamp(inputs[DECAYCVIN_INPUT].getVoltage(), -5.f, 5.f);
+					decayParam += cv / 5.f; // ±5V → ±1
+				}
+				decayParam = std::clamp(decayParam, 0.f, 1.f);
+	
 				const float minDecayTime = 0.005f;
-				const float maxDecayTime = (float)numSampleFrames / sampleSampleRate;
-				const float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
-				const float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
-
+				float maxDecayTime = (float)numSampleFrames / sampleSampleRate;
+				float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
+	
+				float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
 				env *= decayCoef;
-
+	
 				output = sampleValue * env;
 			}
 		}
-
+	
+		// Volume CV (0–5V)
 		float volumeCV = 5.f;
 		if (inputs[VOLCVIN_INPUT].isConnected()) {
 			volumeCV = std::clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
 		}
-
+	
 		output *= volumeCV / 5.f;
-
+	
 		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.0f);
-	}
+	}	
 };
 
 struct SnareWidget : ModuleWidget {
