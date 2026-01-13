@@ -77,11 +77,11 @@ struct Ride : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		// Cache sample time and sample rate for efficiency
+		// Cache sample time and sample rate
 		const float sampleTime = args.sampleTime;
 		const float sampleRate = args.sampleRate;
 	
-		// Trigger detection (rising edge on trig or button)
+		// Trigger detection
 		const float trigIn = inputs[TRIGIN_INPUT].getVoltage();
 		const float buttonIn = params[PUSH_PARAM].getValue();
 	
@@ -94,8 +94,13 @@ struct Ride : Module {
 		if (trigRising || buttonRising) {
 			RideLightBrightness = 1.f;
 	
-			// Determine sample index std::clamped to valid range
-			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() + inputs[SAMPLECVIN_INPUT].getVoltage());
+			// Sample index with ±5V CV mapping
+			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue());
+			if (inputs[SAMPLECVIN_INPUT].isConnected()) {
+				float cv = inputs[SAMPLECVIN_INPUT].getVoltage();
+				cv = std::clamp(cv, -5.f, 5.f);
+				sampleIndex += (int)round(cv * (numSamples / 10.f)); // ±5V → ±numSamples/2
+			}
 			sampleIndex = std::clamp(sampleIndex, 0, numSamples - 1);
 	
 			currentSample = getSampleByIndex(sampleIndex);
@@ -108,18 +113,21 @@ struct Ride : Module {
 	
 		// Light decay
 		RideLightBrightness -= sampleTime * 10.f;
-		if (RideLightBrightness < 0.f)
-			RideLightBrightness = 0.f;
+		if (RideLightBrightness < 0.f) RideLightBrightness = 0.f;
 		lights[RIDE_LIGHT].setBrightnessSmooth(RideLightBrightness, sampleTime);
 	
 		float output = 0.f;
 	
 		if (playing && currentSample) {
-			// Pitch processing
-			float pitchMod = params[PITCH_PARAM].getValue() + inputs[PITCHCVIN_INPUT].getVoltage();
-			pitchMod = (pitchMod < -1.f) ? -1.f : (pitchMod > 1.f ? 1.f : pitchMod);
+			// Pitch processing (±5V CV already works like before)
+		// Pitch processing with proper ±5V mapping
+		float pitchMod = params[PITCH_PARAM].getValue(); // base knob
+		if (inputs[PITCHCVIN_INPUT].isConnected()) {
+		    float cv = std::clamp(inputs[PITCHCVIN_INPUT].getVoltage(), -5.f, 5.f);
+		    pitchMod += cv / 5.f; // scale ±5V → ±1
+		}
+			pitchMod = std::clamp(pitchMod, -1.f, 1.f);
 	
-			// Convert pitch modulation to playback speed ratio
 			float normalizedPitch = (pitchMod + 1.f) * 0.5f;
 			const float MIN_PLAYBACK_SPEED = 0.01f;
 			const float MAX_PLAYBACK_SPEED = 2.0f;
@@ -130,7 +138,7 @@ struct Ride : Module {
 	
 			samplePos += pitchRatio * sampleRateRatio;
 	
-			const int numSamplesInSample = sampleLength / 2; // 16-bit samples, 2 bytes each
+			const int numSamplesInSample = sampleLength / 2;
 			if ((int)samplePos >= numSamplesInSample) {
 				playing = false;
 			} else {
@@ -138,24 +146,19 @@ struct Ride : Module {
 				int nextIdx = (idx + 1 < numSamplesInSample) ? idx + 1 : idx;
 				float frac = samplePos - idx;
 	
-				// Read samples (little-endian)
 				int16_t s1 = (int16_t)(currentSample[idx * 2] | (currentSample[idx * 2 + 1] << 8));
 				int16_t s2 = (int16_t)(currentSample[nextIdx * 2] | (currentSample[nextIdx * 2 + 1] << 8));
 	
-				// Linear interpolation
 				float sampleValue = s1 * (1.f - frac) + s2 * frac;
 				sampleValue /= 32768.f;
 	
-				// Decay envelope
 				float decayParam = params[DECAY_PARAM].getValue() + inputs[DECAYCVIN_INPUT].getVoltage();
-				decayParam = (decayParam < 0.f) ? 0.f : (decayParam > 1.f ? 1.f : decayParam);
+				decayParam = std::clamp(decayParam, 0.f, 1.f);
 	
-				// Precalculate decay time range
 				constexpr float minDecayTime = 0.005f;
 				float maxDecayTime = (float)numSamplesInSample / sampleSampleRate;
 				float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
 	
-				// Calculate decay coefficient once per sample frame
 				float decayCoef = expf(-1.f / (decayTime * sampleRate));
 	
 				env *= decayCoef;
@@ -164,13 +167,10 @@ struct Ride : Module {
 			}
 		}
 	
-		// Volume CV processing (default to 1.0 if no input)
+		// Volume CV
 		float volumeCV = 1.f;
 		if (inputs[VOLCVIN_INPUT].isConnected()) {
-			volumeCV = inputs[VOLCVIN_INPUT].getVoltage();
-			if (volumeCV < 0.f) volumeCV = 0.f;
-			else if (volumeCV > 5.f) volumeCV = 5.f;
-			volumeCV /= 5.f;
+			volumeCV = std::clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f) / 5.f;
 		}
 	
 		outputs[AUDIOOUT_OUTPUT].setVoltage(output * volumeCV * 5.f);
