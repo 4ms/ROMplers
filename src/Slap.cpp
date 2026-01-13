@@ -91,17 +91,26 @@ struct Slap : Module {
 
 		if (playing && currentSample) {
 			// Pitch calculation: knob + CV, std::clamp CV if disconnected
-			const float octaveKnob = params[OCTAVE_PARAM].getValue(); // 0..4 oct
-			const float pitchCV = inputs[PITCHCVIN_INPUT].isConnected() ? inputs[PITCHCVIN_INPUT].getVoltage() : 0.f;
-			float pitch = octaveKnob + pitchCV;
+			// --- Octave parameter with CV scaling ---
+// --- Octave knob + CV ---
+int octaveKnob = static_cast<int>(params[OCTAVE_PARAM].getValue()); // 0..4
+float cv = std::clamp((inputs[OCTAVECVIN_INPUT].getVoltage() * 0.5f), -5.f, 5.f);
 
-			// Compute pitchRatio without std::pow for most CPU savings:
-			// fallback to std::pow if out of range
-			float pitchRatio;
-			if (pitch >= 0.f && pitch <= 8.f)
-				pitchRatio = fastPow2(pitch);
-			else
-				pitchRatio = std::pow(2.f, pitch);
+// Sum knob + CV, round, and clamp to 0-4 discrete steps
+int finalOctave = static_cast<int>(std::round(octaveKnob + cv));
+finalOctave = std::clamp(finalOctave, 0, 4);
+
+// Then use the finalOctave for pitch calculation:
+float pitchCV = inputs[PITCHCVIN_INPUT].isConnected() ? inputs[PITCHCVIN_INPUT].getVoltage() : 0.f;
+float pitch = finalOctave + pitchCV; // final pitch for playback
+
+// Compute pitch ratio
+float pitchRatio;
+if (pitch >= 0.f && pitch <= 8.f)
+    pitchRatio = fastPow2(pitch);
+else
+    pitchRatio = std::pow(2.f, pitch);
+
 
 			const float sampleRateRatio = sampleSampleRate / args.sampleRate;
 			samplePos += pitchRatio * sampleRateRatio;
@@ -126,7 +135,7 @@ struct Slap : Module {
 				const float s2 = s2s * (1.f / 32768.f);
 
 				const float sampleValue = s1 + frac * (s2 - s1);
-			// --- Decay parameter with 0-5 knob + -10..10 CV ---
+		// --- Decay parameter with 0-5 knob + -10..10 CV ---
 			float decayKnob = params[DECAY_PARAM].getValue() * 5.f;  // 0-1 → 0-5
 			float decayCV = 0.f;
 			if (inputs[DECAYCVIN_INPUT].isConnected()) {
