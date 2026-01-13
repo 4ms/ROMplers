@@ -29,7 +29,7 @@ struct AyysKing : Module {
 		KICK_LIGHT, SNARE1_LIGHT, SNARE2_LIGHT,
 		CLOSEDHAT_LIGHT, OPENHAT_LIGHT,
 		BONGO1_LIGHT, BONGO2_LIGHT, BONGO3_LIGHT,
-		CLAVE_LIGHT, CYMBAL_LIGHT,
+		CLAVE_LIGHT, CYMBAL_LIGHT, LOOP_LIGHT,
 		LIGHTS_LEN
 	};
 
@@ -62,6 +62,11 @@ struct AyysKing : Module {
 	const float SPEED_HIGH = 3.0f;
 	const float LENGTH_MIN = 0.1f;
 	const float LENGTH_MAX = 1.0f;
+	
+
+	bool loopState = false;           // the current loop on/off state
+	bool lastLoopButton = false;      // previous frame state for the button
+	bool lastLoopCVTrigger = false;   // previous frame state for the CV
 
 	AyysKing() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -154,10 +159,25 @@ struct AyysKing : Module {
 		float lengthRatio = LENGTH_MIN + lengthInput * (LENGTH_MAX - LENGTH_MIN);
 
 		const int maxSamples = int(voices[0].sampleLength * lengthRatio);
-		bool loop = params[LOOP_PARAM].getValue() > 0.5f || inputs[LOOPCVIN_INPUT].getVoltage() > 1.f;
+			// --- Loop mode ---
+			bool loopButton = params[LOOP_PARAM].getValue() > 0.5f;
+			float loopCV = inputs[LOOPCVIN_INPUT].isConnected() ? inputs[LOOPCVIN_INPUT].getVoltage() : 0.f;
+			bool loopButtonRising = loopButton && !lastLoopButton;
+			if (loopButtonRising) {
+				loopState = !loopState;
+			}
+			if (!loopState && loopCV > 1.f) {       // OFF → ON with positive CV
+				loopState = true;
+			} else if (loopState && loopCV < -1.f) { // ON → OFF with negative CV
+				loopState = false;
+			}
+			lastLoopButton = loopButton;
+
+			bool loopEnabled = loopState;
+			lights[LOOP_LIGHT].setBrightnessSmooth(loopState, args.sampleTime);
 
 		for (int i = 0; i < 10; i++) {
-			processVoice(args, voices[i], KICKTRIGIN_INPUT + i, KICKPUSH_PARAM + i, speed, maxSamples, loop);
+			processVoice(args, voices[i], KICKTRIGIN_INPUT + i, KICKPUSH_PARAM + i, speed, maxSamples, loopEnabled);
 		}
 	}
 };
@@ -174,7 +194,9 @@ struct AyysKingWidget : ModuleWidget {
 
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(11.24, 15.501)), module, AyysKing::LENGTH_PARAM));
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(31.249, 15.501)), module, AyysKing::SPEED_PARAM));
-		addParam(createParam<Switch2Pos>(mm2px(Vec(47, 12.499)), module, AyysKing::LOOP_PARAM));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(49.731, 15.501)), module, AyysKing::LOOP_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(49.731, 15.501)), module, AyysKing::LOOP_LIGHT));
 		
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(6.999, 42.002)), module, AyysKing::KICKPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(6.999, 42.002)), module, AyysKing::KICK_LIGHT));
