@@ -192,54 +192,56 @@ struct SicksOh : Module {
 		processVoice(args, cymVoice, CYMTRIGIN_INPUT, CYMPUSH_PARAM, speed, lengthRatio, loopEnabled);
 	}
 	
-	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId,
-					  float speed, float lengthRatio, bool loopEnabled) {
+void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId,
+		float speed, float lengthRatio, bool loopEnabled) {
 		bool inputTrig = inputs[trigInputId].getVoltage() > 1.f;
 		bool buttonTrig = params[pushParamId].getValue() > 0.5f;
-	
+
 		bool inputRising = inputTrig && !voice.lastInputTrigger;
 		bool buttonRising = buttonTrig && !voice.lastButtonTrigger;
-		bool triggered = inputRising || buttonRising;
-	
+		bool fired = inputRising || buttonRising;
+
 		voice.lastInputTrigger = inputTrig;
 		voice.lastButtonTrigger = buttonTrig;
-	
-		// On trigger or loop restart, start playing
-		if (triggered || (loopEnabled && !voice.playing)) {
-			voice.playing = true;
-			voice.samplePos = 0.f;
-	
-			if (voice.lightId >= 0)
-				lights[voice.lightId].setBrightness(1.f); // instant light on trigger
+
+		// Start playback if triggered manually or if looping and not playing
+		if (fired || (loopEnabled && !voice.playing)) {
+		voice.playing = true;
+		voice.samplePos = 0.f;
+		fired = true; // ensure light fires
 		}
-	
+
 		if (!voice.playing) {
-			outputs[voice.outputId].setVoltage(0.f);
-			return;  // Early exit if not playing: minimal CPU
+		outputs[voice.outputId].setVoltage(0.f);
+		return;  // early exit if not playing
 		}
-	
+
 		int maxSamples = (int)(voice.sampleLength * lengthRatio);
 		int idx = (int)voice.samplePos;
-	
+
 		if (idx < maxSamples) {
-			int16_t sample = voice.readSample16(idx);
-			float out = (float)sample / 32768.f * 5.f;
-			outputs[voice.outputId].setVoltage(out);
-			voice.samplePos += speed;
+		int16_t sample = voice.readSample16(idx);
+		float out = (float)sample / 32768.f * 5.f;
+		outputs[voice.outputId].setVoltage(out);
+		voice.samplePos += speed;
 		} else {
-			if (loopEnabled)
-				voice.samplePos = 0.f;  // Loop restart
-			else {
-				voice.playing = false;
-				outputs[voice.outputId].setVoltage(0.f);
-			}
+		if (loopEnabled) {
+		  voice.samplePos = 0.f; 
+		  fired = true; // 🔴 loop restart triggers light
+		} else {
+		  voice.playing = false;
+		  outputs[voice.outputId].setVoltage(0.f);
 		}
-	
-		// Smooth light fade out only if playing
+		}
+
+		// Light handling: blink on trigger or loop restart
 		if (voice.lightId >= 0) {
-			lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
+		if (fired)
+		  lights[voice.lightId].setBrightness(1.f);
+		else
+		  lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
 		}
-	}	
+		}
 };
 
 struct SicksOhWidget : ModuleWidget {
