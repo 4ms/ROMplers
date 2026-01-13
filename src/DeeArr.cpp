@@ -158,54 +158,56 @@ struct DeeArr : Module {
 	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId, float speed, float lengthRatio, bool loopEnabled) {
 		const bool inputTrigger = inputs[trigInputId].getVoltage() > 1.0f;
 		const bool buttonTrigger = params[pushParamId].getValue() > 0.5f;
-
+	
 		const bool inputRising = inputTrigger && !voice.lastInputTrigger;
 		const bool buttonRising = buttonTrigger && !voice.lastButtonTrigger;
-
+	
+		voice.lastInputTrigger = inputTrigger;
+		voice.lastButtonTrigger = buttonTrigger;
+	
+		// --- New: fire flag for light control ---
+		bool fired = false;
+	
+		// Manual trigger
 		if (inputRising || buttonRising || (loopEnabled && !voice.playing)) {
 			voice.playing = true;
 			voice.samplePos = 0.f;
+			fired = true;  // light should blink
 			if (voice.lightId >= 0)
 				lights[voice.lightId].setBrightness(1.f);
 			voice.outputZeroSet = false;
 		}
-
-		voice.lastInputTrigger = inputTrigger;
-		voice.lastButtonTrigger = buttonTrigger;
-
-		if (!voice.playing) {
-			if (!voice.outputZeroSet) {
-				outputs[voice.outputId].setVoltage(0.f);
-				voice.outputZeroSet = true;
-			}
-			// Light fades out smoothly automatically
-			if (voice.lightId >= 0)
-				lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
-			return;
-		}
-
-		int maxSamplesToPlay = (int)(voice.decodedSample.size() * lengthRatio);
-		int idx = (int)voice.samplePos;
-
-		if (idx < maxSamplesToPlay) {
-			// No interpolation, just direct sample (could add linear interp later)
-			float sample = voice.decodedSample[idx];
-			outputs[voice.outputId].setVoltage(sample * 5.f);
-			voice.samplePos += speed;
-		} else {
-			if (loopEnabled) {
-				voice.samplePos = 0.f;
+	
+		if (voice.playing) {
+			int maxSamplesToPlay = (int)(voice.decodedSample.size() * lengthRatio);
+			int idx = (int)voice.samplePos;
+	
+			if (idx < maxSamplesToPlay) {
+				float sample = voice.decodedSample[idx];
+				outputs[voice.outputId].setVoltage(sample * 5.f);
+				voice.samplePos += speed;
 			} else {
-				voice.playing = false;
-				outputs[voice.outputId].setVoltage(0.f);
-				voice.outputZeroSet = true;
+				if (loopEnabled) {
+					voice.samplePos = 0.f;
+					fired = true; // 🔴 new: blink light on loop restart
+				} else {
+					voice.playing = false;
+					outputs[voice.outputId].setVoltage(0.f);
+					voice.outputZeroSet = true;
+				}
 			}
+		} else {
+			outputs[voice.outputId].setVoltage(0.f);
 		}
-
-		// Smoothly fade light out every frame after trigger
-		if (voice.lightId >= 0)
-			lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
-	}
+	
+		// Light handling
+		if (voice.lightId >= 0) {
+			if (fired)
+				lights[voice.lightId].setBrightness(1.f);
+			else
+				lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
+		}
+	}	
 };
 
 struct DeeArrWidget : ModuleWidget {
