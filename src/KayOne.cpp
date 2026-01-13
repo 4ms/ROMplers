@@ -186,7 +186,11 @@ struct KayOne : Module {
 		bool inputTrigger = inputs[trigInputId].getVoltage() > 1.0f;
 		bool buttonTrigger = params[pushParamId].getValue() > 0.5f;
 	
-		bool triggered = (inputTrigger && !voice.lastInputTrigger) || (buttonTrigger && !voice.lastButtonTrigger);
+		bool inputRising = inputTrigger && !voice.lastInputTrigger;
+		bool buttonRising = buttonTrigger && !voice.lastButtonTrigger;
+	
+		bool triggered = inputRising || buttonRising;
+		bool fired = triggered; // 🔴 track for light
 	
 		if (triggered || (loopEnabled && !voice.playing)) {
 			voice.playing = true;
@@ -208,25 +212,27 @@ struct KayOne : Module {
 				int16_t sampleInt = voice.readSample16(idx);
 				sample = sampleInt * SAMPLE_SCALE;
 				voice.samplePos += speed;
-			}
-			else {
+			} else {
 				if (loopEnabled) {
 					voice.samplePos = 0.f;
-				}
-				else {
+					fired = true; // 🔴 loop restart triggers light
+				} else {
 					voice.playing = false;
 				}
 			}
 		}
 	
-		// Only set output voltage if needed (avoid unnecessary calls)
+		// Only set output voltage if needed
 		if (outputs[voice.outputId].getVoltage() != sample) {
 			outputs[voice.outputId].setVoltage(sample);
 		}
 	
-		// Only call fade if light was active
+		// Light handling: trigger on button/input OR loop restart
 		if (voice.lightId >= 0) {
-			lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
+			if (fired)
+				lights[voice.lightId].setBrightness(1.0f);
+			else
+				lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
 		}
 	}	
 };
