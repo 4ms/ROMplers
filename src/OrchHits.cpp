@@ -71,10 +71,12 @@ struct OrchHits : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		float sampleParam = params[SAMPLE_PARAM].getValue();
-		if (inputs[SAMPLECVIN_INPUT].isConnected()) {
-			sampleParam += inputs[SAMPLECVIN_INPUT].getVoltage();
-		}
+// --- SAMPLE SELECTION WITH CV ---
+		float sampleKnob = params[SAMPLE_PARAM].getValue(); // 0 .. numSamples-1
+		float cv = inputs[SAMPLECVIN_INPUT].isConnected() ? inputs[SAMPLECVIN_INPUT].getVoltage() : 0.f;
+		float cvScaled = cv * ((numSamples - 1) / 2.f) / 5.f;
+		float center = (numSamples - 1) / 2.f;
+		float sampleParam = center + (sampleKnob - center) + cvScaled;
 		sampleParam = std::clamp(sampleParam, 0.f, static_cast<float>(numSamples - 1));
 		int selectedIndex = static_cast<int>(std::round(sampleParam));
 	
