@@ -169,24 +169,25 @@ struct OrchHits : Module {
 struct OrchHitsWidget : ModuleWidget {
 	OrchHitsWidget(OrchHits* module) {
 		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/OrchHits_info.svg")));
+		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/OrchHits.svg")));
 
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 16.052)), module, OrchHits::SAMPLE_PARAM));
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 39.468)), module, OrchHits::OCTAVE_PARAM));
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 63.5)), module, OrchHits::DECAY_PARAM));
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 88.812)), module, OrchHits::PUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(10.16, 88.812)), module, OrchHits::ORCHHITS_LIGHT));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 12.45)), module, OrchHits::SAMPLE_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 36.199)), module, OrchHits::OCTAVE_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 62.001)), module, OrchHits::DECAY_PARAM));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 85.5)), module, OrchHits::PUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(10.16, 85.5)), module, OrchHits::ORCHHITS_LIGHT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 30.138)), module, OrchHits::SAMPLECVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 53.553)), module, OrchHits::PITCHCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 79.129)), module, OrchHits::DECAYCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.469, 104.952)), module, OrchHits::TRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.994, 104.952)), module, OrchHits::VOLCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 25.15)), module, OrchHits::SAMPLECVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.5, 49.001)), module, OrchHits::OCTAVECVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.799, 49.001)), module, OrchHits::PITCHCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 74.701)), module, OrchHits::DECAYCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.5, 98.002)), module, OrchHits::TRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.799, 98.002)), module, OrchHits::VOLCVIN_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.16, 118.71)), module, OrchHits::AUDIOOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.16, 112.0)), module, OrchHits::AUDIOOUT_OUTPUT));
 	}
 };
 
