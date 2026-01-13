@@ -201,15 +201,25 @@ struct SehvenToo : Module {
     }
 
     void process(const ProcessArgs& args) override {
-        float speed = rescale(params[SPEED_PARAM].getValue(), 0.f, 1.f, 0.05f, 2.f);
-        if (inputs[SPEEDCVIN_INPUT].isConnected())
-            speed *= std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage() / 10.f, 0.f, 1.f);
-        float lengthRatio = rescale(params[LENGTH_PARAM].getValue(), 0.f, 1.f, 0.1f, 1.f);
-        if (inputs[LENGTHCVIN_INPUT].isConnected())
-            lengthRatio *= std::clamp(inputs[LENGTHCVIN_INPUT].getVoltage() / 10.f, 0.f, 1.f);
+        // --- Speed ---
+        float knobSpeed = params[SPEED_PARAM].getValue() * 5.f;  // 0-1 → 0-5
+        float speedCV = inputs[SPEEDCVIN_INPUT].isConnected() ? inputs[SPEEDCVIN_INPUT].getVoltage() : 0.f;
+        speedCV = std::clamp(speedCV * 0.5f, -5.f, 5.f);         // -10..10 → -5..5
+        float combinedSpeed = knobSpeed + speedCV;               // sum
+        float normSpeed = std::clamp(combinedSpeed / 5.f, 0.f, 1.f); // normalize 0-1
+        float speed = SPEED_MIN + normSpeed * (SPEED_MAX - SPEED_MIN);
+    
+        // --- Length ---
+        float knobLength = params[LENGTH_PARAM].getValue() * 5.f;  // 0-1 → 0-5
+        float lengthCV = inputs[LENGTHCVIN_INPUT].isConnected() ? inputs[LENGTHCVIN_INPUT].getVoltage() : 0.f;
+        lengthCV = std::clamp(lengthCV * 0.5f, -5.f, 5.f);        // -10..10 → -5..5
+        float combinedLength = knobLength + lengthCV;             // sum
+        float normLength = std::clamp(combinedLength / 5.f, 0.f, 1.f); // normalize 0-1
+        float lengthRatio = LENGTH_MIN + normLength * (LENGTH_MAX - LENGTH_MIN);
+    
         bool loop = (params[LOOP_PARAM].getValue() > 0.5f)
-                   || (inputs[LOOPCVIN_INPUT].isConnected() && inputs[LOOPCVIN_INPUT].getVoltage() > 1.f);
-
+                    || (inputs[LOOPCVIN_INPUT].isConnected() && inputs[LOOPCVIN_INPUT].getVoltage() > 1.f);
+    
         processVoice(args, congaLVoice, CONGALTRIGIN_INPUT, CONGALPUSH_PARAM, speed, lengthRatio, loop);
         processVoice(args, congaHVoice, CONGAHTRIGIN_INPUT, CONGAHPUSH_PARAM, speed, lengthRatio, loop);
         processVoice(args, congaHMVoice, CONGAHMTRIGIN_INPUT, CONGAHMPUSH_PARAM, speed, lengthRatio, loop);
@@ -223,7 +233,7 @@ struct SehvenToo : Module {
         processVoice(args, cabasaVoice, CABASATRIGIN_INPUT, CABASAPUSH_PARAM, speed, lengthRatio, loop);
         processVoice(args, whistleVoice, WHISTLETRIGIN_INPUT, WHISTLEPUSH_PARAM, speed, lengthRatio, loop);
     }
-};
+};    
 
 struct SehvenTooWidget : ModuleWidget {
 	SehvenTooWidget(SehvenToo* module) {
