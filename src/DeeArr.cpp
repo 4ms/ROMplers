@@ -110,26 +110,33 @@ struct DeeArr : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		// Precalculate speed with CV
-		const float knobSpeed = params[SPEED_PARAM].getValue();
-		const float speedCV = std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -5.f, 5.f);
-		const float normSpeed = std::clamp(knobSpeed + (speedCV / 5.f) * 0.5f, 0.01f, 1.0f);
-		const float speed = SPEED_LOW + (normSpeed - 0.01f) * ((SPEED_HIGH - SPEED_LOW) / (1.0f - 0.01f));
-
-		// Precalculate length with CV
-		const float knobLength = params[LENGTH_PARAM].getValue();
-		const float lengthCV = std::clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -5.f, 5.f);
-		const float normLength = std::clamp(knobLength + (lengthCV / 5.f) * 0.5f, 0.1f, 1.0f);
-		const float lengthRatio = LENGTH_MIN + (normLength - 0.1f) * ((LENGTH_MAX - LENGTH_MIN) / (1.0f - 0.1f));
-
+		// --- Precalculate speed with CV ---
+		float knobSpeedV = params[SPEED_PARAM].getValue() * 5.f;  // 0–1 → 0–5V
+		float speedCVV = 0.f;
+		if (inputs[SPEEDCVIN_INPUT].isConnected())
+			speedCVV = std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -10.f, 10.f) * 0.5f; // -10..10 → -5..5
+		float normSpeed = std::clamp(knobSpeedV + speedCVV, 0.f, 5.f) / 5.f; // 0–1 normalized
+		float speed = SPEED_LOW + normSpeed * (SPEED_HIGH - SPEED_LOW);
+	
+		// --- Precalculate length with CV ---
+		float knobLengthV = params[LENGTH_PARAM].getValue() * 5.f;  // 0–1 → 0–5V
+		float lengthCVV = 0.f;
+		if (inputs[LENGTHCVIN_INPUT].isConnected())
+			lengthCVV = std::clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -10.f, 10.f) * 0.5f; // -10..10 → -5..5
+		float normLength = std::clamp(knobLengthV + lengthCVV, 0.f, 5.f) / 5.f; // 0–1 normalized
+		float lengthRatio = LENGTH_MIN + normLength * (LENGTH_MAX - LENGTH_MIN);
+	
+		// --- Loop mode ---
 		const bool baseLoop = params[LOOP_PARAM].getValue() > 0.5f;
 		const bool loopEnabled = baseLoop || (!baseLoop && inputs[LOOPCVIN_INPUT].getVoltage() > 1.f);
-
+	
+		// --- Process each voice ---
 		processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, speed, lengthRatio, loopEnabled);
 		processVoice(args, snareVoice, SNARETRIGIN_INPUT, SNAREPUSH_PARAM, speed, lengthRatio, loopEnabled);
 		processVoice(args, hatVoice, HATTRIGIN_INPUT, HATPUSH_PARAM, speed, lengthRatio, loopEnabled);
 		processVoice(args, rimVoice, RIMTRIGIN_INPUT, RIMPUSH_PARAM, speed, lengthRatio, loopEnabled);
 	}
+	
 
 	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId, float speed, float lengthRatio, bool loopEnabled) {
 		const bool inputTrigger = inputs[trigInputId].getVoltage() > 1.0f;
