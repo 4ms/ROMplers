@@ -3,7 +3,7 @@
 
 struct SehvenToo : Module {
     enum ParamId {
-        SPEED__PARAM,
+        SPEED_PARAM,
         LENGTH_PARAM,
         LOOP_PARAM,
         CONGALPUSH_PARAM,
@@ -103,7 +103,7 @@ struct SehvenToo : Module {
 
     SehvenToo() {
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-        configParam(SPEED__PARAM, 0.f, 1.f, 0.5f, "Speed", "%", 0.f, 100.f);
+        configParam(SPEED_PARAM, 0.f, 1.f, 0.5f, "Speed", "%", 0.f, 100.f);
         configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length", "%", 0.f, 100.f);
         configSwitch(LOOP_PARAM, 0.f, 1.f, 0.f, "Loop", {"Off", "On"});
         configSwitch(CONGALPUSH_PARAM, 0.f, 1.f, 0.f, "Conga Lo Trig", {"Off", "On"});
@@ -201,7 +201,7 @@ struct SehvenToo : Module {
     }
 
     void process(const ProcessArgs& args) override {
-        float speed = rescale(params[SPEED__PARAM].getValue(), 0.f, 1.f, 0.05f, 2.f);
+        float speed = rescale(params[SPEED_PARAM].getValue(), 0.f, 1.f, 0.05f, 2.f);
         if (inputs[SPEEDCVIN_INPUT].isConnected())
             speed *= std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage() / 10.f, 0.f, 1.f);
         float lengthRatio = rescale(params[LENGTH_PARAM].getValue(), 0.f, 1.f, 0.1f, 1.f);
