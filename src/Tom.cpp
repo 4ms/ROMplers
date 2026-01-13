@@ -181,24 +181,24 @@ struct Tom : Module {
 struct TomWidget : ModuleWidget {
 	TomWidget(Tom* module) {
 		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/Tom_info.svg")));
+		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/Tom.svg")));
 
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 15.971)), module, Tom::SAMPLE_PARAM));
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 39.997)), module, Tom::PITCH_PARAM));
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 64.029)), module, Tom::DECAY_PARAM));
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 89.342)), module, Tom::PUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(10.16, 89.342)), module, Tom::TOM_LIGHT));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 12.45)), module, Tom::SAMPLE_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 36.199)), module, Tom::PITCH_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 60.001)), module, Tom::DECAY_PARAM));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 84.3)), module, Tom::PUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(10.16, 84.3)), module, Tom::TOM_LIGHT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 29.578)), module, Tom::SAMPLECVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 54.083)), module, Tom::PITCHCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 79.658)), module, Tom::DECAYCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.469, 105.481)), module, Tom::TRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.994, 105.481)), module, Tom::VOLCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 25.15)), module, Tom::SAMPLECVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 49.001)), module, Tom::PITCHCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 72.701)), module, Tom::DECAYCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.5, 98.002)), module, Tom::TRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.799, 98.002)), module, Tom::VOLCVIN_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.16, 119.24)), module, Tom::AUDIOOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.16, 112.0)), module, Tom::AUDIOOUT_OUTPUT));
 	}
 };
 
