@@ -106,7 +106,7 @@ struct KayArr : Module {
 	bool lastLoopCVTrigger = false;   // previous frame state for the CV
 	
 	void process(const ProcessArgs& args) override {
-	    // --- Speed parameter ---
+		// --- Speed parameter ---
 		float speedKnobV = params[SPEED_PARAM].getValue() * 5.f; // knob 0-1 → 0-5V
 		float speedCVV = inputs[SPEEDCVIN_INPUT].isConnected() ? std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -10.f, 10.f) * 0.5f : 0.f; // -10..10 → -5..5
 		float normSpeed = std::clamp(speedKnobV + speedCVV, 0.f, 5.f) / 5.f; // 0-1 normalized
@@ -117,43 +117,45 @@ struct KayArr : Module {
 		float lengthCVV = inputs[LENGTHCVIN_INPUT].isConnected() ? std::clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -10.f, 10.f) * 0.5f : 0.f; // -10..10 → -5..5
 		float normLength = std::clamp(lengthKnobV + lengthCVV, 0.f, 5.f) / 5.f; // 0-1 normalized
 		float lengthRatio = LENGTH_MIN + normLength * (LENGTH_MAX - LENGTH_MIN);
-
-			// --- Loop mode ---
-			bool loopButton = params[LOOP_PARAM].getValue() > 0.5f;
-			float loopCV = inputs[LOOPCVIN_INPUT].isConnected() ? inputs[LOOPCVIN_INPUT].getVoltage() : 0.f;
-			bool loopButtonRising = loopButton && !lastLoopButton;
-			if (loopButtonRising) {
-				loopState = !loopState;
-			}
-			if (!loopState && loopCV > 1.f) {       // OFF → ON with positive CV
-				loopState = true;
-			} else if (loopState && loopCV < -1.f) { // ON → OFF with negative CV
-				loopState = false;
-			}
-			lastLoopButton = loopButton;
-			bool loopEnabled = loopState;
-			lights[LOOP_LIGHT].setBrightnessSmooth(loopState, args.sampleTime);
-			
+	
+		// --- Loop mode ---
+		bool loopButton = params[LOOP_PARAM].getValue() > 0.5f;
+		float loopCV = inputs[LOOPCVIN_INPUT].isConnected() ? inputs[LOOPCVIN_INPUT].getVoltage() : 0.f;
+		bool loopButtonRising = loopButton && !lastLoopButton;
+		if (loopButtonRising) {
+			loopState = !loopState;
+		}
+		if (!loopState && loopCV > 1.f) {       // OFF → ON with positive CV
+			loopState = true;
+		} else if (loopState && loopCV < -1.f) { // ON → OFF with negative CV
+			loopState = false;
+		}
+		lastLoopButton = loopButton;
+		bool loopEnabled = loopState;
+		lights[LOOP_LIGHT].setBrightnessSmooth(loopState, args.sampleTime);
+	
 		for (int i = 0; i < 10; i++) {
 			Voice& v = voices[i];
-
+	
 			bool inputTrig = inputs[v.trigInputId].getVoltage() > 1.f;
 			bool buttonTrig = params[v.pushParamId].getValue() > 0.5f;
 			bool inputRising = inputTrig && !v.lastInputTrigger;
 			bool buttonRising = buttonTrig && !v.lastButtonTrigger;
-
+	
 			bool retrigger = inputRising || buttonRising || (loopEnabled && !v.playing);
-
+	
+			v.lastInputTrigger = inputTrig;
+			v.lastButtonTrigger = buttonTrig;
+	
+			const int maxSamples = (int)(v.sampleLength * lengthRatio);
+	
+			bool fired = retrigger; // 🔴 new: track for light
+	
 			if (retrigger) {
 				v.samplePos = 0.f;
 				v.playing = true;
 			}
-
-			v.lastInputTrigger = inputTrig;
-			v.lastButtonTrigger = buttonTrig;
-
-			const int maxSamples = (int)(v.sampleLength * lengthRatio);
-
+	
 			if (v.playing) {
 				int idx = (int)v.samplePos;
 				if (idx < maxSamples) {
@@ -163,6 +165,7 @@ struct KayArr : Module {
 				} else {
 					if (loopEnabled) {
 						v.samplePos = 0.f;
+						fired = true; // 🔴 loop restart fires light
 					} else {
 						v.playing = false;
 						outputs[v.outputId].setVoltage(0.f);
@@ -171,14 +174,18 @@ struct KayArr : Module {
 			} else {
 				outputs[v.outputId].setVoltage(0.f);
 			}
-
+	
 			// Efficient light fade
 			if (v.lightId >= 0) {
-				lights[v.lightId].setBrightnessSmooth(retrigger ? 1.f : 0.f, args.sampleTime);
+				if (fired)
+					lights[v.lightId].setBrightness(1.f);
+				else
+					lights[v.lightId].setBrightnessSmooth(0.f, args.sampleTime);
 			}
 		}
 	}
 };
+	
 
 struct KayArrWidget : ModuleWidget {
 	KayArrWidget(KayArr* module) {
