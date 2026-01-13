@@ -170,16 +170,24 @@ struct SeaArr : Module {
 	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId, float speed, float lengthRatio, bool loopEnabled) {
 		bool inputTrigger = inputs[trigInputId].getVoltage() > 1.0f;
 		bool buttonTrigger = params[pushParamId].getValue() > 0.5f;
+	
 		bool inputRising = inputTrigger && !voice.lastInputTrigger;
 		bool buttonRising = buttonTrigger && !voice.lastButtonTrigger;
-		if (inputRising || buttonRising || (loopEnabled && !voice.playing)) {
+	
+		// track firing for lights
+		bool fired = inputRising || buttonRising;
+	
+		if (fired || (loopEnabled && !voice.playing)) {
 			voice.playing = true;
 			voice.samplePos = 0.f;
+			fired = true; // ensure light triggers
 		}
+	
 		voice.lastInputTrigger = inputTrigger;
 		voice.lastButtonTrigger = buttonTrigger;
-
+	
 		int maxSamplesToPlay = (int)(voice.sampleLength * lengthRatio);
+	
 		if (voice.playing) {
 			int idx = (int)voice.samplePos;
 			if (idx < maxSamplesToPlay) {
@@ -190,6 +198,7 @@ struct SeaArr : Module {
 			} else {
 				if (loopEnabled) {
 					voice.samplePos = 0.f;
+					fired = true; // 🔴 loop restart triggers light
 				} else {
 					voice.playing = false;
 					outputs[voice.outputId].setVoltage(0.f);
@@ -198,13 +207,15 @@ struct SeaArr : Module {
 		} else {
 			outputs[voice.outputId].setVoltage(0.f);
 		}
+	
+		// light handling: blink on trigger or loop restart
 		if (voice.lightId >= 0) {
-			if (inputRising || buttonRising || (loopEnabled && !voice.playing)) {
+			if (fired)
 				lights[voice.lightId].setBrightness(1.f);
-			}
-			lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
+			else
+				lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
 		}
-	}
+	}	
 
 	bool loopState = false;           // the current loop on/off state
 	bool lastLoopButton = false;      // previous frame state for the button
