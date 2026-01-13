@@ -225,86 +225,86 @@ struct SehvenToo : Module {
     }
 };
 
-	struct SehvenTooWidget : ModuleWidget {
-		SehvenTooWidget(SehvenToo* module) {
-			setModule(module);
-			setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/SehvenToo_info.svg")));
+struct SehvenTooWidget : ModuleWidget {
+	SehvenTooWidget(SehvenToo* module) {
+		setModule(module);
+		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/SehvenToo.svg")));
 
-			addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-			addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-			addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-			addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-			addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(30.48, 21.308)), module, SehvenToo::SPEED__PARAM));
-			addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(16.002, 33.508)), module, SehvenToo::LENGTH_PARAM));
-			addParam(createParamCentered<Switch2Pos>(mm2px(Vec(46.446, 33.508)), module, SehvenToo::LOOP_PARAM));
+		addParam(createParam<Switch2Pos>(mm2px(Vec(56.4, 12.002)), module, SehvenToo::LOOP_PARAM));
+		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(16.799, 15.501)), module, SehvenToo::LENGTH_PARAM));
+		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(38.799, 15.501)), module, SehvenToo::SPEED_PARAM));
 
-			addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.0, 59.14)), module, SehvenToo::CONGALPUSH_PARAM));
-			addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.0, 59.14)), module, SehvenToo::CONGAL_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(8.798, 42.002)), module, SehvenToo::CONGALPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(8.798, 42.002)), module, SehvenToo::CONGAL_LIGHT));
 
-			addParam(createParamCentered<LEDBezel>(mm2px(Vec(16.49, 59.14)), module, SehvenToo::CONGAHPUSH_PARAM));
-			addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(16.49, 59.14)), module, SehvenToo::CONGAH_LIGHT));
-			
-			addParam(createParamCentered<LEDBezel>(mm2px(Vec(25.4, 59.14)), module, SehvenToo::CONGAHMPUSH_PARAM));
-			addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(25.4, 59.14)), module, SehvenToo::CONGAHM_LIGHT));
-			
-			addParam(createParamCentered<LEDBezel>(mm2px(Vec(35.318, 59.14)), module, SehvenToo::BONGOLPUSH_PARAM));
-			addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(35.318, 59.14)), module, SehvenToo::BONGOL_LIGHT));
-			
-			addParam(createParamCentered<LEDBezel>(mm2px(Vec(44.699, 59.14)), module, SehvenToo::BONGOHPUSH_PARAM));
-			addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(44.699, 59.14)), module, SehvenToo::BONGOH_LIGHT));
-			
-			addParam(createParamCentered<LEDBezel>(mm2px(Vec(54.519, 59.14)), module, SehvenToo::TIMBALELPUSH_PARAM));
-			addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(54.519, 59.14)), module, SehvenToo::TIMBALEL_LIGHT));
-			
-			addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.0, 94.743)), module, SehvenToo::TIMBALEHPUSH_PARAM));
-			addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.0, 94.743)), module, SehvenToo::TIMBALEH_LIGHT));
-			
-			addParam(createParamCentered<LEDBezel>(mm2px(Vec(16.49, 94.743)), module, SehvenToo::AGOGOLPUSH_PARAM));
-			addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(16.49, 94.743)), module, SehvenToo::AGOGOL_LIGHT));
-			
-			addParam(createParamCentered<LEDBezel>(mm2px(Vec(25.4, 94.743)), module, SehvenToo::AGOGOHPUSH_PARAM));
-			addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(25.4, 94.743)), module, SehvenToo::AGOGOH_LIGHT));
-			
-			addParam(createParamCentered<LEDBezel>(mm2px(Vec(35.318, 94.743)), module, SehvenToo::MARACAPUSH_PARAM));
-			addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(35.318, 94.743)), module, SehvenToo::MARACA_LIGHT));
-			
-			addParam(createParamCentered<LEDBezel>(mm2px(Vec(44.699, 94.743)), module, SehvenToo::CABASAPUSH_PARAM));
-			addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(44.699, 94.743)), module, SehvenToo::CABASA_LIGHT));
-			
-			addParam(createParamCentered<LEDBezel>(mm2px(Vec(54.519, 94.743)), module, SehvenToo::WHISTLEPUSH_PARAM));
-			addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(54.519, 94.743)), module, SehvenToo::WHISTLE_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(20.5, 42.002)), module, SehvenToo::CONGAHPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(20.5, 42.002)), module, SehvenToo::CONGAH_LIGHT));
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(30.48, 33.97)), module, SehvenToo::SPEEDCVIN_INPUT));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.002, 45.349)), module, SehvenToo::LENGTHCVIN_INPUT));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(46.446, 45.349)), module, SehvenToo::LOOPCVIN_INPUT));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.0, 71.357)), module, SehvenToo::CONGALTRIGIN_INPUT));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.49, 71.357)), module, SehvenToo::CONGAHTRIGIN_INPUT));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.4, 71.357)), module, SehvenToo::CONGAHMTRIGIN_INPUT));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(35.318, 71.357)), module, SehvenToo::BONGOLTRIGIN_INPUT));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(44.699, 71.357)), module, SehvenToo::BONGOHTRIGIN_INPUT));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(54.519, 71.357)), module, SehvenToo::TIMBALELTRIGIN_INPUT));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.0, 106.959)), module, SehvenToo::TIMBALEHTRIGIN_INPUT));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.49, 106.959)), module, SehvenToo::AGOGOLTRIGIN_INPUT));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.4, 106.959)), module, SehvenToo::AGOGOHTRIGIN_INPUT));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(35.318, 106.959)), module, SehvenToo::MARACATRIGIN_INPUT));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(44.699, 106.959)), module, SehvenToo::CABASATRIGIN_INPUT));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(54.519, 106.959)), module, SehvenToo::WHISTLETRIGIN_INPUT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(32.3, 42.002)), module, SehvenToo::CONGAHMPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(32.3, 42.002)), module, SehvenToo::CONGAHM_LIGHT));
 
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.0, 83.813)), module, SehvenToo::CONGALOUT_OUTPUT));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(16.49, 83.813)), module, SehvenToo::CONGAHOUT_OUTPUT));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(25.4, 83.813)), module, SehvenToo::CONGAHMOUT_OUTPUT));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(35.318, 83.813)), module, SehvenToo::BONGOLOUT_OUTPUT));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(44.699, 83.813)), module, SehvenToo::BONGOHOUT_OUTPUT));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(54.519, 83.813)), module, SehvenToo::TIMBALELOUT_OUTPUT));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.0, 118.357)), module, SehvenToo::TIMBALEHOUT_OUTPUT));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(16.49, 118.357)), module, SehvenToo::AGOGOLOUT_OUTPUT));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(25.4, 118.357)), module, SehvenToo::AGOGOHOUT_OUTPUT));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(35.318, 118.357)), module, SehvenToo::MARACAOUT_OUTPUT));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(44.699, 118.357)), module, SehvenToo::CABASAOUT_OUTPUT));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(54.519, 118.357)), module, SehvenToo::WHISTLEOUT_OUTPUT));
-		}
-	};
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(43.998, 42.002)), module, SehvenToo::BONGOLPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(43.998, 42.002)), module, SehvenToo::BONGOL_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(55.7, 42.002)), module, SehvenToo::BONGOHPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(55.7, 42.002)), module, SehvenToo::BONGOH_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(67.501, 42.002)), module, SehvenToo::TIMBALELPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(67.501, 42.002)), module, SehvenToo::TIMBALEL_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(8.798, 84.999)), module, SehvenToo::TIMBALEHPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(8.798, 84.999)), module, SehvenToo::TIMBALEH_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(20.5, 84.999)), module, SehvenToo::AGOGOLPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(20.5, 84.999)), module, SehvenToo::AGOGOL_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(32.3, 84.999)), module, SehvenToo::AGOGOHPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(32.3, 84.999)), module, SehvenToo::AGOGOH_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(43.998, 84.999)), module, SehvenToo::MARACAPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(43.998, 84.999)), module, SehvenToo::MARACA_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(55.7, 84.999)), module, SehvenToo::CABASAPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(55.7, 84.999)), module, SehvenToo::CABASA_LIGHT));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(67.501, 84.999)), module, SehvenToo::WHISTLEPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(67.501, 84.999)), module, SehvenToo::WHISTLE_LIGHT));
+
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.849, 30.801)), module, SehvenToo::LENGTHCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(38.851, 30.801)), module, SehvenToo::SPEEDCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(59.351, 30.801)), module, SehvenToo::LOOPCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.798, 56.0)), module, SehvenToo::CONGALTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.5, 56.0)), module, SehvenToo::CONGAHTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.3, 56.0)), module, SehvenToo::CONGAHMTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43.998, 56.0)), module, SehvenToo::BONGOLTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55.7, 56.0)), module, SehvenToo::BONGOHTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(67.501, 56.0)), module, SehvenToo::TIMBALELTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.798, 99.001)), module, SehvenToo::TIMBALEHTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.5, 99.001)), module, SehvenToo::AGOGOLTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.3, 99.001)), module, SehvenToo::AGOGOHTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43.998, 99.001)), module, SehvenToo::MARACATRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55.7, 99.001)), module, SehvenToo::CABASATRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(67.501, 99.001)), module, SehvenToo::WHISTLETRIGIN_INPUT));
+
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(8.798, 70.002)), module, SehvenToo::CONGALOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.5, 70.002)), module, SehvenToo::CONGAHOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.3, 70.002)), module, SehvenToo::CONGAHMOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 70.002)), module, SehvenToo::BONGOLOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(55.7, 70.002)), module, SehvenToo::BONGOHOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(67.501, 70.002)), module, SehvenToo::TIMBALELOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(8.798, 112.999)), module, SehvenToo::TIMBALEHOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.5, 112.999)), module, SehvenToo::AGOGOLOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.3, 112.999)), module, SehvenToo::AGOGOHOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 112.999)), module, SehvenToo::MARACAOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(55.7, 112.999)), module, SehvenToo::CABASAOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(67.501, 112.999)), module, SehvenToo::WHISTLEOUT_OUTPUT));
+	}
+};
 
 
 	Model* modelSehvenToo = createModel<SehvenToo, SehvenTooWidget>("SehvenToo");
