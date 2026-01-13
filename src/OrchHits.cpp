@@ -123,11 +123,25 @@ struct OrchHits : Module {
 		float output = 0.f;
 	
 		if (playing && currentSample) {
-			float pitchKnob = params[OCTAVE_PARAM].getValue();   
-			float octaveOffset = pitchKnob - 2.f;               
-			float pitchCV = inputs[PITCHCVIN_INPUT].isConnected() ? inputs[PITCHCVIN_INPUT].getVoltage() : 0.f;
-			float totalVolts = octaveOffset + pitchCV;
-			float pitchRatio = std::pow(2.f, totalVolts);
+// --- OCTAVE CONTROL WITH QUANTIZED CV (±5V) ---
+float octaveKnob = params[OCTAVE_PARAM].getValue(); // 0 .. 4
+float octaveCV = inputs[OCTAVECVIN_INPUT].isConnected() ? inputs[OCTAVECVIN_INPUT].getVoltage() : 0.f;
+
+// Scale CV: ±5V maps to full knob range (0..4)
+float cvScaled = octaveCV * 2.f / 5.f; // 5V → +2, -5V → -2
+
+// Combine knob + CV relative to center
+float center = 2.f;
+float combined = center + (octaveKnob - center) + cvScaled;
+
+// Quantize to discrete steps 0..4
+float totalOctave = std::clamp(std::round(combined), 0.f, 4.f);
+
+// Use in pitch calculation
+float pitchCV = inputs[PITCHCVIN_INPUT].isConnected() ? inputs[PITCHCVIN_INPUT].getVoltage() : 0.f;
+float totalVolts = (totalOctave - 2.f) + pitchCV; // centered around Unison
+float pitchRatio = std::pow(2.f, totalVolts);
+
 			
 	
 			float sampleRateRatio = sampleSampleRate / args.sampleRate;
