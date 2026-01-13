@@ -206,15 +206,20 @@ struct SeaArr : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		float speed = rescale(params[SPEED_PARAM].getValue(), 0.f, 1.f, SPEED_MIN, SPEED_MAX);
-		if (inputs[SPEEDCVIN_INPUT].isConnected()) {
-			speed *= std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage() / 10.f, 0.f, 1.f);
-		}
+	   // --- Speed ---
+	   float knobSpeed = params[SPEED_PARAM].getValue();  // 0-1
+	   float speedCV = inputs[SPEEDCVIN_INPUT].isConnected() ? inputs[SPEEDCVIN_INPUT].getVoltage() : 0.f;
+	   speedCV = std::clamp(speedCV * 0.5f, -5.f, 5.f); // scale -10..10V -> -5..5
+	   float normSpeed = std::clamp(knobSpeed + speedCV / 10.f, 0.f, 1.f); // sum knob + CV (-5..5)/10 -> -0.5..0.5
+	   float speed = SPEED_MIN + normSpeed * (SPEED_MAX - SPEED_MIN);
 
-		float lengthRatio = rescale(params[LENGTH_PARAM].getValue(), 0.f, 1.f, LENGTH_MIN, LENGTH_MAX);
-		if (inputs[LENGTHCVIN_INPUT].isConnected()) {
-			lengthRatio *= std::clamp(inputs[LENGTHCVIN_INPUT].getVoltage() / 10.f, 0.f, 1.f);
-		}
+		// --- Length ---
+		float knobLength = params[LENGTH_PARAM].getValue() * 5.f;       // convert knob 0-1 → 0-5
+		float lengthCV = inputs[LENGTHCVIN_INPUT].isConnected() ? inputs[LENGTHCVIN_INPUT].getVoltage() : 0.f;
+		lengthCV = std::clamp(lengthCV * 0.5f, -5.f, 5.f);              // scale CV -10..10 → -5..5
+		float combined = knobLength + lengthCV;                          // sum knob + CV
+		float normLength = std::clamp(combined / 5.f, 0.f, 1.f);        // rescale to 0-1
+		float lengthRatio = LENGTH_MIN + normLength * (LENGTH_MAX - LENGTH_MIN);
 
 		bool loopEnabled = (params[LOOP_PARAM].getValue() > 0.5f) || (inputs[LOOPCVIN_INPUT].getVoltage() > 1.f);
 
