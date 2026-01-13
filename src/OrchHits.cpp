@@ -16,6 +16,7 @@ struct OrchHits : Module {
 		DECAYCVIN_INPUT,
 		TRIGIN_INPUT,
 		VOLCVIN_INPUT,
+		OCTAVECVIN_INPUT,
 		INPUTS_LEN
 	};
 	enum OutputId {
@@ -53,7 +54,9 @@ struct OrchHits : Module {
 		configSwitch(OCTAVE_PARAM, 0.f, 4.f, 2.f, "Octave transpose", {"-2", "-1", "Unison", "+1", "+2"});
 		configParam(DECAY_PARAM, 0.1f, 5.f, 5.f, "Decay", "s");
 		configParam(PUSH_PARAM, 0.f, 1.f, 0.f, "Trigger button");
-	
+
+		configInput(SAMPLECVIN_INPUT, "Sample Select CV");
+		configInput(OCTAVECVIN_INPUT, "Octave CV");
 		configInput(PITCHCVIN_INPUT, "Pitch CV (1V/oct)");
 		configInput(DECAYCVIN_INPUT, "Decay CV");
 		configInput(TRIGIN_INPUT, "Trig");
