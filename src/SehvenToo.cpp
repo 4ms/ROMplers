@@ -164,18 +164,26 @@ struct SehvenToo : Module {
 
     void processVoice(const ProcessArgs& args, Voice& v, int trigInId, int pushParamId,
         float speed, float lengthRatio, bool loopEnabled) {
+    
         bool inTrig = inputs[trigInId].getVoltage() > 1.f;
         bool btnTrig = params[pushParamId].getValue() > 0.5f;
-        bool rising = (inTrig && !v.lastInputTrigger) || (btnTrig && !v.lastButtonTrigger);
-
-        if (rising || (loopEnabled && !v.playing)) {
+        bool inputRising = inTrig && !v.lastInputTrigger;
+        bool buttonRising = btnTrig && !v.lastButtonTrigger;
+    
+        // track firing for lights
+        bool fired = inputRising || buttonRising;
+    
+        if (fired || (loopEnabled && !v.playing)) {
             v.playing = true;
             v.samplePos = 0.f;
+            fired = true; // ensure light triggers
         }
+    
         v.lastInputTrigger = inTrig;
         v.lastButtonTrigger = btnTrig;
-
+    
         int maxSamples = (int)(v.sampleLength * lengthRatio);
+    
         if (v.playing) {
             int idx = int(v.samplePos);
             if (idx < maxSamples) {
@@ -184,8 +192,10 @@ struct SehvenToo : Module {
                 outputs[v.outputId].setVoltage(out * 5.f);
                 v.samplePos += speed;
             } else {
-                if (loopEnabled) v.samplePos = 0.f;
-                else {
+                if (loopEnabled) {
+                    v.samplePos = 0.f;
+                    fired = true; // 🔴 loop restart triggers light
+                } else {
                     v.playing = false;
                     outputs[v.outputId].setVoltage(0.f);
                 }
@@ -193,13 +203,16 @@ struct SehvenToo : Module {
         } else {
             outputs[v.outputId].setVoltage(0.f);
         }
-
+    
+        // light handling: blink on trigger or loop restart
         if (v.lightId >= 0) {
-            if (rising || (loopEnabled && !v.playing))
+            if (fired)
                 lights[v.lightId].setBrightness(1.f);
-            lights[v.lightId].setBrightnessSmooth(0.f, args.sampleTime);
+            else
+                lights[v.lightId].setBrightnessSmooth(0.f, args.sampleTime);
         }
     }
+    
 
     bool loopState = false;           // the current loopState on/off state
 	bool lastLoopButton = false;      // previous frame state for the button
