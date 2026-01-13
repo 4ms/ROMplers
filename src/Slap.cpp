@@ -92,24 +92,17 @@ struct Slap : Module {
 		if (playing && currentSample) {
 			// Pitch calculation: knob + CV, std::clamp CV if disconnected
 			// --- Octave parameter with CV scaling ---
-// --- Octave knob + CV ---
-int octaveKnob = static_cast<int>(params[OCTAVE_PARAM].getValue()); // 0..4
-float cv = std::clamp((inputs[OCTAVECVIN_INPUT].getVoltage() * 0.5f), -5.f, 5.f);
+// --- 1V/oct pitch calculation ---
+int finalOctave = std::clamp(static_cast<int>(params[OCTAVE_PARAM].getValue()) + static_cast<int>(std::round(std::clamp(inputs[OCTAVECVIN_INPUT].getVoltage(), -5.f, 5.f) * 0.4f)), 0, 4);
+float pitchCV  = inputs[PITCHCVIN_INPUT].isConnected() ? inputs[PITCHCVIN_INPUT].getVoltage() : 0.f;
 
-// Sum knob + CV, round, and clamp to 0-4 discrete steps
-int finalOctave = static_cast<int>(std::round(octaveKnob + cv));
-finalOctave = std::clamp(finalOctave, 0, 4);
+// Sum everything in volts for 1V/oct tracking
+// Each volt = 1 octave, so total pitch in volts:
+float totalVolts = finalOctave + pitchCV;
 
-// Then use the finalOctave for pitch calculation:
-float pitchCV = inputs[PITCHCVIN_INPUT].isConnected() ? inputs[PITCHCVIN_INPUT].getVoltage() : 0.f;
-float pitch = finalOctave + pitchCV; // final pitch for playback
-
-// Compute pitch ratio
-float pitchRatio;
-if (pitch >= 0.f && pitch <= 8.f)
-    pitchRatio = fastPow2(pitch);
-else
-    pitchRatio = std::pow(2.f, pitch);
+// Convert volts to playback rate
+// playbackRate = 2^(V) to get correct 1V/oct frequency
+float pitchRatio = std::pow(2.f, totalVolts);
 
 
 			const float sampleRateRatio = sampleSampleRate / args.sampleRate;
