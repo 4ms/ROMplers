@@ -112,95 +112,92 @@ struct AyysKing : Module {
 	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId,
 		float speed, int maxSamples, bool loop) {
 
-		const bool trig = inputs[trigInputId].getVoltage() > 1.f;
-		const bool btn  = params[pushParamId].getValue() > 0.5f;
+const bool trig = inputs[trigInputId].getVoltage() > 1.f;
+const bool btn  = params[pushParamId].getValue() > 0.5f;
 
-		const bool trigRise = trig && !voice.lastInputTrigger;
-		const bool btnRise  = btn  && !voice.lastButtonTrigger;
-		const bool trigger  = trigRise || btnRise || (loop && !voice.playing);
-			
-		voice.lastInputTrigger = trig;
-		voice.lastButtonTrigger = btn;	
+const bool trigRise = trig && !voice.lastInputTrigger;
+const bool btnRise  = btn  && !voice.lastButtonTrigger;
+const bool trigger  = trigRise || btnRise || (loop && !voice.playing);
 
-		bool loopReset = false; // ← NEW: light-only pulse source
-			
-		if (trigger) {
-		voice.playing = true;
-		voice.samplePos = 0.f;
-		if (voice.lightId >= 0)
-		  lights[voice.lightId].setBrightness(1.f);
-		}
+voice.lastInputTrigger = trig;
+voice.lastButtonTrigger = btn;
 
-		if (voice.playing) {
-		int idx = (int)voice.samplePos;
+bool loopReset = false; // light-only pulse source
 
-		if (idx < maxSamples) {
-		  outputs[voice.outputId].setVoltage(voice.getSample(idx));
-		  voice.samplePos += speed;
-		} else {
-		  if (loop) {
-			  voice.samplePos = 0.f;
-			  outputs[voice.outputId].setVoltage(voice.getSample(0));
-			  loopReset = true; // 🔴 detect wrap
-		  } else {
-			  voice.playing = false;
-			  outputs[voice.outputId].setVoltage(0.f);
-		  }
-		}
-		} else {
-		outputs[voice.outputId].setVoltage(0.f);
-		}
+if (trigger) {
+voice.playing = true;
+voice.samplePos = 0.f;
+if (voice.lightId >= 0)
+  lights[voice.lightId].setBrightness(1.f);
+}
 
-		// --- Light handling (additive, non-invasive) ---
-		if (voice.lightId >= 0) {
-		if (loopReset)
-		  lights[voice.lightId].setBrightness(1.f);
-		lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
-		}
-		}
+if (voice.playing) {
+int idx = (int)voice.samplePos;
+if (idx >= maxSamples)
+  idx = maxSamples - 1;
 
-	void process(const ProcessArgs& args) override {
-		// --- Speed ---
-		float speedKnobV = params[SPEED_PARAM].getValue() * 5.f; // 0–1 → 0–5 V
-		float speedCVV = 0.f;
-		if (inputs[SPEEDCVIN_INPUT].isConnected()) {
-		    speedCVV = std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -10.f, 10.f) * 0.5f; // -10..10 → -5..5
-		}
-		float speedNorm = std::clamp(speedKnobV + speedCVV, 0.f, 5.f) / 5.f; // back to 0–1
-		float speed = SPEED_LOW + speedNorm * (SPEED_HIGH - SPEED_LOW);
+outputs[voice.outputId].setVoltage(voice.getSample(idx));
+voice.samplePos += speed;
 
-		// --- Length ---
-		float lengthKnobV = params[LENGTH_PARAM].getValue() * 5.f; // 0–1 → 0–5 V
-		float lengthCVV = 0.f;
-		if (inputs[LENGTHCVIN_INPUT].isConnected()) {
-		    lengthCVV = std::clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -10.f, 10.f) * 0.5f; // -10..10 → -5..5
-		}
-		float lengthNorm = std::clamp(lengthKnobV + lengthCVV, 0.f, 5.f) / 5.f; // back to 0–1
-		float lengthRatio = LENGTH_MIN + lengthNorm * (LENGTH_MAX - LENGTH_MIN);
+if (voice.samplePos >= maxSamples) {
+  if (loop) {
+	  voice.samplePos = 0.f;
+	  loopReset = true; // detect wrap
+  } else {
+	  voice.playing = false;
+	  outputs[voice.outputId].setVoltage(0.f);
+  }
+}
+} else {
+outputs[voice.outputId].setVoltage(0.f);
+}
 
+// Light handling
+if (voice.lightId >= 0) {
+if (loopReset)
+  lights[voice.lightId].setBrightness(1.f);
+lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
+}
+}
 
-		const int maxSamples = int(voices[0].sampleLength * lengthRatio);
-			// --- Loop mode ---
-			bool loopButton = params[LOOP_PARAM].getValue() > 0.5f;
-			float loopCV = inputs[LOOPCVIN_INPUT].isConnected() ? inputs[LOOPCVIN_INPUT].getVoltage() : 0.f;
-			bool loopButtonRising = loopButton && !lastLoopButton;
-			if (loopButtonRising) {
-				loopState = !loopState;
-			}
-			if (!loopState && loopCV > 1.f) {       // OFF → ON with positive CV
-				loopState = true;
-			} else if (loopState && loopCV < -1.f) { // ON → OFF with negative CV
-				loopState = false;
-			}
-			lastLoopButton = loopButton;
+void process(const ProcessArgs& args) override {
+// --- Speed ---
+float speedKnobV = params[SPEED_PARAM].getValue() * 5.f; // 0–1 → 0–5 V
+float speedCVV = 0.f;
+if (inputs[SPEEDCVIN_INPUT].isConnected())
+speedCVV = std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -10.f, 10.f) * 0.5f; // -10..10 → -5..5
+float speedNorm = std::clamp(speedKnobV + speedCVV, 0.f, 5.f) / 5.f; // back to 0–1
+float speed = SPEED_LOW + speedNorm * (SPEED_HIGH - SPEED_LOW);
 
-			bool loopEnabled = loopState;
-			lights[LOOP_LIGHT].setBrightnessSmooth(loopState, args.sampleTime);
+// --- Length ---
+float lengthKnobV = params[LENGTH_PARAM].getValue() * 5.f; // 0–1 → 0–5 V
+float lengthCVV = 0.f;
+if (inputs[LENGTHCVIN_INPUT].isConnected())
+lengthCVV = std::clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -10.f, 10.f) * 0.5f;
+float lengthNorm = std::clamp(lengthKnobV + lengthCVV, 0.f, 5.f) / 5.f;
+float lengthRatio = LENGTH_MIN + lengthNorm * (LENGTH_MAX - LENGTH_MIN);
 
-		for (int i = 0; i < 10; i++) {
-			processVoice(args, voices[i], KICKTRIGIN_INPUT + i, KICKPUSH_PARAM + i, speed, maxSamples, loopEnabled);
-		}
-	}
+// --- Loop state ---
+bool loopButton = params[LOOP_PARAM].getValue() > 0.5f;
+float loopCV = inputs[LOOPCVIN_INPUT].isConnected() ? inputs[LOOPCVIN_INPUT].getVoltage() : 0.f;
+bool loopButtonRising = loopButton && !lastLoopButton;
+if (loopButtonRising)
+loopState = !loopState;
+if (!loopState && loopCV > 1.f)
+loopState = true;
+else if (loopState && loopCV < -1.f)
+loopState = false;
+lastLoopButton = loopButton;
+
+bool loopEnabled = loopState;
+lights[LOOP_LIGHT].setBrightnessSmooth(loopState, args.sampleTime);
+
+// --- Process each voice individually ---
+for (int i = 0; i < 10; i++) {
+int voiceMaxSamples = int(voices[i].sampleLength * lengthRatio); // per-voice maxSamples
+processVoice(args, voices[i], KICKTRIGIN_INPUT + i, KICKPUSH_PARAM + i, speed, voiceMaxSamples, loopEnabled);
+}
+}
 };
 
 struct AyysKingWidget : ModuleWidget {
