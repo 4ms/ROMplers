@@ -42,6 +42,7 @@ struct KayOne : Module {
 		TOMH_LIGHT,
 		CL_LIGHT,
 		OH_LIGHT,
+		LOOP_LIGHT,
 		LIGHTS_LEN
 	};
 
@@ -138,6 +139,10 @@ struct KayOne : Module {
 		openHatVoice.lightId = OH_LIGHT;
 	}
 
+	bool loopState = false;           // the current loop on/off state
+	bool lastLoopButton = false;      // previous frame state for the button
+	bool lastLoopCVTrigger = false;   // previous frame state for the CV
+
 	void process(const ProcessArgs& args) override {
 		static const float speedCVScale = 0.1f;  // (1/5 * 0.5)
 		static const float lengthCVScale = 0.1f;
@@ -150,9 +155,21 @@ struct KayOne : Module {
 		float normLength = std::clamp(knobLength + inputs[LENGTHCVIN_INPUT].getVoltage() * lengthCVScale, 0.1f, 1.0f);
 		float lengthRatio = LENGTH_MIN + (normLength - 0.1f) * ((LENGTH_MAX - LENGTH_MIN) / (1.0f - 0.1f));
 	
-		bool baseLoop = params[LOOP_PARAM].getValue() > 0.5f;
-		float loopCV = inputs[LOOPCVIN_INPUT].getVoltage();
-		bool loopEnabled = (baseLoop && loopCV >= -1.f) || (!baseLoop && loopCV > 1.f);
+			// --- Loop mode ---
+			bool loopButton = params[LOOP_PARAM].getValue() > 0.5f;
+			float loopCV = inputs[LOOPCVIN_INPUT].isConnected() ? inputs[LOOPCVIN_INPUT].getVoltage() : 0.f;
+			bool loopButtonRising = loopButton && !lastLoopButton;
+			if (loopButtonRising) {
+				loopState = !loopState;
+			}
+			if (!loopState && loopCV > 1.f) {       // OFF → ON with positive CV
+				loopState = true;
+			} else if (loopState && loopCV < -1.f) { // ON → OFF with negative CV
+				loopState = false;
+			}
+			lastLoopButton = loopButton;
+			bool loopEnabled = loopState;
+			lights[LOOP_LIGHT].setBrightnessSmooth(loopState, args.sampleTime);
 	
 		// Process all voices
 		processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, speed, lengthRatio, loopEnabled);
@@ -226,7 +243,9 @@ struct KayOneWidget : ModuleWidget {
 
 		addParam(createParamCentered<Knob9mm>(mm2px(Vec(7.751, 12.45)), module, KayOne::LENGTH_PARAM));
 		addParam(createParamCentered<Knob9mm>(mm2px(Vec(27.002, 12.45)), module, KayOne::SPEED_PARAM));
-		addParam(createParam<Switch2Pos>(mm2px(Vec(41.4, 9.451)), module, KayOne::LOOP_PARAM));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(44.2, 12.45)), module, KayOne::LOOP_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(44.2, 12.45)), module, KayOne::LOOP_LIGHT));
 
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 37.0)), module, KayOne::KICKPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 37.0)), module, KayOne::KICK_LIGHT));
