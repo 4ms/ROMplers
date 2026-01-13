@@ -191,5 +191,4 @@ struct OrchHitsWidget : ModuleWidget {
 	}
 };
 
-
 Model* modelOrchHits = createModel<OrchHits, OrchHitsWidget>("OrchHits");
