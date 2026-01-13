@@ -91,9 +91,9 @@ struct Slap : Module {
 
 		if (playing && currentSample) {
 			// Pitch calculation: knob + CV, std::clamp CV if disconnected
-			const float pitchKnob = params[OCTAVE_PARAM].getValue(); // 0..4 oct
+			const float octaveKnob = params[OCTAVE_PARAM].getValue(); // 0..4 oct
 			const float pitchCV = inputs[PITCHCVIN_INPUT].isConnected() ? inputs[PITCHCVIN_INPUT].getVoltage() : 0.f;
-			float pitch = pitchKnob + pitchCV;
+			float pitch = octaveKnob + pitchCV;
 
 			// Compute pitchRatio without std::pow for most CPU savings:
 			// fallback to std::pow if out of range
@@ -126,22 +126,23 @@ struct Slap : Module {
 				const float s2 = s2s * (1.f / 32768.f);
 
 				const float sampleValue = s1 + frac * (s2 - s1);
+			// --- Decay parameter with 0-5 knob + -10..10 CV ---
+			float decayKnob = params[DECAY_PARAM].getValue() * 5.f;  // 0-1 → 0-5
+			float decayCV = 0.f;
+			if (inputs[DECAYCVIN_INPUT].isConnected()) {
+			    decayCV = inputs[DECAYCVIN_INPUT].getVoltage() * 0.5f;  // -10..10 → -5..5
+			}
+			float decayParam = decayKnob + decayCV;        // sum knob + CV
+			decayParam = std::clamp(decayParam, 0.f, 5.f); 
+			decayParam /= 5.f;                             // normalize back to 0-1
 
-				// Decay parameter with std::clamp
-				float decayParam = params[DECAY_PARAM].getValue();
-				if (inputs[DECAYCVIN_INPUT].isConnected()) {
-					decayParam += inputs[DECAYCVIN_INPUT].getVoltage();
-				}
-				if (decayParam < 0.f) decayParam = 0.f;
-				else if (decayParam > 1.f) decayParam = 1.f;
+			const float minDecayTime = 0.005f;
+			const float maxDecayTime = numSamples / sampleSampleRate;
+			const float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
 
-				const float minDecayTime = 0.005f;
-				const float maxDecayTime = numSamples / sampleSampleRate;
-				const float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
-
-				// Calculate decay coefficient only once per sample
-				const float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
-				env *= decayCoef;
+			// Calculate decay coefficient once per sample
+			const float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
+			env *= decayCoef;
 
 				output = sampleValue * env;
 			}
