@@ -30,6 +30,7 @@ struct DeeArr : Module {
 		OUTPUTS_LEN
 	};
 	enum LightId {
+		LOOP_LIGHT,
 		KICK_LIGHT,
 		SNARE_LIGHT,
 		HAT_LIGHT,
@@ -109,6 +110,10 @@ struct DeeArr : Module {
 		return v;
 	}
 
+	bool loopState = false;           // the current loop on/off state
+	bool lastLoopButton = false;      // previous frame state for the button
+	bool lastLoopCVTrigger = false;   // previous frame state for the CV
+
 	void process(const ProcessArgs& args) override {
 		// --- Precalculate speed with CV ---
 		float knobSpeedV = params[SPEED_PARAM].getValue() * 5.f;  // 0–1 → 0–5V
@@ -126,9 +131,21 @@ struct DeeArr : Module {
 		float normLength = std::clamp(knobLengthV + lengthCVV, 0.f, 5.f) / 5.f; // 0–1 normalized
 		float lengthRatio = LENGTH_MIN + normLength * (LENGTH_MAX - LENGTH_MIN);
 	
-		// --- Loop mode ---
-		const bool baseLoop = params[LOOP_PARAM].getValue() > 0.5f;
-		const bool loopEnabled = baseLoop || (!baseLoop && inputs[LOOPCVIN_INPUT].getVoltage() > 1.f);
+			// --- Loop mode ---
+		bool loopButton = params[LOOP_PARAM].getValue() > 0.5f;
+		float loopCV = inputs[LOOPCVIN_INPUT].isConnected() ? inputs[LOOPCVIN_INPUT].getVoltage() : 0.f;
+		bool loopButtonRising = loopButton && !lastLoopButton;
+		if (loopButtonRising) {
+		    loopState = !loopState;
+		}
+		if (!loopState && loopCV > 1.f) {       // OFF → ON with positive CV
+		    loopState = true;
+		} else if (loopState && loopCV < -1.f) { // ON → OFF with negative CV
+		    loopState = false;
+		}
+		lastLoopButton = loopButton;
+		bool loopEnabled = loopState;
+		lights[LOOP_LIGHT].setBrightnessSmooth(loopState, args.sampleTime);
 	
 		// --- Process each voice ---
 		processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, speed, lengthRatio, loopEnabled);
@@ -203,7 +220,9 @@ struct DeeArrWidget : ModuleWidget {
 
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(25.4, 19.001)), module, DeeArr::SPEED_PARAM));
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(9.751, 29.2)), module, DeeArr::LENGTH_PARAM));
-		addParam(createParam<Switch2Pos>(mm2px(Vec(38.3, 27.499)), module, DeeArr::LOOP_PARAM));
+
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(41.25, 27.49)), module, DeeArr::LOOP_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(41.25, 27.49)), module, DeeArr::LOOP_LIGHT));
 
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 67.0)), module, DeeArr::KICKPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 67.0)), module, DeeArr::KICK_LIGHT));
