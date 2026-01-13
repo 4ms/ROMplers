@@ -229,53 +229,52 @@ struct SinSahnix : Module {
 struct SinSahnixWidget : ModuleWidget {
 	SinSahnixWidget(SinSahnix* module) {
 		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/SinSahnix_info.svg")));
+		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/SinSahnix.svg")));
 
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(20.32, 15.958)), module, SinSahnix::SPEED_PARAM));
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(8.867, 35.67)), module, SinSahnix::LENGTH_PARAM));
-		addParam(createParamCentered<Switch2Pos>(mm2px(Vec(30.511, 35.67)), module, SinSahnix::LOOP_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(7.751, 12.45)), module, SinSahnix::LENGTH_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(27.002, 12.45)), module, SinSahnix::SPEED_PARAM));
+		addParam(createParam<Switch2Pos>(mm2px(Vec(41.4, 9.451)), module, SinSahnix::LOOP_PARAM));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 63.771)), module, SinSahnix::KICKPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 63.771)), module, SinSahnix::KICK_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 37)), module, SinSahnix::KICKPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 37)), module, SinSahnix::KICK_LIGHT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 73.417)), module, SinSahnix::SNAREPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 73.417)), module, SinSahnix::SNARE_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 52)), module, SinSahnix::SNAREPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 52)), module, SinSahnix::SNARE_LIGHT));
 		
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 83.302)), module, SinSahnix::TOMLPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 83.302)), module, SinSahnix::TOML_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 67)), module, SinSahnix::TOMLPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 67)), module, SinSahnix::TOML_LIGHT));
 		
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 93.19)), module, SinSahnix::TOMMPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 93.19)), module, SinSahnix::TOMM_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 82)), module, SinSahnix::TOMMPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 82)), module, SinSahnix::TOMM_LIGHT));
 		
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 103.551)), module, SinSahnix::TOMHPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 103.551)), module, SinSahnix::TOMH_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 97)), module, SinSahnix::TOMHPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 97)), module, SinSahnix::TOMH_LIGHT));
 		
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 114.064)), module, SinSahnix::CYMPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 114.064)), module, SinSahnix::CYM_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 112)), module, SinSahnix::CYMPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 112)), module, SinSahnix::CYM_LIGHT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.32, 29.153)), module, SinSahnix::SPEEDCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.867, 49.49)), module, SinSahnix::LENGTHCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(30.511, 49.49)), module, SinSahnix::LOOPCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 63.771)), module, SinSahnix::KICKTRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 73.417)), module, SinSahnix::SNARETRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 83.302)), module, SinSahnix::TOMLTRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 93.19)), module, SinSahnix::TOMMTRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 103.551)), module, SinSahnix::TOMHTRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 114.064)), module, SinSahnix::CYMTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.751, 26.0)), module, SinSahnix::LENGTHCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(27.002, 26.0)), module, SinSahnix::SPEEDCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(44.2, 26.0)), module, SinSahnix::LOOPCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 37.0)), module, SinSahnix::KICKTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 52.0)), module, SinSahnix::SNARETRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 67.0)), module, SinSahnix::TOMLTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 82.0)), module, SinSahnix::TOMMTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 97.0)), module, SinSahnix::TOMHTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 112.0)), module, SinSahnix::CYMTRIGIN_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 63.771)), module, SinSahnix::KICKOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 73.417)), module, SinSahnix::SNAREOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 83.302)), module, SinSahnix::TOMLOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 93.19)), module, SinSahnix::TOMMOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 103.551)), module, SinSahnix::TOMHOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 114.064)), module, SinSahnix::CYMOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 37.0)), module, SinSahnix::KICKOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 52.0)), module, SinSahnix::SNAREOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 67.0)), module, SinSahnix::TOMLOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 82.0)), module, SinSahnix::TOMMOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 97.0)), module, SinSahnix::TOMHOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 112.0)), module, SinSahnix::CYMOUT_OUTPUT));
 	}
 };
-
 
 Model* modelSinSahnix = createModel<SinSahnix, SinSahnixWidget>("SinSahnix");
