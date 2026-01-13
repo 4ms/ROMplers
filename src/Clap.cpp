@@ -147,38 +147,46 @@ struct Clap : Module {
 		float output = 0.f;
 
 		if (playing && currentSampleFloat) {
-			// Cache parameters once
-			float pitchMod = std::clamp(params[PITCH_PARAM].getValue() + inputs[PITCHCVIN_INPUT].getVoltage(), -1.f, 1.f);
+			// --- PITCH ---
+			float pitchKnob = params[PITCH_PARAM].getValue(); // -1 to 1
+			float pitchCV = inputs[PITCHCVIN_INPUT].isConnected() ? inputs[PITCHCVIN_INPUT].getVoltage() / 5.0f : 0.f; // -1 to 1
+			pitchCV = std::clamp(pitchCV, -1.f, 1.f);
+		
+			float pitchMod = pitchKnob + (1.0f - fabs(pitchKnob)) * pitchCV; 
+			// Explanation: CV influence is scaled so full knob sweep + full CV covers -1..1
+			pitchMod = std::clamp(pitchMod, -1.f, 1.f);
+		
 			float normalizedPitch = (pitchMod + 1.f) * 0.5f;
 			float pitchRatio = MIN_PLAYBACK_SPEED + normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
-
-			constexpr float sampleSampleRate = 44100.f;
-			float sampleRateRatio = sampleSampleRate / args.sampleRate;
-
-			float decayParam = std::clamp(params[DECAY_PARAM].getValue() + inputs[DECAYCVIN_INPUT].getVoltage(), 0.f, 1.f);
+		
+			// --- DECAY ---
+			float decayKnob = params[DECAY_PARAM].getValue(); // 0 to 1
+			float decayCV = inputs[DECAYCVIN_INPUT].isConnected() ? inputs[DECAYCVIN_INPUT].getVoltage() / 5.0f : 0.f; // -1 to 1
+			decayCV = std::clamp(decayCV, -1.f, 1.f);
+		
+			float decayMod = decayKnob + ((decayCV > 0 ? (1.0f - decayKnob) : decayKnob) * decayCV); 
+			// scale CV so that +5V pushes to max, -5V pushes to min, respecting knob
+			decayMod = std::clamp(decayMod, 0.f, 1.f);
+		
 			float minDecayTime = 0.005f;
-			float maxDecayTime = (float)decodedSampleLength / sampleSampleRate;
-			float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
+			float maxDecayTime = (float)decodedSampleLength / 44100.f;
+			float decayTime = minDecayTime + decayMod * (maxDecayTime - minDecayTime);
 			float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
-
-			// Advance sample position
-			samplePos += pitchRatio * sampleRateRatio;
-
+		
+			// --- Sample playback ---
+			samplePos += pitchRatio * (44100.f / args.sampleRate);
+		
 			if ((int)samplePos >= decodedSampleLength) {
 				playing = false;
 			} else {
 				int idx = (int)samplePos;
 				int nextIdx = (idx + 1 < decodedSampleLength) ? idx + 1 : idx;
 				float frac = samplePos - idx;
-
-				// Linear interpolate between floats (predecoded)
 				float sampleValue = currentSampleFloat[idx] + frac * (currentSampleFloat[nextIdx] - currentSampleFloat[idx]);
-
 				env *= decayCoef;
-
 				output = sampleValue * env;
 			}
-		}
+		}		
 
 		float volumeCV = 5.f;
 		if (inputs[VOLCVIN_INPUT].isConnected()) {
