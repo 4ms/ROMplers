@@ -229,58 +229,57 @@ struct SicksOh : Module {
 struct SicksOhWidget : ModuleWidget {
 	SicksOhWidget(SicksOh* module) {
 		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/SicksOh_info.svg")));
+		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/SicksOh.svg")));
 
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(20.32, 15.958)), module, SicksOh::SPEED_PARAM));
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(8.867, 24.557)), module, SicksOh::LENGTH_PARAM));
-		addParam(createParamCentered<Switch2Pos>(mm2px(Vec(30.511, 24.557)), module, SicksOh::LOOP_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(7.751, 12.45)), module, SicksOh::LENGTH_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(27.002, 12.45)), module, SicksOh::SPEED_PARAM));
+		addParam(createParam<Switch2Pos>(mm2px(Vec(41.4, 9.451)), module, SicksOh::LOOP_PARAM));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 53.187)), module, SicksOh::KICKPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 53.187)), module, SicksOh::KICK_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 37.0)), module, SicksOh::KICKPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 37.0)), module, SicksOh::KICK_LIGHT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 62.834)), module, SicksOh::SNAREPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 62.834)), module, SicksOh::SNARE_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 49.499)), module, SicksOh::SNAREPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 49.499)), module, SicksOh::SNARE_LIGHT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 72.719)), module, SicksOh::TOMLPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 72.719)), module, SicksOh::TOML_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 62.001)), module, SicksOh::TOMLPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 62.001)), module, SicksOh::TOML_LIGHT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 82.607)), module, SicksOh::TOMHPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 82.607)), module, SicksOh::TOMH_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 74.5)), module, SicksOh::TOMHPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 74.5)), module, SicksOh::TOMH_LIGHT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 92.968)), module, SicksOh::CLPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 92.968)), module, SicksOh::CL_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 86.999)), module, SicksOh::CLPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 86.999)), module, SicksOh::CL_LIGHT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 103.481)), module, SicksOh::OHPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 103.481)), module, SicksOh::OH_LIGHT));
-		
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(5.692, 113.154)), module, SicksOh::CYMPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(5.692, 113.154)), module, SicksOh::CYM_LIGHT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 99.502)), module, SicksOh::OHPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 99.502)), module, SicksOh::OH_LIGHT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.32, 29.153)), module, SicksOh::SPEEDCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.867, 38.377)), module, SicksOh::LENGTHCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(30.511, 38.377)), module, SicksOh::LOOPCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 53.187)), module, SicksOh::KICKTRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 62.834)), module, SicksOh::SNARETRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 72.719)), module, SicksOh::TOMLTRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 82.607)), module, SicksOh::TOMHTRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 92.968)), module, SicksOh::CLTRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 103.481)), module, SicksOh::OHTRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.495, 113.154)), module, SicksOh::CYMTRIGIN_INPUT));
+		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 112.0)), module, SicksOh::CYMPUSH_PARAM));
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 112.0)), module, SicksOh::CYM_LIGHT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 53.187)), module, SicksOh::KICKOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 62.834)), module, SicksOh::SNAREOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 72.719)), module, SicksOh::TOMLOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 82.607)), module, SicksOh::TOMHOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 92.968)), module, SicksOh::CLOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 103.481)), module, SicksOh::OHOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.627, 113.154)), module, SicksOh::CYMOUT_OUTPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.751, 26.0)), module, SicksOh::LENGTHCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(27.002, 26.0)), module, SicksOh::SPEEDCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(44.2, 26.0)), module, SicksOh::LOOPCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 37.0)), module, SicksOh::KICKTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 49.499)), module, SicksOh::SNARETRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 62.001)), module, SicksOh::TOMLTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 74.5)), module, SicksOh::TOMHTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 86.999)), module, SicksOh::CLTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 99.502)), module, SicksOh::OHTRIGIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 112.0)), module, SicksOh::CYMTRIGIN_INPUT));
+
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 37.0)), module, SicksOh::KICKOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 49.499)), module, SicksOh::SNAREOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 62.001)), module, SicksOh::TOMLOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 74.5)), module, SicksOh::TOMHOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 86.999)), module, SicksOh::CLOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 99.502)), module, SicksOh::OHOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 112.0)), module, SicksOh::CYMOUT_OUTPUT));
 	}
 };
-
 
 Model* modelSicksOh = createModel<SicksOh, SicksOhWidget>("SicksOh");
