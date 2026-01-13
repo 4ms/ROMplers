@@ -93,7 +93,7 @@ struct Kick : Module {
 	void process(const ProcessArgs& args) override {
 		const float trigIn = inputs[TRIGIN_INPUT].getVoltage();
 		const float buttonIn = params[PUSH_PARAM].getValue();
-	
+		
 		const bool trigRising = (lastTrigValue <= 1.f && trigIn > 1.f);
 		const bool buttonRising = (lastButtonValue <= 0.5f && buttonIn > 0.5f);
 		lastTrigValue = trigIn;
@@ -102,11 +102,14 @@ struct Kick : Module {
 		if (trigRising || buttonRising) {
 			kickLightBrightness = 1.f;
 	
-			int sampleIndex = (int)(params[SAMPLE_PARAM].getValue() + 0.5f);  // avoid rounding unless needed
-			if (inputs[SAMPLECVIN_INPUT].isConnected())
-				sampleIndex += (int)(inputs[SAMPLECVIN_INPUT].getVoltage());
+			// --- SAMPLE INDEX WITH CV ---
+			float sampleKnob = params[SAMPLE_PARAM].getValue(); // 0..numSamples-1
+			float sampleCV = inputs[SAMPLECVIN_INPUT].isConnected() ? inputs[SAMPLECVIN_INPUT].getVoltage() / 5.f : 0.f; // -1..1
+			sampleCV = std::clamp(sampleCV, -1.f, 1.f);
 	
-			sampleIndex = std::clamp(sampleIndex, 0, numSamples - 1);
+			float sampleMod = sampleKnob + ((sampleCV > 0 ? (numSamples - 1 - sampleKnob) : sampleKnob) * sampleCV);
+			int sampleIndex = std::clamp((int)round(sampleMod), 0, numSamples - 1);
+	
 			currentSample = getSampleByIndex(sampleIndex);
 			sampleLength = getSampleLengthByIndex(sampleIndex);
 			samplePos = 0.f;
@@ -114,6 +117,7 @@ struct Kick : Module {
 			env = 1.f;
 		}
 	
+		// --- LIGHT DECAY ---
 		kickLightBrightness -= args.sampleTime * 10.f;
 		if (kickLightBrightness < 0.f) kickLightBrightness = 0.f;
 		lights[KICK_LIGHT].setBrightness(kickLightBrightness);
@@ -121,35 +125,40 @@ struct Kick : Module {
 		float output = 0.f;
 	
 		if (playing && currentSample) {
-			float pitchMod = params[PITCH_PARAM].getValue();
-			if (inputs[PITCHCVIN_INPUT].isConnected())
-				pitchMod += inputs[PITCHCVIN_INPUT].getVoltage();
+			const int numSamps = sampleLength / 2;
 	
+			// --- PITCH WITH CV ---
+			float pitchKnob = params[PITCH_PARAM].getValue(); // -1..1
+			float pitchCV = inputs[PITCHCVIN_INPUT].isConnected() ? inputs[PITCHCVIN_INPUT].getVoltage() / 5.f : 0.f; // -1..1
+			pitchCV = std::clamp(pitchCV, -1.f, 1.f);
+	
+			float pitchMod = pitchKnob + ((pitchCV > 0 ? (1.f - pitchKnob) : (1.f + pitchKnob)) * pitchCV);
 			pitchMod = std::clamp(pitchMod, -1.f, 1.f);
+	
 			float pitchRatio = MIN_PLAYBACK_SPEED + (pitchMod + 1.f) * 0.5f * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
-	
 			samplePos += pitchRatio * (44100.f / args.sampleRate);
-			const int numSamps = sampleLength >> 1;  // divide by 2
 	
-			if ((int)samplePos >= numSamps) {
+			int idx = (int)samplePos;
+			if (idx >= numSamps) {
 				playing = false;
 			} else {
-				int idx = (int)samplePos;
 				int nextIdx = (idx + 1 < numSamps) ? idx + 1 : idx;
 				float frac = samplePos - idx;
 	
 				const uint8_t* s = currentSample;
 				int16_t s1 = (int16_t)(s[idx * 2] | (s[idx * 2 + 1] << 8));
 				int16_t s2 = (int16_t)(s[nextIdx * 2] | (s[nextIdx * 2 + 1] << 8));
-	
 				float sampleValue = ((float)s1 + frac * (s2 - s1)) / 32768.f;
 	
-				float decayParam = params[DECAY_PARAM].getValue();
-				if (inputs[DECAYCVIN_INPUT].isConnected())
-					decayParam += inputs[DECAYCVIN_INPUT].getVoltage();
+				// --- DECAY WITH CV ---
+				float decayKnob = params[DECAY_PARAM].getValue(); // 0..1
+				float decayCV = inputs[DECAYCVIN_INPUT].isConnected() ? inputs[DECAYCVIN_INPUT].getVoltage() / 5.f : 0.f; // -1..1
+				decayCV = std::clamp(decayCV, -1.f, 1.f);
 	
-				decayParam = std::clamp(decayParam, 0.f, 1.f);
-				const float decayTime = 0.005f + decayParam * ((float)numSamps / 44100.f - 0.005f);
+				float decayMod = decayKnob + ((decayCV > 0 ? (1.f - decayKnob) : decayKnob) * decayCV);
+				decayMod = std::clamp(decayMod, 0.f, 1.f);
+	
+				const float decayTime = 0.005f + decayMod * ((float)numSamps / 44100.f - 0.005f);
 				const float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
 	
 				env *= decayCoef;
@@ -157,14 +166,11 @@ struct Kick : Module {
 			}
 		}
 	
-		// Volume CV scaling
-		float volume = 1.f;
-		if (inputs[VOLCVIN_INPUT].isConnected())
-			volume = std::clamp(inputs[VOLCVIN_INPUT].getVoltage() / 5.f, 0.f, 1.f);
-	
+		// --- VOLUME CV ---
+		float volume = inputs[VOLCVIN_INPUT].isConnected() ? std::clamp(inputs[VOLCVIN_INPUT].getVoltage() / 5.f, 0.f, 1.f) : 1.f;
 		outputs[AUDIOOUT_OUTPUT].setVoltage(output * volume * 5.f);
-	}	
-};
+	}
+};	
 
 struct KickWidget : ModuleWidget {
 	KickWidget(Kick* module) {
