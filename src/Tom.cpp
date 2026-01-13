@@ -100,51 +100,61 @@ struct Tom : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
+		// Read inputs
 		const float trigIn = inputs[TRIGIN_INPUT].getVoltage();
 		const float buttonIn = params[PUSH_PARAM].getValue();
-		const float sampleCV = inputs[SAMPLECVIN_INPUT].isConnected() ? inputs[SAMPLECVIN_INPUT].getVoltage() : 0.f;
-		const float pitchCV = inputs[PITCHCVIN_INPUT].isConnected() ? inputs[PITCHCVIN_INPUT].getVoltage() : 0.f;
-		const float decayCV = inputs[DECAYCVIN_INPUT].isConnected() ? inputs[DECAYCVIN_INPUT].getVoltage() : 0.f;
-		const float volCV = inputs[VOLCVIN_INPUT].isConnected() ? std::clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f) : 5.f;
-
+	
 		bool trigRising = (lastTrigValue <= 1.f && trigIn > 1.f);
 		bool buttonRising = (lastButtonValue <= 0.5f && buttonIn > 0.5f);
-
+	
 		lastTrigValue = trigIn;
 		lastButtonValue = buttonIn;
-
+	
 		bool triggered = trigRising || buttonRising;
-
+	
 		if (triggered) {
 			TomLightBrightness = 1.0f;
-
-			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() + sampleCV);
+	
+			// --- Sample selection ---
+			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue());
+			if (inputs[SAMPLECVIN_INPUT].isConnected()) {
+				float cv = std::clamp(inputs[SAMPLECVIN_INPUT].getVoltage(), -5.f, 5.f);
+				int cvOffset = (int)round((cv / 5.f) * numSamples); // ±5V → ±numSamples
+				sampleIndex += cvOffset;
+			}
 			sampleIndex = std::clamp(sampleIndex, 0, numSamples - 1);
-
+	
 			currentSample = getSampleByIndex(sampleIndex);
 			int sampleLengthBytes = getSampleLengthByIndex(sampleIndex);
-			sampleLengthSamples = sampleLengthBytes / 2;
-
+			sampleLengthSamples = sampleLengthBytes / 2; // 16-bit samples
+	
 			samplePos = 0.f;
 			playing = (currentSample != nullptr && sampleLengthSamples > 1);
 			env = 1.f;
-			// Avoid clipping on next index calculation below by ensuring length > 1
 		}
-
+	
+		// --- Light decay ---
 		TomLightBrightness -= args.sampleTime * 10.f;
 		if (TomLightBrightness < 0.f) TomLightBrightness = 0.f;
-		lights[TOM_LIGHT].setBrightness(TomLightBrightness);
-
+		lights[TOM_LIGHT].setBrightnessSmooth(TomLightBrightness, args.sampleTime);
+	
 		float output = 0.f;
-
-		if (playing) {
-			float pitchMod = std::clamp(params[PITCH_PARAM].getValue() + pitchCV, -1.f, 1.f);
+	
+		if (playing && currentSample) {
+			// --- Pitch CV ---
+			float pitchMod = params[PITCH_PARAM].getValue();
+			if (inputs[PITCHCVIN_INPUT].isConnected()) {
+				float cv = std::clamp(inputs[PITCHCVIN_INPUT].getVoltage(), -5.f, 5.f);
+				pitchMod += cv / 5.f; // ±5V → ±1
+			}
+			pitchMod = std::clamp(pitchMod, -1.f, 1.f);
 			float normalizedPitch = (pitchMod + 1.f) * 0.5f;
 			float pitchRatio = MIN_PLAYBACK_SPEED + normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
-
+	
 			float sampleRateRatio = SAMPLE_SAMPLE_RATE / args.sampleRate;
 			samplePos += pitchRatio * sampleRateRatio;
-
+	
+			// --- Sample interpolation ---
 			if ((int)samplePos >= sampleLengthSamples) {
 				playing = false;
 				env = 0.f;
@@ -152,30 +162,39 @@ struct Tom : Module {
 				int idx = (int)samplePos;
 				int nextIdx = (idx + 1 < sampleLengthSamples) ? idx + 1 : idx;
 				float frac = samplePos - idx;
-
+	
 				int16_t s1 = (int16_t)(currentSample[idx * 2] | (currentSample[idx * 2 + 1] << 8));
 				int16_t s2 = (int16_t)(currentSample[nextIdx * 2] | (currentSample[nextIdx * 2 + 1] << 8));
+	
+				float sampleValue = ((s1 + frac * (s2 - s1)) / 32768.f);
 
-				float sampleValue = (s1 + frac * (s2 - s1)) * (1.0f / 32768.0f);
-
-				float decayParam = std::clamp(params[DECAY_PARAM].getValue() + decayCV, 0.f, 1.f);
+				float knobV = params[DECAY_PARAM].getValue() * 5.f;
+				float cvV = 0.f;
+				if (inputs[DECAYCVIN_INPUT].isConnected())
+    			cvV = std::clamp(inputs[DECAYCVIN_INPUT].getVoltage(), -10.f, 10.f) * 0.5f;
+				float decayParam = std::clamp(knobV + cvV, 0.f, 5.f) / 5.f;
+	
 				const float minDecayTime = 0.005f;
 				const float maxDecayTime = (float)sampleLengthSamples / SAMPLE_SAMPLE_RATE;
 				float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
-
 				float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
+	
 				env *= decayCoef;
-
 				output = sampleValue * env;
 			}
 		} else {
 			env = 0.f;
 		}
-
-		output *= volCV * 0.2f;
-
+	
+		// --- Volume CV ---
+		float volume = 5.f;
+		if (inputs[VOLCVIN_INPUT].isConnected()) {
+			volume = std::clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
+		}
+		output *= volume / 5.f;
+	
 		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.f);
-	}
+	}	
 };
 
 struct TomWidget : ModuleWidget {
