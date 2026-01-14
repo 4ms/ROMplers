@@ -11,6 +11,8 @@ Use this document to understand the behavior, controls, and design inspirations 
 ---
 ## AyysKing — Ace King drums 
 
+<img src="https://github.com/4ms/XOXDrums/blob/main/doc/res/Accent.png" width="48">
+
 Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 
 ---
