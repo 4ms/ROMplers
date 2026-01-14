@@ -128,7 +128,7 @@
     {
       "slug": "Slap",
       "name": "Slap",
-      "description": "The only bass sample anyone ever needs.",
+      "description": "The only pitched bass sample anyone ever needs",
       "tags": [
         "Synth Voice"
       ]
@@ -168,7 +168,7 @@
     {
       "slug": "OrchHits",
       "name": "OrchHits",
-      "description": "Orchestra hits",
+      "description": "Pitched orchestra hits",
       "tags": [
         "drum",
         "synth voice"
