@@ -39,21 +39,21 @@ Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 ---
 ## DeeArr — DR-55 drums
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/DeeArr.png" width="200">
+<img src="https://github.com/4ms/ROMplers/blob/main/doc/DeeArr.png" width="150">
 
 DR-55 samples with playback speed, sample length, looping, and direct outs.
 
 ---
 ## KayArr — KR-55 drums
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/KayArr.png" width="200">
+<img src="https://github.com/4ms/ROMplers/blob/main/doc/KayArr.png" width="150">
 
 KR55 samples with playback speed, sample length, and looping.
 
 ---
 ## KayOne — SK-1 drums
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/KayOne.png" width="200">
+<img src="https://github.com/4ms/ROMplers/blob/main/doc/KayOne.png" width="150">
 
 Casio SK-1 samples with playback speed, sample length, and looping.
 
@@ -102,7 +102,7 @@ Pitched orchestra hits.
 ---
 ## SeaArr — CR-78 drums
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/SeeArr.png" width="200">
+<img src="https://github.com/4ms/ROMplers/blob/main/doc/SeaArr.png" width="200">
 
 CR-78 samples with playback speed, sample length, looping, and direct outs.
 
