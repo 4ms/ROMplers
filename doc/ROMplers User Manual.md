@@ -25,14 +25,14 @@ Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 ---
 ## ClosedHat — Acoustic closed hi-hats
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/ClosedHiHat.png" width="200">
+<img src="https://github.com/4ms/ROMplers/blob/main/doc/ClosedHiHat.png" width="60">
 
 “Real” closed hi-hat samples with playback speed, velocity, and a decay envelope.
 
 ---
 ## Crash — Acoustic crash cymbals
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/Crash.png" width="200">
+<img src="https://github.com/4ms/ROMplers/blob/main/doc/Crash.png" width="60">
 
 “Real” crash samples with playback speed, velocity, and a decay envelope.
 
@@ -60,42 +60,42 @@ Casio SK-1 samples with playback speed, sample length, and looping.
 ---
 ## Kick — Acoustic kick drums
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/Kick.png" width="200">
+<img src="https://github.com/4ms/ROMplers/blob/main/doc/Kick.png" width="60">
 
 “Real” kick samples with playback speed, velocity, and a decay envelope.
 
 ---
 ## OpenHat — Acoustic open hi-hats
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/OpenHiHat.png" width="200">
+<img src="https://github.com/4ms/ROMplers/blob/main/doc/OpenHiHat.png" width="60">
 
 “Real” open hi-hat samples with playback speed, velocity, and a decay envelope.
 
 ---
 ## OrchHits — Pitched orchestra hits
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/OrchestraHits.png" width="200">
+<img src="https://github.com/4ms/ROMplers/blob/main/doc/OrchestraHits.png" width="60">
 
 Pitched orchestra hits.
 
 ---
 ## Percussion — Assorted world percussion 
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/Percussion.png" width="200">
+<img src="https://github.com/4ms/ROMplers/blob/main/doc/Percussion.png" width="60">
 
 “Real” auxiliary percussion samples with playback speed, velocity, and a decay envelope.
 
 ---
 ## Ride — Acoustic ride cymbals
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/Ride.png" width="200">
+<img src="https://github.com/4ms/ROMplers/blob/main/doc/Ride.png" width="60">
 
 “Real” ride samples with playback speed, velocity, and a decay envelope.
 
 ---
 ## Rimshot — Acoustic rimshots
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/Rimshot.png" width="200">
+<img src="https://github.com/4ms/ROMplers/blob/main/doc/Rimshot.png" width="60">
 
 “Real” rimshot samples with playback speed, velocity, and a decay envelope.
 
@@ -130,20 +130,20 @@ Synsonics samples with playback speed, sample length, and looping.
 ---
 ## Slap — Pitched slap bass
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/Slap.png" width="200">
+<img src="https://github.com/4ms/ROMplers/blob/main/doc/Slap.png" width="60">
 
 The only bass sample anyone ever needs.
 
 ---
 ## Snare — Acoustic snare drums
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/Snare.png" width="200">
+<img src="https://github.com/4ms/ROMplers/blob/main/doc/Snare.png" width="60">
 
 “Real” snare samples with playback speed, velocity, and a decay envelope.
 
 ---
 ## Tom — Acoustic tom drums
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/Tom.png" width="200">
+<img src="https://github.com/4ms/ROMplers/blob/main/doc/Tom.png" width="60">
 
 “Real” tom samples with playback speed, velocity, and a decay envelope.
