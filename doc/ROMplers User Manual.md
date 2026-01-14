@@ -15,6 +15,13 @@ Use this document to understand the behavior, controls, and design inspirations 
 
 Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 
+- **Length**: Sample file length. 
+- **Speed**: Changes the playback speed and resolution of the drum samples.
+- **Loop**: Turns looping on and off for entire drum kit.
+- **Buttons**: Triggers samples.
+- **Trigger inputs**: Trigger input, conditioned for rising edge detection.
+- **Outputs**: Audio output, 10vpp.
+
 ---
 ## Clap — Acoustic claps
 
@@ -43,6 +50,13 @@ Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 
 DR-55 samples with playback speed, sample length, looping, and direct outs.
 
+- **Length**: Sample file length for all samples. 
+- **Speed**: Changes the playback speed and resolution of all samples.
+- **Loop**: Turns looping on and off for all samples. 
+- **Buttons**: Triggers samples.
+- **Trigger inputs**: Trigger input, conditioned for rising edge detection.
+- **Outputs**: Audio output, 10vpp.
+
 ---
 ## KayArr — KR-55 drums
 
@@ -50,12 +64,26 @@ DR-55 samples with playback speed, sample length, looping, and direct outs.
 
 KR55 samples with playback speed, sample length, and looping.
 
+- **Length**: Sample file length for all samples. 
+- **Speed**: Changes the playback speed and resolution of all samples.
+- **Loop**: Turns looping on and off for all samples. 
+- **Buttons**: Triggers samples.
+- **Trigger inputs**: Trigger input, conditioned for rising edge detection.
+- **Outputs**: Audio output, 10vpp.
+
 ---
 ## KayOne — SK-1 drums
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/KayOne.png" width="150">
 
 Casio SK-1 samples with playback speed, sample length, and looping.
+
+- **Length**: Sample file length for all samples. 
+- **Speed**: Changes the playback speed and resolution of all samples.
+- **Loop**: Turns looping on and off for all samples. 
+- **Buttons**: Triggers samples.
+- **Trigger inputs**: Trigger input, conditioned for rising edge detection.
+- **Outputs**: Audio output, 10vpp.
 
 ---
 ## Kick — Acoustic kick drums
@@ -106,12 +134,26 @@ Pitched orchestra hits.
 
 CR-78 samples with playback speed, sample length, looping, and direct outs.
 
+- **Length**: Sample file length for all samples. 
+- **Speed**: Changes the playback speed and resolution of all samples.
+- **Loop**: Turns looping on and off for all samples. 
+- **Buttons**: Triggers samples.
+- **Trigger inputs**: Trigger input, conditioned for rising edge detection.
+- **Outputs**: Audio output, 10vpp.
+
 ---
 ## SehvenToo — TR-727 drums
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/SehvenToo.png" width="200">
 
 TR-727 samples with playback speed, sample length, looping, and direct outs.
+
+- **Length**: Sample file length for all samples. 
+- **Speed**: Changes the playback speed and resolution of all samples.
+- **Loop**: Turns looping on and off for all samples. 
+- **Buttons**: Triggers samples.
+- **Trigger inputs**: Trigger input, conditioned for rising edge detection.
+- **Outputs**: Audio output, 10vpp.
 
 ---
 ## SicksOh — TR-606 drums
@@ -120,12 +162,26 @@ TR-727 samples with playback speed, sample length, looping, and direct outs.
 
 TR-606 samples with playback speed, sample length, and looping.
 
+- **Length**: Sample file length for all samples. 
+- **Speed**: Changes the playback speed and resolution of all samples.
+- **Loop**: Turns looping on and off for all samples. 
+- **Buttons**: Triggers samples.
+- **Trigger inputs**: Trigger input, conditioned for rising edge detection.
+- **Outputs**: Audio output, 10vpp.
+
 ---
 ## SinSahnix — Synsonics drums
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/SinSahnix.png" width="150">
 
 Synsonics samples with playback speed, sample length, and looping.
+
+- **Length**: Sample file length for all samples. 
+- **Speed**: Changes the playback speed and resolution of all samples.
+- **Loop**: Turns looping on and off for all samples. 
+- **Buttons**: Triggers samples.
+- **Trigger inputs**: Trigger input, conditioned for rising edge detection.
+- **Outputs**: Audio output, 10vpp.
 
 ---
 ## Slap — Pitched slap bass
