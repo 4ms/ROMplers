@@ -116,14 +116,14 @@ TR-727 samples with playback speed, sample length, looping, and direct outs.
 ---
 ## SicksOh — TR-606 drums
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/SicksOh.png" width="200">
+<img src="https://github.com/4ms/ROMplers/blob/main/doc/SicksOh.png" width="150">
 
 TR-606 samples with playback speed, sample length, and looping.
 
 ---
 ## SinSahnix — Synsonics drums
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/SinSahnix.png" width="200">
+<img src="https://github.com/4ms/ROMplers/blob/main/doc/SinSahnix.png" width="150">
 
 Synsonics samples with playback speed, sample length, and looping.
 
