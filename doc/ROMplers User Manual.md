@@ -29,13 +29,13 @@ Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 
 “Real” clap samples with playback speed, velocity, and a decay envelope.
 
--**Sample**: Sample selection. There are 9 total samples for this module.
--**Pitch**: Changes the playback speed and resolution of the drum samples.
--**Decay**: An exponential decay envelope, 1ms - 1 second long.
--**Button**: Triggers the sample.
--**Trig**: Trigger input, conditioned for rising edge detection. 
--**Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
--**Out**: Audio output, 10vpp.
+- **Sample**: Sample selection. There are 9 total samples for this module.
+- **Pitch**: Changes the playback speed and resolution of the drum samples.
+- **Decay**: An exponential decay envelope, 1ms - 1 second long.
+- **Button**: Triggers the sample.
+- **Trig**: Trigger input, conditioned for rising edge detection. 
+- **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
+- **Out**: Audio output, 10vpp.
 
 ---
 ## ClosedHat — Acoustic closed hi-hats
@@ -44,13 +44,13 @@ Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 
 “Real” closed hi-hat samples with playback speed, velocity, and a decay envelope.
 
--**Sample**: Sample selection. There are 21 total samples for this module.
--**Pitch**: Changes the playback speed and resolution of the drum samples.
--**Decay**: An exponential decay envelope, 1ms - 1 second long.
--**Button**: Triggers the sample.
--**Trig**: Trigger input, conditioned for rising edge detection. 
--**Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
--**Out**: Audio output, 10vpp.
+- **Sample**: Sample selection. There are 21 total samples for this module.
+- **Pitch**: Changes the playback speed and resolution of the drum samples.
+- **Decay**: An exponential decay envelope, 1ms - 1 second long.
+- **Button**: Triggers the sample.
+- **Trig**: Trigger input, conditioned for rising edge detection. 
+- **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
+- **Out**: Audio output, 10vpp.
 
 ---
 ## Crash — Acoustic crash cymbals
@@ -59,13 +59,13 @@ Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 
 “Real” crash samples with playback speed, velocity, and a decay envelope.
 
--**Sample**: Sample selection. There are 20 total samples for this module.
--**Pitch**: Changes the playback speed and resolution of the drum samples.
--**Decay**: An exponential decay envelope, 1ms - 1 second long.
--**Button**: Triggers the sample.
--**Trig**: Trigger input, conditioned for rising edge detection. 
--**Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
--**Out**: Audio output, 10vpp.
+- **Sample**: Sample selection. There are 20 total samples for this module.
+- **Pitch**: Changes the playback speed and resolution of the drum samples.
+- **Decay**: An exponential decay envelope, 1ms - 1 second long.
+- **Button**: Triggers the sample.
+- **Trig**: Trigger input, conditioned for rising edge detection. 
+- **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
+- **Out**: Audio output, 10vpp.
 
 ---
 ## DeeArr — DR-55 drums
@@ -116,13 +116,13 @@ Casio SK-1 samples with playback speed, sample length, and looping.
 
 “Real” kick samples with playback speed, velocity, and a decay envelope.
 
--**Sample**: Sample selection. There are 60 total samples for this module.
--**Pitch**: Changes the playback speed and resolution of the drum samples.
--**Decay**: An exponential decay envelope, 1ms - 1 second long.
--**Button**: Triggers the sample.
--**Trig**: Trigger input, conditioned for rising edge detection. 
--**Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
--**Out**: Audio output, 10vpp.
+- **Sample**: Sample selection. There are 60 total samples for this module.
+- **Pitch**: Changes the playback speed and resolution of the drum samples.
+- **Decay**: An exponential decay envelope, 1ms - 1 second long.
+- **Button**: Triggers the sample.
+- **Trig**: Trigger input, conditioned for rising edge detection. 
+- **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
+- **Out**: Audio output, 10vpp.
 
 ---
 ## OpenHat — Acoustic open hi-hats
@@ -131,13 +131,13 @@ Casio SK-1 samples with playback speed, sample length, and looping.
 
 “Real” open hi-hat samples with playback speed, velocity, and a decay envelope.
 
--**Sample**: Sample selection. There are 17 total samples for this module.
--**Pitch**: Changes the playback speed and resolution of the drum samples.
--**Decay**: An exponential decay envelope, 1ms - 1 second long.
--**Button**: Triggers the sample.
--**Trig**: Trigger input, conditioned for rising edge detection. 
--**Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
--**Out**: Audio output, 10vpp.
+- **Sample**: Sample selection. There are 17 total samples for this module.
+- **Pitch**: Changes the playback speed and resolution of the drum samples.
+- **Decay**: An exponential decay envelope, 1ms - 1 second long.
+- **Button**: Triggers the sample.
+- **Trig**: Trigger input, conditioned for rising edge detection. 
+- **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
+- **Out**: Audio output, 10vpp.
 
 ---
 ## OrchHits — Pitched orchestra hits
@@ -154,7 +154,7 @@ Pitched orchestra hits.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
 - **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
 - **Out**: Audio output, 10vpp.
-- 
+
 ---
 ## Percussion — Assorted world percussion 
 
@@ -162,14 +162,13 @@ Pitched orchestra hits.
 
 “Real” auxiliary percussion samples with playback speed, velocity, and a decay envelope.
 
--**Sample**: Sample selection. There are 96 total samples for this module.
--**Pitch**: Changes the playback speed and resolution of the drum samples.
--**Decay**: An exponential decay envelope, 1ms - 1 second long.
--**Button**: Triggers the sample.
--**Trig**: Trigger input, conditioned for rising edge detection. 
--**Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
--**Out**: Audio output, 10vpp.
-
+- **Sample**: Sample selection. There are 96 total samples for this module.
+- **Pitch**: Changes the playback speed and resolution of the drum samples.
+- **Decay**: An exponential decay envelope, 1ms - 1 second long.
+- **Button**: Triggers the sample.
+- **Trig**: Trigger input, conditioned for rising edge detection. 
+- **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
+- **Out**: Audio output, 10vpp.
 
 ---
 ## Ride — Acoustic ride cymbals
@@ -178,13 +177,13 @@ Pitched orchestra hits.
 
 “Real” ride samples with playback speed, velocity, and a decay envelope.
 
--**Sample**: Sample selection. There are 15 total samples for this module.
--**Pitch**: Changes the playback speed and resolution of the drum samples.
--**Decay**: An exponential decay envelope, 1ms - 1 second long.
--**Button**: Triggers the sample.
--**Trig**: Trigger input, conditioned for rising edge detection. 
--**Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
--**Out**: Audio output, 10vpp.
+- **Sample**: Sample selection. There are 15 total samples for this module.
+- **Pitch**: Changes the playback speed and resolution of the drum samples.
+- **Decay**: An exponential decay envelope, 1ms - 1 second long.
+- **Button**: Triggers the sample.
+- **Trig**: Trigger input, conditioned for rising edge detection. 
+- **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
+- **Out**: Audio output, 10vpp.
 
 ---
 ## Rimshot — Acoustic rimshots
@@ -193,13 +192,13 @@ Pitched orchestra hits.
 
 “Real” rimshot samples with playback speed, velocity, and a decay envelope.
 
--**Sample**: Sample selection. There are 9 total samples for this module.
--**Pitch**: Changes the playback speed and resolution of the drum samples.
--**Decay**: An exponential decay envelope, 1ms - 1 second long.
--**Button**: Triggers the sample.
--**Trig**: Trigger input, conditioned for rising edge detection. 
--**Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
--**Out**: Audio output, 10vpp.
+- **Sample**: Sample selection. There are 9 total samples for this module.
+- **Pitch**: Changes the playback speed and resolution of the drum samples.
+- **Decay**: An exponential decay envelope, 1ms - 1 second long.
+- **Button**: Triggers the sample.
+- **Trig**: Trigger input, conditioned for rising edge detection. 
+- **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
+- **Out**: Audio output, 10vpp.
 
 ---
 ## SeaArr — CR-78 drums
@@ -279,13 +278,13 @@ The only bass sample anyone ever needs.
 
 “Real” snare samples with playback speed, velocity, and a decay envelope.
 
--**Sample**: Sample selection. There are 79 total samples for this module.
--**Pitch**: Changes the playback speed and resolution of the drum samples.
--**Decay**: An exponential decay envelope, 1ms - 1 second long.
--**Button**: Triggers the sample.
--**Trig**: Trigger input, conditioned for rising edge detection. 
--**Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
--**Out**: Audio output, 10vpp.
+- **Sample**: Sample selection. There are 79 total samples for this module.
+- **Pitch**: Changes the playback speed and resolution of the drum samples.
+- **Decay**: An exponential decay envelope, 1ms - 1 second long.
+- **Button**: Triggers the sample.
+- **Trig**: Trigger input, conditioned for rising edge detection. 
+- **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
+- **Out**: Audio output, 10vpp.
 
 ---
 ## Tom — Acoustic tom drums
@@ -294,11 +293,11 @@ The only bass sample anyone ever needs.
 
 “Real” tom samples with playback speed, velocity, and a decay envelope.
 
--**Sample**: Sample selection. There are 80 total samples for this module.
--**Pitch**: Changes the playback speed and resolution of the drum samples.
--**Decay**: An exponential decay envelope, 1ms - 1 second long.
--**Button**: Triggers the sample.
--**Trig**: Trigger input, conditioned for rising edge detection. 
--**Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
--**Out**: Audio output, 10vpp.
+- **Sample**: Sample selection. There are 80 total samples for this module.
+- **Pitch**: Changes the playback speed and resolution of the drum samples.
+- **Decay**: An exponential decay envelope, 1ms - 1 second long.
+- **Button**: Triggers the sample.
+- **Trig**: Trigger input, conditioned for rising edge detection. 
+- **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
+- **Out**: Audio output, 10vpp.
 
