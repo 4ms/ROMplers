@@ -18,7 +18,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 ---
 ## Clap — Acoustic claps
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/Clap.png" width="200">
+<img src="https://github.com/4ms/ROMplers/blob/main/doc/Clap.png" width="100">
 
 “Real” clap samples with playback speed, velocity, and a decay envelope.
 
