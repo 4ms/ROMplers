@@ -1,92 +1,94 @@
 {
-  "MetaModuleBrandName": "ROMplers",
-  "MetaModuleBrandSlug": "4ms-ROMplers",
-  "MetaModuleBrandAliases": ["4msROMplers", "ROMplers"],
-  "MetaModulePluginMaintainer": "4ms Company",
-  "MetaModulePluginMaintainerEmail": "4ms@4mscompany.com",
-  "MetaModulePluginMaintainerUrl": "",
-  "MetaModuleDescription": "ROM based drum machines",
-  "MetaModuleIncludedModules":
-  [
-	{
-	  "slug": "AyysKing",
-	  "name": "AyysKing"
-	},
-	{
-	  "slug": "Clap",
-	  "name": "Clap"
-	},
-	{
-	  "slug": "ClosedHat",
-	  "name": "ClosedHat"
-	},
-	{
-	  "slug": "Crash",
-	  "name": "Crash"
-	},
-	{
-	  "slug": "DeeArr",
-	  "name": "DeeArr"
-	},
-	{
-	  "slug": "KayArr",
-	  "name": "KayArr"
-	},
-	{
-	  "slug": "KayOne",
-	  "name": "KayOne"
-	},
-	{
-	  "slug": "Kick",
-	  "name": "Kick"
-	},
-	{
-	  "slug": "OpenHat",
-	  "name": "OpenHat"
-	},
-	{
-	  "slug": "Percussion",
-	  "name": "Percussion"
-	},
-	{
-	  "slug": "Ride",
-	  "name": "Ride"
-	},
-	{
-	  "slug": "Rimshot",
-	  "name": "Rimshot"
-	},
-	{
-	  "slug": "SeaArr",
-	  "name": "SeaArr"
-	},
-	{
-	  "slug": "SehvenToo",
-	  "name": "SehvenToo"
-	},
-	{
-	  "slug": "SicksOh",
-	  "name": "SicksOh"
-	},
-	{
-	  "slug": "SinSahnix",
-	  "name": "SinSahnix"
-	},
-	{
-		"slug": "Slap",
-		"name": "Slap"
-	  },
-	{
-	  "slug": "Snare",
-	  "name": "Snare"
-	},
-	{
-	  "slug": "Tom",
-	  "name": "Tom"
-	},
-	{
-	  "slug": "OrchHits",
-	  "name": "OrchHits"
-	}
-  ]  
+	"MetaModuleBrandName": "ROMplers",
+	"MetaModuleBrandSlug": "4ms-ROMplers",
+	"MetaModuleBrandAliases": [
+		"4msROMplers",
+		"ROMplers"
+	],
+	"MetaModulePluginMaintainer": "4ms Company",
+	"MetaModulePluginMaintainerEmail": "4ms@4mscompany.com",
+	"MetaModulePluginMaintainerUrl": "https://4mscompany.com/",
+	"MetaModuleDescription": "ROM based drum machines",
+	"MetaModuleIncludedModules": [
+		{
+			"slug": "AyysKing",
+			"name": "AyysKing"
+		},
+		{
+			"slug": "Clap",
+			"name": "Clap"
+		},
+		{
+			"slug": "ClosedHat",
+			"name": "ClosedHat"
+		},
+		{
+			"slug": "Crash",
+			"name": "Crash"
+		},
+		{
+			"slug": "DeeArr",
+			"name": "DeeArr"
+		},
+		{
+			"slug": "KayArr",
+			"name": "KayArr"
+		},
+		{
+			"slug": "KayOne",
+			"name": "KayOne"
+		},
+		{
+			"slug": "Kick",
+			"name": "Kick"
+		},
+		{
+			"slug": "OpenHat",
+			"name": "OpenHat"
+		},
+		{
+			"slug": "Percussion",
+			"name": "Percussion"
+		},
+		{
+			"slug": "Ride",
+			"name": "Ride"
+		},
+		{
+			"slug": "Rimshot",
+			"name": "Rimshot"
+		},
+		{
+			"slug": "SeaArr",
+			"name": "SeaArr"
+		},
+		{
+			"slug": "SehvenToo",
+			"name": "SehvenToo"
+		},
+		{
+			"slug": "SicksOh",
+			"name": "SicksOh"
+		},
+		{
+			"slug": "SinSahnix",
+			"name": "SinSahnix"
+		},
+		{
+			"slug": "Slap",
+			"name": "Slap"
+		},
+		{
+			"slug": "Snare",
+			"name": "Snare"
+		},
+		{
+			"slug": "Tom",
+			"name": "Tom"
+		},
+		{
+			"slug": "OrchHits",
+			"name": "OrchHits"
+		}
+	]
 }
