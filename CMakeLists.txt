@@ -12,7 +12,7 @@ endif()
 
 include(${METAMODULE_SDK_DIR}/plugin.cmake)
 
-project(4ms-ROMplers VERSION 0.1 DESCRIPTION "4ms-ROMplers for MetaModule" LANGUAGES C CXX ASM)
+project(4ms-ROMplers VERSION 2.0.0 DESCRIPTION "4ms-ROMplers for MetaModule" LANGUAGES C CXX ASM)
 
 add_library(4ms-ROMplers STATIC)
 
