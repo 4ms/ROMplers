@@ -6,7 +6,7 @@ Use this document to understand the behavior, controls, and design inspirations 
 
 ## CV + Knob Behavior
 
-**All CV inputs are bipolar and clamped to 10vpp. Each knob functions as a 10vpp offset. Gate inputs are conditioned to have rising edge trigger detection and ignore pulse width.**
+**All unlabeled jacks are CV inputs for the associated parameter next to them. All CV inputs are bipolar and clamped to 10vpp. Each knob functions as a 10vpp offset. Trigger inputs are conditioned to have rising edge detection and ignore pulse width.**
 
 ---
 ## AyysKing — Ace King drums 
