@@ -235,20 +235,21 @@ struct SehvenToo : Module {
         float normLength = std::clamp(combinedLength / 5.f, 0.f, 1.f); // normalize 0-1
         float lengthRatio = LENGTH_MIN + normLength * (LENGTH_MAX - LENGTH_MIN);
     
-	    // --- Loop mode ---
-        bool loopButton = params[LOOP_PARAM].getValue() > 0.5f;
-        float loopCV = inputs[LOOPCVIN_INPUT].isConnected() ? inputs[LOOPCVIN_INPUT].getVoltage() : 0.f;
-        bool loopButtonRising = loopButton && !lastLoopButton;
-        if (loopButtonRising) {
-            loopState = !loopState;
-        }
-        if (!loopState && loopCV > 1.f) {       // OFF → ON with positive CV
-            loopState = true;
-        } else if (loopState && loopCV < -1.f) { // ON → OFF with negative CV
-            loopState = false;
-        }
-        lastLoopButton = loopButton;
-        lights[LOOP_LIGHT].setBrightnessSmooth(loopState, args.sampleTime);
+		// --- Loop mode ---
+		bool loopButton = params[LOOP_PARAM].getValue() > 0.5f;
+		float loopCV = inputs[LOOPCVIN_INPUT].isConnected() ? inputs[LOOPCVIN_INPUT].getVoltage() : 0.f;
+		bool loopButtonRising = loopButton && !lastLoopButton;
+		if (loopButtonRising)
+			loopState = !loopState;
+		static bool lastGateHigh = false; // keeps track of gate state across calls
+		bool gateHigh = loopCV > 0.6f;
+		if (gateHigh && !lastGateHigh)
+			loopState = !loopState;
+		lastGateHigh = gateHigh;
+
+		lastLoopButton = loopButton;
+
+		lights[LOOP_LIGHT].setBrightnessSmooth(loopState, args.sampleTime);
     
         processVoice(args, congaLVoice, CONGALTRIGIN_INPUT, CONGALPUSH_PARAM, speed, lengthRatio, loopState);
         processVoice(args, congaHVoice, CONGAHTRIGIN_INPUT, CONGAHPUSH_PARAM, speed, lengthRatio, loopState);
