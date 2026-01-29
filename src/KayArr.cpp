@@ -57,18 +57,46 @@ struct KayArr : Module {
 	KayArr() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
-		configParam(SPEED_PARAM, 0.f, 1.f, 0.33f, "Speed");
-		configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length");
-		configSwitch(LOOP_PARAM, 0.f, 1.f, 0.f, "Loop", {"Off", "On"});
+		configParam(SPEED_PARAM,  0.f, 1.f, 0.5f, "Speed", "%", 0.f, 100.f);
+		configParam(LENGTH_PARAM, 0.f, 1.f, 1.f,  "Length", "%", 0.f, 100.f);
+		configSwitch(LOOP_PARAM,  0.f, 1.f, 0.f,  "Loop", {"Off", "On"});
 
-		for (int i = KICKPUSH_PARAM; i <= CONGAPUSH_PARAM; i++)
-			configSwitch(i, 0.f, 1.f, 0.f, "Trigger", {"Off", "On"});
+		configSwitch(KICKPUSH_PARAM,     0.f, 1.f, 0.f, "Kick Trig",     {"Off", "On"});
+		configSwitch(SNAREPUSH_PARAM,    0.f, 1.f, 0.f, "Snare Trig",    {"Off", "On"});
+		configSwitch(TOMPUSH_PARAM,      0.f, 1.f, 0.f, "Tom Trig",      {"Off", "On"});
+		configSwitch(CLPUSH_PARAM,       0.f, 1.f, 0.f, "Closed Hat Trig", {"Off", "On"});
+		configSwitch(OHPUSH_PARAM,       0.f, 1.f, 0.f, "Open Hat Trig", {"Off", "On"});
+		configSwitch(CLAVEPUSH_PARAM,    0.f, 1.f, 0.f, "Clave Trig",    {"Off", "On"});
+		configSwitch(RIMSHOTPUSH_PARAM,  0.f, 1.f, 0.f, "Rimshot Trig",  {"Off", "On"});
+		configSwitch(COWBELLPUSH_PARAM,  0.f, 1.f, 0.f, "Cowbell Trig",  {"Off", "On"});
+		configSwitch(CYMPUSH_PARAM,      0.f, 1.f, 0.f, "Cymbal Trig",   {"Off", "On"});
+		configSwitch(CONGAPUSH_PARAM,    0.f, 1.f, 0.f, "Conga Trig",    {"Off", "On"});
 
-		for (int i = SPEEDCVIN_INPUT; i < INPUTS_LEN; i++)
-			configInput(i, "Input");
+		configInput(SPEEDCVIN_INPUT,   "Speed CV");
+		configInput(LENGTHCVIN_INPUT,  "Length CV");
+		configInput(LOOPCVIN_INPUT,    "Loop Gate");
 
-		for (int i = KICKOUT_OUTPUT; i < OUTPUTS_LEN; i++)
-			configOutput(i, "Output");
+		configInput(KICKTRIGIN_INPUT,     "Kick Trig");
+		configInput(SNARETRIGIN_INPUT,    "Snare Trig");
+		configInput(TOMTRIG_INPUT,        "Tom Trig");
+		configInput(CLTRIG_INPUT,         "Closed Hat Trig");
+		configInput(OHTRIG_INPUT,         "Open Hat Trig");
+		configInput(CLAVETRIG_INPUT,      "Clave Trig");
+		configInput(RIMSHOTTRIG_INPUT,    "Rimshot Trig");
+		configInput(COWBELLTRIG_INPUT,    "Cowbell Trig");
+		configInput(CYMBALTRIG_INPUT,     "Cymbal Trig");
+		configInput(CONGATRIG_INPUT,      "Conga Trig");
+
+		configOutput(KICKOUT_OUTPUT,     "Kick");
+		configOutput(SNAREOUT_OUTPUT,    "Snare");
+		configOutput(TOMOUT_OUTPUT,      "Tom");
+		configOutput(CLOUT_OUTPUT,       "Closed Hat");
+		configOutput(OHOUT_OUTPUT,       "Open Hat");
+		configOutput(CLAVEOUT_OUTPUT,    "Clave");
+		configOutput(RIMSHOTOUT_OUTPUT,  "Rimshot");
+		configOutput(COWBELLOUT_OUTPUT,  "Cowbell");
+		configOutput(CYMBALOUT_OUTPUT,   "Cymbal");
+		configOutput(CONGAOUT_OUTPUT,    "Conga");
 
 		static const struct {
 			const uint8_t* data;
