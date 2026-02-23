@@ -64,7 +64,7 @@
     {
       "slug": "KayOne",
       "name": "KayOne",
-      "description": "Casio SK-1 samples with playback speed, sample length, and looping. Samples by Brian Hilmers CC-BY-SA-4.0",
+      "description": "Casio SK-1 samples with playback speed, sample length, and looping. Samples by Brian Hilmers, license: CC-BY-SA-4.0",
       "tags": [
         "Drum"
       ]
@@ -112,7 +112,7 @@
     {
       "slug": "SeaArr",
       "name": "SeaArr",
-      "description": "CR-78 samples with playback speed, sample length, looping, and direct outs.",
+      "description": "CR-78 samples with playback speed, sample length, looping, and direct outs. Samples provided by Oramics, license: Public Domain.",
       "tags": [
         "Drum"
       ]
