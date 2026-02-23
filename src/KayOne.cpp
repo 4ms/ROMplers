@@ -79,7 +79,7 @@ struct KayOne : Module {
 	KayOne() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
-		configParam(SPEED_PARAM, 0.f, 1.f, 0.5f, "Speed", "%", 0.f, 100.f);
+		configParam(SPEED_PARAM, 0.f, 2.f, 1.0f, "Speed", "%", 0.f, 100.f);
 		configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length", "%", 0.f, 100.f);
 		configSwitch(LOOP_PARAM, 0.f, 1.f, 0.f, "Loop", {"Off", "On"});
 
@@ -148,7 +148,7 @@ struct KayOne : Module {
 		static const float lengthCVScale = 0.1f;
 	
 		float knobSpeed = 0.01f + params[SPEED_PARAM].getValue() * (1.0f - 0.01f);
-		float normSpeed = std::clamp(knobSpeed + inputs[SPEEDCVIN_INPUT].getVoltage() * speedCVScale, 0.01f, 1.0f);
+		float normSpeed = std::clamp(knobSpeed + inputs[SPEEDCVIN_INPUT].getVoltage() * speedCVScale, 0.01f, 2.0f);
 		float speed = SPEED_LOW + (normSpeed - 0.01f) * ((SPEED_HIGH - SPEED_LOW) / (1.0f - 0.01f));
 	
 		float knobLength = params[LENGTH_PARAM].getValue();
