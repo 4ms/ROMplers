@@ -27,38 +27,16 @@ struct Snare : Module {
 	};
 
 	// Use arrays to store sample pointers and lengths
-	const unsigned char* samples[79] = {
+	const unsigned char* samples[16] = {
 		Snare1, Snare2, Snare3, Snare4, Snare5, Snare6,
 		Snare7, Snare8, Snare9, Snare10, Snare11, Snare12,
-		Snare13, Snare14, Snare15, Snare16, Snare17, Snare18,
-		Snare19, Snare20, Snare21, Snare22, Snare23, Snare24,
-		Snare25, Snare26, Snare27, Snare28, Snare29, Snare30,
-		Snare31, Snare32, Snare33, Snare34, Snare35, Snare36,
-		Snare37, Snare38, Snare39, Snare40, Snare41, Snare42,
-		Snare43, Snare44, Snare45, Snare46, Snare47, Snare48,
-		Snare49, Snare50, Snare51, Snare52, Snare53, Snare54,
-		Snare55, Snare56, Snare57, Snare58, Snare59, Snare60,
-		Snare61, Snare62, Snare63, Snare64, Snare65, Snare66,
-		Snare67, Snare68, Snare69, Snare70, Snare71, Snare72,
-		Snare73, Snare74, Snare75, Snare76, Snare77, Snare78,
-		Snare79
+		Snare13, Snare14, Snare15, Snare16
 	};
 
-	unsigned int sampleLengths[79] = {
+	unsigned int sampleLengths[16] = {
 		Snare1_len, Snare2_len, Snare3_len, Snare4_len, Snare5_len, Snare6_len,
 		Snare7_len, Snare8_len, Snare9_len, Snare10_len, Snare11_len, Snare12_len,
-		Snare13_len, Snare14_len, Snare15_len, Snare16_len, Snare17_len, Snare18_len,
-		Snare19_len, Snare20_len, Snare21_len, Snare22_len, Snare23_len, Snare24_len,
-		Snare25_len, Snare26_len, Snare27_len, Snare28_len, Snare29_len, Snare30_len,
-		Snare31_len, Snare32_len, Snare33_len, Snare34_len, Snare35_len, Snare36_len,
-		Snare37_len, Snare38_len, Snare39_len, Snare40_len, Snare41_len, Snare42_len,
-		Snare43_len, Snare44_len, Snare45_len, Snare46_len, Snare47_len, Snare48_len,
-		Snare49_len, Snare50_len, Snare51_len, Snare52_len, Snare53_len, Snare54_len,
-		Snare55_len, Snare56_len, Snare57_len, Snare58_len, Snare59_len, Snare60_len,
-		Snare61_len, Snare62_len, Snare63_len, Snare64_len, Snare65_len, Snare66_len,
-		Snare67_len, Snare68_len, Snare69_len, Snare70_len, Snare71_len, Snare72_len,
-		Snare73_len, Snare74_len, Snare75_len, Snare76_len, Snare77_len, Snare78_len,
-		Snare79_len
+		Snare13_len, Snare14_len, Snare15_len, Snare16_len
 	};
 
 	const float MIN_PLAYBACK_SPEED = 0.01f;
@@ -76,7 +54,7 @@ struct Snare : Module {
 	float lastButtonValue = 0.f;
 	float SnareLightBrightness = 0.f;
 
-	int numSamples = 79;
+	int numSamples = 16;
 
 	Snare() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -170,16 +148,16 @@ struct Snare : Module {
 			if (inputs[DECAYCVIN_INPUT].isConnected()){
 				decayParam += inputs[DECAYCVIN_INPUT].getVoltage() / 10.f; // ±5V → ±0.5
 				decayParam = std::clamp(decayParam, 0.f, 1.f);
-	
-				const float minDecayTime = 0.005f;
-				float maxDecayTime = (float)numSampleFrames / sampleSampleRate;
-				float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
-	
-				float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
-				env *= decayCoef;
-	
-				output = sampleValue * env;
 			}
+	
+			const float minDecayTime = 0.005f;
+			float maxDecayTime = (float)numSampleFrames / sampleSampleRate;
+			float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
+	
+			float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
+			env *= decayCoef;
+	
+			output = sampleValue * env;
 		  }
 		}
 	
@@ -187,7 +165,7 @@ struct Snare : Module {
 		float volumeCV = 5.f;
 		if (inputs[VOLCVIN_INPUT].isConnected()) {
 			volumeCV = std::clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
-		}
+		} 
 	
 		output *= volumeCV / 5.f;
 	
