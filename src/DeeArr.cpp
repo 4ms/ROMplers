@@ -74,7 +74,7 @@ struct DeeArr : Module {
 
 	DeeArr() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam(SPEED_PARAM, 0.f, 1.f, 0.5f, "Speed", "%", 0.f, 100.f);
+		configParam(SPEED_PARAM, 0.f, 1.f, 0.5f, "Speed", "%", 0.f, 200.f);
 		configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length", "%", 0.f, 100.f);
 		configSwitch(LOOP_PARAM, 0.f, 1.f, 0.f, "Loop", {"Off", "On"});
 		configSwitch(KICKPUSH_PARAM, 0.f, 1.f, 0.f, "Kick Trig", {"Off", "On"});
@@ -120,7 +120,7 @@ struct DeeArr : Module {
 		float speedCVV = 0.f;
 		if (inputs[SPEEDCVIN_INPUT].isConnected())
 			speedCVV = std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -10.f, 10.f) * 0.5f; // -10..10 → -5..5
-		float normSpeed = std::clamp(knobSpeedV + speedCVV, 0.f, 5.f) / 5.f; // 0–1 normalized
+		float normSpeed = (std::clamp(knobSpeedV + speedCVV, 0.f, 5.f) / 5.f); // 0–1 normalized
 		float speed = SPEED_LOW + normSpeed * (SPEED_HIGH - SPEED_LOW);
 	
 		// --- Precalculate length with CV ---
