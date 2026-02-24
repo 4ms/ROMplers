@@ -39,7 +39,7 @@ struct Ride : Module {
 	const float MIN_PLAYBACK_SPEED = 0.01f;
 	const float MAX_PLAYBACK_SPEED = 2.0f;
 
-	int numSamples = 15;
+	int numSamples = 16;
 
 	Ride() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -62,7 +62,7 @@ struct Ride : Module {
 		switch (index) {
 			case 0: return Ride1; case 1: return Ride2; case 2: return Ride3; case 3: return Ride4; case 4: return Ride5; case 5: return Ride6;
 			case 6: return Ride7; case 7: return Ride8; case 8: return Ride9; case 9: return Ride10; case 10: return Ride11; case 11: return Ride12;
-			case 12: return Ride13; case 13: return Ride14; case 14: return Ride15; 
+			case 12: return Ride13; case 13: return Ride14; case 14: return Ride15; case 15: return Ride16;
 			default: return nullptr;
 		}
 	}
@@ -71,7 +71,7 @@ struct Ride : Module {
 		switch (index) {
 			case 0: return Ride1_len; case 1: return Ride2_len; case 2: return Ride3_len; case 3: return Ride4_len; case 4: return Ride5_len; case 5: return Ride6_len;
 			case 6: return Ride7_len; case 7: return Ride8_len; case 8: return Ride9_len; case 9: return Ride10_len; case 10: return Ride11_len; case 11: return Ride12_len;
-			case 12: return Ride13_len; case 13: return Ride14_len; case 14: return Ride15_len; 
+			case 12: return Ride13_len; case 13: return Ride14_len; case 14: return Ride15_len; case 15: return Ride16_len; 
 			default: return 0;
 		}
 	}
