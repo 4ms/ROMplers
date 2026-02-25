@@ -40,7 +40,7 @@ struct Tom : Module {
 	constexpr static float MAX_PLAYBACK_SPEED = 2.0f;
 	constexpr static float SAMPLE_SAMPLE_RATE = 44100.f;
 
-	int numSamples = 80;
+	int numSamples = 16;
 
 	Tom() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -63,18 +63,7 @@ struct Tom : Module {
 		switch (index) {
 			case 0: return Tom1; case 1: return Tom2; case 2: return Tom3; case 3: return Tom4; case 4: return Tom5; case 5: return Tom6;
 			case 6: return Tom7; case 7: return Tom8; case 8: return Tom9; case 9: return Tom10; case 10: return Tom11; case 11: return Tom12;
-			case 12: return Tom13; case 13: return Tom14; case 14: return Tom15; case 15: return Tom16; case 16: return Tom17; case 17: return Tom18;
-			case 18: return Tom19; case 19: return Tom20; case 20: return Tom21; case 21: return Tom22; case 22: return Tom23; case 23: return Tom24;
-			case 24: return Tom25; case 25: return Tom26; case 26: return Tom27; case 27: return Tom28; case 28: return Tom29; case 29: return Tom30;
-			case 30: return Tom31; case 31: return Tom32; case 32: return Tom33; case 33: return Tom34; case 34: return Tom35; case 35: return Tom36;
-			case 36: return Tom37; case 37: return Tom38; case 38: return Tom39; case 39: return Tom40; case 40: return Tom41; case 41: return Tom42;
-			case 42: return Tom43; case 43: return Tom44; case 44: return Tom45; case 45: return Tom46; case 46: return Tom47; case 47: return Tom48;
-			case 48: return Tom49; case 49: return Tom50; case 50: return Tom51; case 51: return Tom52; case 52: return Tom53; case 53: return Tom54;
-			case 54: return Tom55; case 55: return Tom56; case 56: return Tom57; case 57: return Tom58; case 58: return Tom59; case 59: return Tom60;
-			case 60: return Tom61; case 61: return Tom62; case 62: return Tom63; case 63: return Tom64; case 64: return Tom65; case 65: return Tom66;
-			case 66: return Tom67; case 67: return Tom68; case 68: return Tom69; case 69: return Tom70; case 70: return Tom71; case 71: return Tom72;
-			case 72: return Tom73; case 73: return Tom74; case 74: return Tom75; case 75: return Tom76; case 76: return Tom77; case 77: return Tom78;
-			case 78: return Tom79; case 79: return Tom80;
+			case 12: return Tom13; case 13: return Tom14; case 14: return Tom15; case 15: return Tom16; 
 			default: return nullptr;
 		}
 	}
@@ -83,18 +72,7 @@ struct Tom : Module {
 		switch (index) {
 			case 0: return Tom1_len; case 1: return Tom2_len; case 2: return Tom3_len; case 3: return Tom4_len; case 4: return Tom5_len; case 5: return Tom6_len;
 			case 6: return Tom7_len; case 7: return Tom8_len; case 8: return Tom9_len; case 9: return Tom10_len; case 10: return Tom11_len; case 11: return Tom12_len;
-			case 12: return Tom13_len; case 13: return Tom14_len; case 14: return Tom15_len; case 15: return Tom16_len; case 16: return Tom17_len; case 17: return Tom18_len;
-			case 18: return Tom19_len; case 19: return Tom20_len; case 20: return Tom21_len; case 21: return Tom22_len; case 22: return Tom23_len; case 23: return Tom24_len;
-			case 24: return Tom25_len; case 25: return Tom26_len; case 26: return Tom27_len; case 27: return Tom28_len; case 28: return Tom29_len; case 29: return Tom30_len;
-			case 30: return Tom31_len; case 31: return Tom32_len; case 32: return Tom33_len; case 33: return Tom34_len; case 34: return Tom35_len; case 35: return Tom36_len;
-			case 36: return Tom37_len; case 37: return Tom38_len; case 38: return Tom39_len; case 39: return Tom40_len; case 40: return Tom41_len; case 41: return Tom42_len;
-			case 42: return Tom43_len; case 43: return Tom44_len; case 44: return Tom45_len; case 45: return Tom46_len; case 46: return Tom47_len; case 47: return Tom48_len;
-			case 48: return Tom49_len; case 49: return Tom50_len; case 50: return Tom51_len; case 51: return Tom52_len; case 52: return Tom53_len; case 53: return Tom54_len;
-			case 54: return Tom55_len; case 55: return Tom56_len; case 56: return Tom57_len; case 57: return Tom58_len; case 58: return Tom59_len; case 59: return Tom60_len;
-			case 60: return Tom61_len; case 61: return Tom62_len; case 62: return Tom63_len; case 63: return Tom64_len; case 64: return Tom65_len; case 65: return Tom66_len;
-			case 66: return Tom67_len; case 67: return Tom68_len; case 68: return Tom69_len; case 69: return Tom70_len; case 70: return Tom71_len; case 71: return Tom72_len;
-			case 72: return Tom73_len; case 73: return Tom74_len; case 74: return Tom75_len; case 75: return Tom76_len; case 76: return Tom77_len; case 77: return Tom78_len;
-			case 78: return Tom79_len; case 79: return Tom80_len; 
+			case 12: return Tom13_len; case 13: return Tom14_len; case 14: return Tom15_len; case 15: return Tom16_len; 
 			default: return 0;
 		}
 	}
@@ -193,7 +171,7 @@ struct Tom : Module {
 		}
 		output *= volume / 5.f;
 	
-		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.f);
+		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 10.f);
 	}	
 };
 
