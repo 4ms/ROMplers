@@ -37,9 +37,9 @@ struct OpenHat : Module {
 	float OpenHatLightBrightness = 0.f;
 
 	const float MIN_PLAYBACK_SPEED = 0.01f;
-	const float MAX_PLAYBACK_SPEED = 2.0f;
+	const float MAX_PLAYBACK_SPEED = 8.0f;
 
-	int numSamples = 17;
+	int numSamples = 16;
 
 	OpenHat() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -62,7 +62,7 @@ struct OpenHat : Module {
 		switch (index) {
 			case 0: return OpenHat1; case 1: return OpenHat2; case 2: return OpenHat3; case 3: return OpenHat4; case 4: return OpenHat5; case 5: return OpenHat6;
 			case 6: return OpenHat7; case 7: return OpenHat8; case 8: return OpenHat9; case 9: return OpenHat10; case 10: return OpenHat11; case 11: return OpenHat12;
-			case 12: return OpenHat13; case 13: return OpenHat14; case 14: return OpenHat15; case 15: return OpenHat16; case 16: return OpenHat17; 
+			case 12: return OpenHat13; case 13: return OpenHat14; case 14: return OpenHat15; case 15: return OpenHat16; case 16: 
 			default: return nullptr;
 		}
 	}
@@ -71,7 +71,7 @@ struct OpenHat : Module {
 		switch (index) {
 			case 0: return OpenHat1_len; case 1: return OpenHat2_len; case 2: return OpenHat3_len; case 3: return OpenHat4_len; case 4: return OpenHat5_len; case 5: return OpenHat6_len;
 			case 6: return OpenHat7_len; case 7: return OpenHat8_len; case 8: return OpenHat9_len; case 9: return OpenHat10_len; case 10: return OpenHat11_len; case 11: return OpenHat12_len;
-			case 12: return OpenHat13_len; case 13: return OpenHat14_len; case 14: return OpenHat15_len; case 15: return OpenHat16_len; case 16: return OpenHat17_len;
+			case 12: return OpenHat13_len; case 13: return OpenHat14_len; case 14: return OpenHat15_len; case 15: return OpenHat16_len; 
 			default: return 0;
 		}
 	}
@@ -155,7 +155,7 @@ struct OpenHat : Module {
 	
 		// --- VOLUME CV ---
 		float volume = inputs[VOLCVIN_INPUT].isConnected() ? std::clamp(inputs[VOLCVIN_INPUT].getVoltage() / 5.f, 0.f, 1.f) : 1.f;
-		outputs[AUDIOOUT_OUTPUT].setVoltage(output * volume * 5.f);
+		outputs[AUDIOOUT_OUTPUT].setVoltage(output * volume * 10.f);
 	}
 };	
 
