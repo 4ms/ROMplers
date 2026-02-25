@@ -163,7 +163,7 @@ struct ClosedHat : Module {
 		}
 	
 		output *= volCV / 5.f;
-		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.f);
+		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 10.f);
 	}
 };	
 

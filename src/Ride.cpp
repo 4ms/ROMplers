@@ -176,7 +176,7 @@ struct Ride : Module {
 			volumeCV = std::clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f) / 5.f;
 		}
 	
-		outputs[AUDIOOUT_OUTPUT].setVoltage(output * volumeCV * 5.f);
+		outputs[AUDIOOUT_OUTPUT].setVoltage(output * volumeCV * 10.f);
 	}	
 };
 
