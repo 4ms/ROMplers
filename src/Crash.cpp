@@ -39,7 +39,7 @@ struct Crash : Module {
 	const float MIN_PLAYBACK_SPEED = 0.01f;
 	const float MAX_PLAYBACK_SPEED = 2.0f;
 
-	int numSamples = 20;
+	int numSamples = 16;
 
 	Crash() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -62,8 +62,7 @@ struct Crash : Module {
 		switch (index) {
 			case 0: return Crash1; case 1: return Crash2; case 2: return Crash3; case 3: return Crash4; case 4: return Crash5; case 5: return Crash6;
 			case 6: return Crash7; case 7: return Crash8; case 8: return Crash9; case 9: return Crash10; case 10: return Crash11; case 11: return Crash12;
-			case 12: return Crash13; case 13: return Crash14; case 14: return Crash15; case 15: return Crash16; case 16: return Crash17; case 17: return Crash18;
-			case 18: return Crash19; case 19: return Crash20; 
+			case 12: return Crash13; case 13: return Crash14; case 14: return Crash15; case 15: return Crash16;
 			default: return nullptr;
 		}
 	}
@@ -72,8 +71,7 @@ struct Crash : Module {
 		switch (index) {
 			case 0: return Crash1_len; case 1: return Crash2_len; case 2: return Crash3_len; case 3: return Crash4_len; case 4: return Crash5_len; case 5: return Crash6_len;
 			case 6: return Crash7_len; case 7: return Crash8_len; case 8: return Crash9_len; case 9: return Crash10_len; case 10: return Crash11_len; case 11: return Crash12_len;
-			case 12: return Crash13_len; case 13: return Crash14_len; case 14: return Crash15_len; case 15: return Crash16_len; case 16: return Crash17_len; case 17: return Crash18_len;
-			case 18: return Crash19_len; case 19: return Crash20_len; 
+			case 12: return Crash13_len; case 13: return Crash14_len; case 14: return Crash15_len; case 15: return Crash16_len;
 			default: return 0;
 		}
 	}
@@ -176,7 +174,7 @@ struct Crash : Module {
 		}
 		output *= volumeCV / 5.f;
 	
-		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.f);
+		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 10.f);
 	}
 };
 
