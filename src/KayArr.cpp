@@ -189,7 +189,7 @@ struct KayArr : Module {
 				int idx = (int)v.samplePos;
 				if (idx < maxSamples) {
 					float sample = v.readSample16(idx) / 32768.f;
-					outputs[v.outputId].setVoltage(sample * 5.f);
+					outputs[v.outputId].setVoltage(sample * 10.f);
 					v.samplePos += speed;
 				} else {
 					if (loopEnabled) {
