@@ -189,7 +189,7 @@ struct SehvenToo : Module {
             if (idx < maxSamples) {
                 int16_t s = v.readSample16(idx);
                 float out = (float)s / 32768.f;
-                outputs[v.outputId].setVoltage(out * 5.f);
+                outputs[v.outputId].setVoltage(out * 10.f);
                 v.samplePos += speed;
             } else {
                 if (loopEnabled) {
