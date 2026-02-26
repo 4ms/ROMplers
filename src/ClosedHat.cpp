@@ -43,7 +43,7 @@ struct ClosedHat : Module {
 	const float MIN_PLAYBACK_SPEED = 0.01f;
 	const float MAX_PLAYBACK_SPEED = 2.0f;
 
-	int numSamples = 21;
+	int numSamples = 16;
 
 	ClosedHat() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -66,8 +66,7 @@ struct ClosedHat : Module {
 		switch (index) {
 			case 0: return ClosedHat1; case 1: return ClosedHat2; case 2: return ClosedHat3; case 3: return ClosedHat4; case 4: return ClosedHat5; case 5: return ClosedHat6;
 			case 6: return ClosedHat7; case 7: return ClosedHat8; case 8: return ClosedHat9; case 9: return ClosedHat10; case 10: return ClosedHat11; case 11: return ClosedHat12;
-			case 12: return ClosedHat13; case 13: return ClosedHat14; case 14: return ClosedHat15; case 15: return ClosedHat16; case 16: return ClosedHat17; case 17: return ClosedHat18;
-			case 18: return ClosedHat19; case 19: return ClosedHat20; case 20: return ClosedHat21;
+			case 12: return ClosedHat13; case 13: return ClosedHat14; case 14: return ClosedHat15; case 15: return ClosedHat16; 
 			default: return nullptr;
 		}
 	}
@@ -76,8 +75,7 @@ struct ClosedHat : Module {
 		switch (index) {
 			case 0: return ClosedHat1_len; case 1: return ClosedHat2_len; case 2: return ClosedHat3_len; case 3: return ClosedHat4_len; case 4: return ClosedHat5_len; case 5: return ClosedHat6_len;
 			case 6: return ClosedHat7_len; case 7: return ClosedHat8_len; case 8: return ClosedHat9_len; case 9: return ClosedHat10_len; case 10: return ClosedHat11_len; case 11: return ClosedHat12_len;
-			case 12: return ClosedHat13_len; case 13: return ClosedHat14_len; case 14: return ClosedHat15_len; case 15: return ClosedHat16_len; case 16: return ClosedHat17_len; case 17: return ClosedHat18_len;
-			case 18: return ClosedHat19_len; case 19: return ClosedHat20_len; case 20: return ClosedHat21_len;
+			case 12: return ClosedHat13_len; case 13: return ClosedHat14_len; case 14: return ClosedHat15_len; case 15: return ClosedHat16_len; case 16: 
 			default: return 0;
 		}
 	}
@@ -165,7 +163,7 @@ struct ClosedHat : Module {
 		}
 	
 		output *= volCV / 5.f;
-		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.f);
+		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 10.f);
 	}
 };	
 

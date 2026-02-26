@@ -42,7 +42,7 @@ struct Clap : Module {
 	const float MIN_PLAYBACK_SPEED = 0.01f;
 	const float MAX_PLAYBACK_SPEED = 2.0f;
 
-	int numSamples = 9;
+	int numSamples = 16;
 
 	Clap() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -62,35 +62,48 @@ struct Clap : Module {
 	}
 
 	const unsigned char* getSampleByIndex(int index) {
-		switch (index) {
-			case 0: return Clap1;
-			case 1: return Clap2;
-			case 2: return Clap3;
-			case 3: return Clap4;
-			case 4: return Clap5;
-			case 5: return Clap6;
-			case 6: return Clap7;
-			case 7: return Clap8;
-			case 8: return Clap9;
-			default: return nullptr;
-		}
+	switch (index) {
+		case 0:  return Clap1;
+		case 1:  return Clap2;
+		case 2:  return Clap3;
+		case 3:  return Clap4;
+		case 4:  return Clap5;
+		case 5:  return Clap6;
+		case 6:  return Clap7;
+		case 7:  return Clap8;
+		case 8:  return Clap9;
+		case 9:  return Clap10;
+		case 10: return Clap11;
+		case 11: return Clap12;
+		case 12: return Clap13;
+		case 13: return Clap14;
+		case 14: return Clap15;
+		case 15: return Clap16;
+		default: return nullptr;
 	}
+}
 
-	int getSampleLengthByIndex(int index) {
-		switch (index) {
-			case 0: return Clap1_len;
-			case 1: return Clap2_len;
-			case 2: return Clap3_len;
-			case 3: return Clap4_len;
-			case 4: return Clap5_len;
-			case 5: return Clap6_len;
-			case 6: return Clap7_len;
-			case 7: return Clap8_len;
-			case 8: return Clap9_len;
-			default: return 0;
-		}
+int getSampleLengthByIndex(int index) {
+	switch (index) {
+		case 0:  return Clap1_len;
+		case 1:  return Clap2_len;
+		case 2:  return Clap3_len;
+		case 3:  return Clap4_len;
+		case 4:  return Clap5_len;
+		case 5:  return Clap6_len;
+		case 6:  return Clap7_len;
+		case 7:  return Clap8_len;
+		case 8:  return Clap9_len;
+		case 9:  return Clap10_len;
+		case 10: return Clap11_len;
+		case 11: return Clap12_len;
+		case 12: return Clap13_len;
+		case 13: return Clap14_len;
+		case 14: return Clap15_len;
+		case 15: return Clap16_len;
+		default: return 0;
 	}
-
+}
 	// Predecode sample bytes to float buffer once per sample change
 	void loadSample(int index) {
 		const unsigned char* sampleData = getSampleByIndex(index);
@@ -195,7 +208,7 @@ struct Clap : Module {
 
 		output *= volumeCV / 5.f;
 
-		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.0f);
+		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 10.0f);
 	}
 };
 

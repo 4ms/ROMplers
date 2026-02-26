@@ -169,7 +169,7 @@ struct Snare : Module {
 	
 		output *= volumeCV / 5.f;
 	
-		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.0f);
+		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 10.0f);
 	}	
 };
 

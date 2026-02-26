@@ -41,7 +41,7 @@ struct Rimshot : Module {
 
 	constexpr static float sampleSampleRate = 44100.f; // constant
 
-	int numSamples = 9;
+	int numSamples = 16;
 
 	Rimshot() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -60,21 +60,33 @@ struct Rimshot : Module {
 		configOutput(AUDIOOUT_OUTPUT, "Audio output");
 	}
 
-	const unsigned char* getSampleByIndex(int index) {
-		switch (index) {
-			case 0: return Rimshot1; case 1: return Rimshot2; case 2: return Rimshot3; case 3: return Rimshot4; case 4: return Rimshot5;
-			case 5: return Rimshot6; case 6: return Rimshot7; case 7: return Rimshot8; case 8: return Rimshot9;
-			default: return nullptr;
-		}
+const unsigned char* getSampleByIndex(int index) {
+	switch (index) {
+		case 0:  return Rimshot1;  case 1:  return Rimshot2;
+		case 2:  return Rimshot3;  case 3:  return Rimshot4;
+		case 4:  return Rimshot5;  case 5:  return Rimshot6;
+		case 6:  return Rimshot7;  case 7:  return Rimshot8;
+		case 8:  return Rimshot9;  case 9:  return Rimshot10;
+		case 10: return Rimshot11; case 11: return Rimshot12;
+		case 12: return Rimshot13; case 13: return Rimshot14;
+		case 14: return Rimshot15; case 15: return Rimshot16;
+		default: return nullptr;
 	}
+}
 
-	int getSampleLengthByIndex(int index) {
-		switch (index) {
-			case 0: return Rimshot1_len; case 1: return Rimshot2_len; case 2: return Rimshot3_len; case 3: return Rimshot4_len; case 4: return Rimshot5_len;
-			case 5: return Rimshot6_len; case 6: return Rimshot7_len; case 7: return Rimshot8_len; case 8: return Rimshot9_len;
-			default: return 0;
-		}
+int getSampleLengthByIndex(int index) {
+	switch (index) {
+		case 0:  return Rimshot1_len;  case 1:  return Rimshot2_len;
+		case 2:  return Rimshot3_len;  case 3:  return Rimshot4_len;
+		case 4:  return Rimshot5_len;  case 5:  return Rimshot6_len;
+		case 6:  return Rimshot7_len;  case 7:  return Rimshot8_len;
+		case 8:  return Rimshot9_len;  case 9:  return Rimshot10_len;
+		case 10: return Rimshot11_len; case 11: return Rimshot12_len;
+		case 12: return Rimshot13_len; case 13: return Rimshot14_len;
+		case 14: return Rimshot15_len; case 15: return Rimshot16_len;
+		default: return 0;
 	}
+}
 
 	void process(const ProcessArgs& args) override {
 		const float trigIn = inputs[TRIGIN_INPUT].getVoltage();
@@ -145,21 +157,22 @@ struct Rimshot : Module {
 				float sampleValue = s1 + frac * (s2 - s1);
 				float normalizedSample = sampleValue / 32768.f;
 	
-			// Decay with ±5V CV
 			float decayParam = params[DECAY_PARAM].getValue();
-			if (inputs[DECAYCVIN_INPUT].isConnected()){
-				decayParam += inputs[DECAYCVIN_INPUT].getVoltage() / 10.f; // ±5V → ±0.5
-				decayParam = std::clamp(decayParam, 0.f, 1.f);
-	
-				const float minDecayTime = 0.005f;
-				float maxDecayTime = (float)numSamplesInSample / sampleSampleRate;
-				float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
-	
-				float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
-				env *= decayCoef;
-	
-				output = normalizedSample * env;
+
+			if (inputs[DECAYCVIN_INPUT].isConnected()) {
+ 		    decayParam += inputs[DECAYCVIN_INPUT].getVoltage() / 10.f; // ±5V → ±0.5
 			}
+
+			decayParam = std::clamp(decayParam, 0.f, 1.f);
+
+			const float minDecayTime = 0.005f;
+			float maxDecayTime = (float)numSamplesInSample / sampleSampleRate;
+			float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
+
+			float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
+			env *= decayCoef;
+
+			output = normalizedSample * env;
 		 }
 		}
 	
@@ -170,7 +183,7 @@ struct Rimshot : Module {
 		}
 		output *= (volumeCV / 5.f);
 	
-		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.f);
+		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 10.f);
 	}
 };	
 
