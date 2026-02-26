@@ -225,7 +225,7 @@ struct KayOne : Module {
 	
 		// Only set output voltage if needed
 		if (outputs[voice.outputId].getVoltage() != sample) {
-			outputs[voice.outputId].setVoltage(sample);
+			outputs[voice.outputId].setVoltage(sample * 2.f);
 		}
 	
 		// Light handling: trigger on button/input OR loop restart
