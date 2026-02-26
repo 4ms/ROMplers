@@ -193,7 +193,7 @@ struct SeaArr : Module {
 			if (idx < maxSamplesToPlay) {
 				int16_t sampleInt = voice.readSample16(idx);
 				float sample = (float)sampleInt / 32768.f;
-				outputs[voice.outputId].setVoltage(sample * 5.f);
+				outputs[voice.outputId].setVoltage(sample * 10.f);
 				voice.samplePos += speed;
 			} else {
 				if (loopEnabled) {
