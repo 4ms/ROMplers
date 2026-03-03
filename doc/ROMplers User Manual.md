@@ -148,7 +148,7 @@ Casio SK-1 samples with playback speed, sample length, and looping.
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/OrchestraHits.png" width="60">
 
-Pitched orchestra hits.
+Pitched orchestra hits, meant to be controlled with a 1v per octave source such as a keyboard or sequencer.
 
 - **Sample**: Sample selection. There are 17 total samples for this module.
 - **Octave**: Octave transpose for sample, from -2 to +2 octaves above root pitch.
@@ -265,7 +265,7 @@ Synsonics samples with playback speed, sample length, and looping.
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/Slap.png" width="60">
 
-The only bass sample anyone ever needs.
+A slap bass sample meant to be controlled with a 1v per octave source such as a keyboard or sequencer.
 
 - **Octave**: Octave transpose for sample, from Unison to +4v octaves above root pitch.
 - **1v/Oct**: 1v per octave pitch input.
