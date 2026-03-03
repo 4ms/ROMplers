@@ -39,7 +39,7 @@ struct Kick : Module {
 	const float MIN_PLAYBACK_SPEED = 0.01f;
 	const float MAX_PLAYBACK_SPEED = 2.0f;
 
-	int numSamples = 60;
+	int numSamples = 16;
 
 	Kick() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -62,14 +62,7 @@ struct Kick : Module {
 		switch (index) {
 			case 0: return Kick1; case 1: return Kick2; case 2: return Kick3; case 3: return Kick4; case 4: return Kick5; case 5: return Kick6;
 			case 6: return Kick7; case 7: return Kick8; case 8: return Kick9; case 9: return Kick10; case 10: return Kick11; case 11: return Kick12;
-			case 12: return Kick13; case 13: return Kick14; case 14: return Kick15; case 15: return Kick16; case 16: return Kick17; case 17: return Kick18;
-			case 18: return Kick19; case 19: return Kick20; case 20: return Kick21; case 21: return Kick22; case 22: return Kick23; case 23: return Kick24;
-			case 24: return Kick25; case 25: return Kick26; case 26: return Kick27; case 27: return Kick28; case 28: return Kick29; case 29: return Kick30;
-			case 30: return Kick31; case 31: return Kick32; case 32: return Kick33; case 33: return Kick34; case 34: return Kick35; case 35: return Kick36;
-			case 36: return Kick37; case 37: return Kick38; case 38: return Kick39; case 39: return Kick40; case 40: return Kick41; case 41: return Kick42;
-			case 42: return Kick43; case 43: return Kick44; case 44: return Kick45; case 45: return Kick46; case 46: return Kick47; case 47: return Kick48;
-			case 48: return Kick49; case 49: return Kick50; case 50: return Kick51; case 51: return Kick52; case 52: return Kick53; case 53: return Kick54;
-			case 54: return Kick55; case 55: return Kick56; case 56: return Kick57; case 57: return Kick58; case 58: return Kick59; case 59: return Kick60;
+			case 12: return Kick13; case 13: return Kick14; case 14: return Kick15; case 15: return Kick16;
 			default: return nullptr;
 		}
 	}
@@ -78,14 +71,7 @@ struct Kick : Module {
 		switch (index) {
 			case 0: return Kick1_len; case 1: return Kick2_len; case 2: return Kick3_len; case 3: return Kick4_len; case 4: return Kick5_len; case 5: return Kick6_len;
 			case 6: return Kick7_len; case 7: return Kick8_len; case 8: return Kick9_len; case 9: return Kick10_len; case 10: return Kick11_len; case 11: return Kick12_len;
-			case 12: return Kick13_len; case 13: return Kick14_len; case 14: return Kick15_len; case 15: return Kick16_len; case 16: return Kick17_len; case 17: return Kick18_len;
-			case 18: return Kick19_len; case 19: return Kick20_len; case 20: return Kick21_len; case 21: return Kick22_len; case 22: return Kick23_len; case 23: return Kick24_len;
-			case 24: return Kick25_len; case 25: return Kick26_len; case 26: return Kick27_len; case 27: return Kick28_len; case 28: return Kick29_len; case 29: return Kick30_len;
-			case 30: return Kick31_len; case 31: return Kick32_len; case 32: return Kick33_len; case 33: return Kick34_len; case 34: return Kick35_len; case 35: return Kick36_len;
-			case 36: return Kick37_len; case 37: return Kick38_len; case 38: return Kick39_len; case 39: return Kick40_len; case 40: return Kick41_len; case 41: return Kick42_len;
-			case 42: return Kick43_len; case 43: return Kick44_len; case 44: return Kick45_len; case 45: return Kick46_len; case 46: return Kick47_len; case 47: return Kick48_len;
-			case 48: return Kick49_len; case 49: return Kick50_len; case 50: return Kick51_len; case 51: return Kick52_len; case 52: return Kick53_len; case 53: return Kick54_len;
-			case 54: return Kick55_len; case 55: return Kick56_len; case 56: return Kick57_len; case 57: return Kick58_len; case 58: return Kick59_len; case 59: return Kick60_len;
+			case 12: return Kick13_len; case 13: return Kick14_len; case 14: return Kick15_len; case 15: return Kick16_len; 
 			default: return 0;
 		}
 	}
@@ -168,7 +154,7 @@ struct Kick : Module {
 	
 		// --- VOLUME CV ---
 		float volume = inputs[VOLCVIN_INPUT].isConnected() ? std::clamp(inputs[VOLCVIN_INPUT].getVoltage() / 5.f, 0.f, 1.f) : 1.f;
-		outputs[AUDIOOUT_OUTPUT].setVoltage(output * volume * 5.f);
+		outputs[AUDIOOUT_OUTPUT].setVoltage(output * volume * 10.f);
 	}
 };	
 
