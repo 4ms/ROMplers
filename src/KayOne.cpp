@@ -1,6 +1,14 @@
 #include "plugin.hpp"
 #include "KayOneSamples.hpp"
 
+struct SpeedQuantity : ParamQuantity {
+	std::string getDisplayValueString() override {
+		float v = getValue();
+		float display = (v >= 0.f) ? (v + 1.f) : (v - 1.f);
+		return string::f("%.3gx", display);
+	}
+};
+
 struct KayOne : Module {
 	enum ParamId {
 		SPEED_PARAM,
@@ -79,7 +87,7 @@ struct KayOne : Module {
 	KayOne() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
-		configParam(SPEED_PARAM, 0.f, 2.f, 1.0f, "Speed", "%", 0.f, 100.f);
+		configParam<SpeedQuantity>(SPEED_PARAM, -1.f, 1.f, 0.f, "Speed");
 		configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length", "%", 0.f, 100.f);
 		configSwitch(LOOP_PARAM, 0.f, 1.f, 0.f, "Loop", {"Off", "On"});
 
@@ -147,7 +155,7 @@ struct KayOne : Module {
 		static const float speedCVScale = 0.1f;  // (1/5 * 0.5)
 		static const float lengthCVScale = 0.1f;
 	
-		float knobSpeed = 0.01f + params[SPEED_PARAM].getValue() * (1.0f - 0.01f);
+		float knobSpeed = 0.01f + (params[SPEED_PARAM].getValue() + 1.f) * (1.0f - 0.01f);
 		float normSpeed = std::clamp(knobSpeed + inputs[SPEEDCVIN_INPUT].getVoltage() * speedCVScale, 0.01f, 2.0f);
 		float speed = SPEED_LOW + (normSpeed - 0.01f) * ((SPEED_HIGH - SPEED_LOW) / (1.0f - 0.01f));
 	

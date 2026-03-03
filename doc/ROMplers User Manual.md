@@ -13,14 +13,14 @@ Use this document to understand the behavior, controls, and design inspirations 
 - Loop inputs respond to a rising edge gate or trigger above 0.6v
 
 ---
-## AyysKing — Ace King drums 
+## AyysKing — Ace King drums
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/AyysKing.png" width="200">
 
 Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 
-- **Length**: Sample file length. 
-- **Speed**: Changes the playback speed and resolution of the drum samples.
+- **Length**: Sample file length.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease.
 - **Loop**: Turns looping on and off for entire drum kit.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
@@ -34,7 +34,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 “Real” clap samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Changes the playback speed and resolution of the drum samples.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -49,7 +49,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 “Real” closed hi-hat samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Changes the playback speed and resolution of the drum samples.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -64,7 +64,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 “Real” crash samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Changes the playback speed and resolution of the drum samples.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -78,9 +78,9 @@ Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 
 DR-55 samples with playback speed, sample length, looping, and direct outs.
 
-- **Length**: Sample file length for all samples. 
-- **Speed**: Changes the playback speed and resolution of all samples.
-- **Loop**: Turns looping on and off for all samples. 
+- **Length**: Sample file length for all samples.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease.
+- **Loop**: Turns looping on and off for all samples.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
 - **Outputs**: Audio output, 10vpp.
@@ -92,9 +92,9 @@ DR-55 samples with playback speed, sample length, looping, and direct outs.
 
 KR55 samples with playback speed, sample length, and looping.
 
-- **Length**: Sample file length for all samples. 
-- **Speed**: Changes the playback speed and resolution of all samples.
-- **Loop**: Turns looping on and off for all samples. 
+- **Length**: Sample file length for all samples.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease.
+- **Loop**: Turns looping on and off for all samples.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
 - **Outputs**: Audio output, 10vpp.
@@ -106,9 +106,9 @@ KR55 samples with playback speed, sample length, and looping.
 
 Casio SK-1 samples with playback speed, sample length, and looping.
 
-- **Length**: Sample file length for all samples. 
-- **Speed**: Changes the playback speed and resolution of all samples.
-- **Loop**: Turns looping on and off for all samples. 
+- **Length**: Sample file length for all samples.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease.
+- **Loop**: Turns looping on and off for all samples.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
 - **Outputs**: Audio output, 10vpp.
@@ -121,7 +121,7 @@ Casio SK-1 samples with playback speed, sample length, and looping.
 “Real” kick samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Changes the playback speed and resolution of the drum samples.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -136,7 +136,7 @@ Casio SK-1 samples with playback speed, sample length, and looping.
 “Real” open hi-hat samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Changes the playback speed and resolution of the drum samples.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -167,7 +167,7 @@ Pitched orchestra hits.
 “Real” auxiliary percussion samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Changes the playback speed and resolution of the drum samples.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -182,7 +182,7 @@ Pitched orchestra hits.
 “Real” ride samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Changes the playback speed and resolution of the drum samples.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -197,7 +197,7 @@ Pitched orchestra hits.
 “Real” rimshot samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Changes the playback speed and resolution of the drum samples.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -211,9 +211,9 @@ Pitched orchestra hits.
 
 CR-78 samples with playback speed, sample length, looping, and direct outs.
 
-- **Length**: Sample file length for all samples. 
-- **Speed**: Changes the playback speed and resolution of all samples.
-- **Loop**: Turns looping on and off for all samples. 
+- **Length**: Sample file length for all samples.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease.
+- **Loop**: Turns looping on and off for all samples.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
 - **Outputs**: Audio output, 10vpp.
@@ -225,9 +225,9 @@ CR-78 samples with playback speed, sample length, looping, and direct outs.
 
 TR-727 samples with playback speed, sample length, looping, and direct outs.
 
-- **Length**: Sample file length for all samples. 
-- **Speed**: Changes the playback speed and resolution of all samples.
-- **Loop**: Turns looping on and off for all samples. 
+- **Length**: Sample file length for all samples.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease.
+- **Loop**: Turns looping on and off for all samples.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
 - **Outputs**: Audio output, 10vpp.
@@ -239,9 +239,9 @@ TR-727 samples with playback speed, sample length, looping, and direct outs.
 
 TR-606 samples with playback speed, sample length, and looping.
 
-- **Length**: Sample file length for all samples. 
-- **Speed**: Changes the playback speed and resolution of all samples.
-- **Loop**: Turns looping on and off for all samples. 
+- **Length**: Sample file length for all samples.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease.
+- **Loop**: Turns looping on and off for all samples.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
 - **Outputs**: Audio output, 10vpp.
@@ -253,9 +253,9 @@ TR-606 samples with playback speed, sample length, and looping.
 
 Synsonics samples with playback speed, sample length, and looping.
 
-- **Length**: Sample file length for all samples. 
-- **Speed**: Changes the playback speed and resolution of all samples.
-- **Loop**: Turns looping on and off for all samples. 
+- **Length**: Sample file length for all samples.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease.
+- **Loop**: Turns looping on and off for all samples.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
 - **Outputs**: Audio output, 10vpp.
@@ -283,7 +283,7 @@ The only bass sample anyone ever needs.
 “Real” snare samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Changes the playback speed and resolution of the drum samples.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -298,7 +298,7 @@ The only bass sample anyone ever needs.
 “Real” tom samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Changes the playback speed and resolution of the drum samples.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 

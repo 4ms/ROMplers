@@ -1,6 +1,14 @@
 #include "plugin.hpp"
 #include "SicksOhSamples.hpp"
 
+struct SpeedQuantity : ParamQuantity {
+	std::string getDisplayValueString() override {
+		float v = getValue();
+		float display = (v >= 0.f) ? (v + 1.f) : (v - 1.f);
+		return string::f("%.3gx", display);
+	}
+};
+
 struct SicksOh : Module {
 	enum ParamId {
 		SPEED_PARAM,
@@ -82,7 +90,7 @@ struct SicksOh : Module {
 	SicksOh() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
-		configParam(SPEED_PARAM, 0.f, 2.f, 1.f, "Speed", "%", 0.f, 100.f);
+		configParam<SpeedQuantity>(SPEED_PARAM, -1.f, 1.f, 0.f, "Speed");
 		configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length", "%", 0.f, 100.f);
 		configSwitch(LOOP_PARAM, 0.f, 1.f, 0.f, "Loop", {"Off", "On"});
 
@@ -155,7 +163,7 @@ struct SicksOh : Module {
 
 	void process(const ProcessArgs& args) override {
 		// Precompute speed (scaled with CV), std::clamp and map to range
-		float knobSpeed = 0.01f + params[SPEED_PARAM].getValue() * (1.0f - 0.01f);
+		float knobSpeed = 0.01f + (params[SPEED_PARAM].getValue() + 1.f) * (1.0f - 0.01f);
 		float speedCV = std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -5.f, 5.f);
 		float normSpeed = std::clamp(knobSpeed + (speedCV / 5.f) * 0.5f, 0.01f, 2.0f);
 		float speed = SPEED_LOW + (normSpeed - 0.01f) * ((SPEED_HIGH - SPEED_LOW) / (1.0f - 0.01f));

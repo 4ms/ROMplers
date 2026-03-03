@@ -1,6 +1,14 @@
 #include "plugin.hpp"
 #include "DeeArrSamples.hpp" // Make sure this provides raw byte arrays DAKick, DASnare, DAHat, DARim
 
+struct SpeedQuantity : ParamQuantity {
+	std::string getDisplayValueString() override {
+		float v = getValue();
+		float display = (v >= 0.f) ? (v + 1.f) : (v - 1.f);
+		return string::f("%.3gx", display);
+	}
+};
+
 struct DeeArr : Module {
 	enum ParamId {
 		SPEED_PARAM,
@@ -74,7 +82,7 @@ struct DeeArr : Module {
 
 	DeeArr() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam(SPEED_PARAM, 0.f, 1.f, 0.5f, "Speed", "%", 0.f, 200.f);
+		configParam<SpeedQuantity>(SPEED_PARAM, -1.f, 1.f, 0.f, "Speed");
 		configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length", "%", 0.f, 100.f);
 		configSwitch(LOOP_PARAM, 0.f, 1.f, 0.f, "Loop", {"Off", "On"});
 		configSwitch(KICKPUSH_PARAM, 0.f, 1.f, 0.f, "Kick Trig", {"Off", "On"});
@@ -116,7 +124,7 @@ struct DeeArr : Module {
 
 	void process(const ProcessArgs& args) override {
 		// --- Precalculate speed with CV ---
-		float knobSpeedV = params[SPEED_PARAM].getValue() * 5.f;  // 0–1 → 0–5V
+		float knobSpeedV = (params[SPEED_PARAM].getValue() + 1.f) * 2.5f;  // -1..1 → 0–5V
 		float speedCVV = 0.f;
 		if (inputs[SPEEDCVIN_INPUT].isConnected())
 			speedCVV = std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -10.f, 10.f) * 0.5f; // -10..10 → -5..5

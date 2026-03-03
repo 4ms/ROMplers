@@ -1,6 +1,14 @@
 #include "plugin.hpp"
 #include "SehvenTooSamples.hpp"
 
+struct SpeedQuantity : ParamQuantity {
+	std::string getDisplayValueString() override {
+		float v = getValue();
+		float display = (v >= 0.f) ? (v + 1.f) : (v - 1.f);
+		return string::f("%.3gx", display);
+	}
+};
+
 struct SehvenToo : Module {
     enum ParamId {
         SPEED_PARAM,
@@ -104,7 +112,7 @@ struct SehvenToo : Module {
 
     SehvenToo() {
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-        configParam(SPEED_PARAM, 0.f, 1.f, 0.5f, "Speed", "%", 0.f, 100.f);
+        configParam<SpeedQuantity>(SPEED_PARAM, -1.f, 1.f, 0.f, "Speed");
         configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length", "%", 0.f, 100.f);
         configSwitch(LOOP_PARAM, 0.f, 1.f, 0.f, "Loop", {"Off", "On"});
         configSwitch(CONGALPUSH_PARAM, 0.f, 1.f, 0.f, "Conga Lo Trig", {"Off", "On"});
@@ -220,7 +228,7 @@ struct SehvenToo : Module {
 
     void process(const ProcessArgs& args) override {
         // --- Speed ---
-        float knobSpeed = params[SPEED_PARAM].getValue() * 5.f;  // 0-1 → 0-5
+        float knobSpeed = (params[SPEED_PARAM].getValue() + 1.f) * 2.5f;  // -1..1 → 0-5
         float speedCV = inputs[SPEEDCVIN_INPUT].isConnected() ? inputs[SPEEDCVIN_INPUT].getVoltage() : 0.f;
         speedCV = std::clamp(speedCV * 0.5f, -5.f, 5.f);         // -10..10 → -5..5
         float combinedSpeed = knobSpeed + speedCV;               // sum
