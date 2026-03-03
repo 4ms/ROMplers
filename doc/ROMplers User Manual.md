@@ -33,7 +33,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 
 “Real” clap samples with playback speed, velocity, and a decay envelope.
 
-- **Sample**: Sample selection. There are 9 total samples for this module.
+- **Sample**: Sample selection. There are 16 total samples for this module.
 - **Pitch**: Changes the playback speed and resolution of the drum samples.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
@@ -48,7 +48,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 
 “Real” closed hi-hat samples with playback speed, velocity, and a decay envelope.
 
-- **Sample**: Sample selection. There are 21 total samples for this module.
+- **Sample**: Sample selection. There are 16 total samples for this module.
 - **Pitch**: Changes the playback speed and resolution of the drum samples.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
@@ -63,7 +63,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 
 “Real” crash samples with playback speed, velocity, and a decay envelope.
 
-- **Sample**: Sample selection. There are 20 total samples for this module.
+- **Sample**: Sample selection. There are 16 total samples for this module.
 - **Pitch**: Changes the playback speed and resolution of the drum samples.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
@@ -120,7 +120,7 @@ Casio SK-1 samples with playback speed, sample length, and looping.
 
 “Real” kick samples with playback speed, velocity, and a decay envelope.
 
-- **Sample**: Sample selection. There are 60 total samples for this module.
+- **Sample**: Sample selection. There are 16 total samples for this module.
 - **Pitch**: Changes the playback speed and resolution of the drum samples.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
@@ -135,7 +135,7 @@ Casio SK-1 samples with playback speed, sample length, and looping.
 
 “Real” open hi-hat samples with playback speed, velocity, and a decay envelope.
 
-- **Sample**: Sample selection. There are 17 total samples for this module.
+- **Sample**: Sample selection. There are 16 total samples for this module.
 - **Pitch**: Changes the playback speed and resolution of the drum samples.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
@@ -160,13 +160,13 @@ Pitched orchestra hits.
 - **Out**: Audio output, 10vpp.
 
 ---
-## Percussion — Assorted world percussion 
+## Percussion — Assorted acoustic hand percussion 
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/Percussion.png" width="60">
 
 “Real” auxiliary percussion samples with playback speed, velocity, and a decay envelope.
 
-- **Sample**: Sample selection. There are 96 total samples for this module.
+- **Sample**: Sample selection. There are 16 total samples for this module.
 - **Pitch**: Changes the playback speed and resolution of the drum samples.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
@@ -181,7 +181,7 @@ Pitched orchestra hits.
 
 “Real” ride samples with playback speed, velocity, and a decay envelope.
 
-- **Sample**: Sample selection. There are 15 total samples for this module.
+- **Sample**: Sample selection. There are 16 total samples for this module.
 - **Pitch**: Changes the playback speed and resolution of the drum samples.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
@@ -196,7 +196,7 @@ Pitched orchestra hits.
 
 “Real” rimshot samples with playback speed, velocity, and a decay envelope.
 
-- **Sample**: Sample selection. There are 9 total samples for this module.
+- **Sample**: Sample selection. There are 16 total samples for this module.
 - **Pitch**: Changes the playback speed and resolution of the drum samples.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
@@ -282,7 +282,7 @@ The only bass sample anyone ever needs.
 
 “Real” snare samples with playback speed, velocity, and a decay envelope.
 
-- **Sample**: Sample selection. There are 79 total samples for this module.
+- **Sample**: Sample selection. There are 16 total samples for this module.
 - **Pitch**: Changes the playback speed and resolution of the drum samples.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
@@ -297,7 +297,7 @@ The only bass sample anyone ever needs.
 
 “Real” tom samples with playback speed, velocity, and a decay envelope.
 
-- **Sample**: Sample selection. There are 80 total samples for this module.
+- **Sample**: Sample selection. There are 16 total samples for this module.
 - **Pitch**: Changes the playback speed and resolution of the drum samples.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
