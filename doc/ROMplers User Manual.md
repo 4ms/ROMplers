@@ -31,7 +31,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/Clap.png" width="60">
 
-“Real” clap samples with playback speed, velocity, and a decay envelope.
+“Real” acoustic clap samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
 - **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
@@ -46,7 +46,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/ClosedHiHat.png" width="60">
 
-“Real” closed hi-hat samples with playback speed, velocity, and a decay envelope.
+“Real” acoustic closed hi-hat samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
 - **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
@@ -61,7 +61,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/Crash.png" width="60">
 
-“Real” crash samples with playback speed, velocity, and a decay envelope.
+“Real” acoustic crash samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
 - **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
@@ -118,7 +118,7 @@ Casio SK-1 samples with playback speed, sample length, and looping.
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/Kick.png" width="60">
 
-“Real” kick samples with playback speed, velocity, and a decay envelope.
+“Real” acoustic kick samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
 - **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
@@ -133,7 +133,7 @@ Casio SK-1 samples with playback speed, sample length, and looping.
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/OpenHiHat.png" width="60">
 
-“Real” open hi-hat samples with playback speed, velocity, and a decay envelope.
+“Real” acoustic open hi-hat samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
 - **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
@@ -164,7 +164,7 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/Percussion.png" width="60">
 
-“Real” auxiliary percussion samples with playback speed, velocity, and a decay envelope.
+“Real” acoustic auxiliary percussion samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
 - **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
@@ -179,7 +179,7 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/Ride.png" width="60">
 
-“Real” ride samples with playback speed, velocity, and a decay envelope.
+“Real” acoustic ride samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
 - **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
@@ -194,7 +194,7 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/Rimshot.png" width="60">
 
-“Real” rimshot samples with playback speed, velocity, and a decay envelope.
+“Real” acoustic rimshot samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
 - **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
@@ -280,7 +280,7 @@ A slap bass sample meant to be controlled with a 1v per octave source such as a 
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/Snare.png" width="60">
 
-“Real” snare samples with playback speed, velocity, and a decay envelope.
+“Real” acoustic snare samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
 - **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
@@ -295,7 +295,7 @@ A slap bass sample meant to be controlled with a 1v per octave source such as a 
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/Tom.png" width="60">
 
-“Real” tom samples with playback speed, velocity, and a decay envelope.
+“Real” acoustic tom samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
 - **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
