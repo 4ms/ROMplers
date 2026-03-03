@@ -213,8 +213,10 @@ void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pu
 		}
 
 		if (!voice.playing) {
-		outputs[voice.outputId].setVoltage(0.f);
-		return;  // early exit if not playing
+			outputs[voice.outputId].setVoltage(0.f);
+			if (voice.lightId >= 0)
+				lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
+			return;  // early exit if not playing
 		}
 
 		int maxSamples = (int)(voice.sampleLength * lengthRatio);
