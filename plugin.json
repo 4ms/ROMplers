@@ -8,7 +8,7 @@
   "authorEmail": "4ms@4mscompany.com",
   "authorUrl": "https://4mscompany.com",
   "pluginUrl": "https://github.com/4ms/ROMplers/",
-  "manualUrl": "https://github.com/4ms/ROMplers/blob/main/doc/ROMplers%20User%20Manual.md",
+  "manualUrl": "https://github.com/4ms/ROMplers/blob/main/doc/ROMplersUserManual.md",
   "sourceUrl": "https://github.com/4ms/ROMplers/",
   "donateUrl": "",
   "changelogUrl": "https://github.com/4ms/ROMplers/blob/main/CHANGELOG.md",
@@ -170,7 +170,7 @@
       "name": "OrchHits",
       "description": "Pitched orchestra hits",
       "tags": [
-        "drum",
+        "Drum",
         "synth voice"
       ]
     }

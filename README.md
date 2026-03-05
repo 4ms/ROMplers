@@ -1,6 +1,4 @@
-# ROMplers Metamodule and VCV Rack Plugin 
+# ROMplers: Sampled drum module plugin for the 4ms Metamodule and VCV Rack
 
-## Version History
+[Read the docs here](doc/ROMplersUserManual.md)
 
-### v2.0.0 
-- Initial Release 
