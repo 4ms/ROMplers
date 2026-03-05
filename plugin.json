@@ -1,6 +1,6 @@
 {
   "slug": "4ms-ROMplers",
-  "name": "ROMplers",
+  "name": "4ms-ROMplers",
   "version": "2.0.0",
   "license": "GPL-3.0-or-later",
   "brand": "4ms",
@@ -24,7 +24,7 @@
     {
       "slug": "Clap",
       "name": "Clap",
-      "description": "'Real' clap samples with playback speed, velocity, and a decay envelope",
+      "description": "'Real' acoustic clap samples with playback speed, velocity, and a decay envelope",
       "tags": [
         "Drum"
       ]
@@ -32,7 +32,7 @@
     {
       "slug": "ClosedHat",
       "name": "ClosedHat",
-      "description": "'Real' closed hi-hat samples with playback speed, velocity, and a decay envelope",
+      "description": "'Real' acoustic closed hi-hat samples with playback speed, velocity, and a decay envelope",
       "tags": [
         "Drum"
       ]
@@ -40,7 +40,7 @@
     {
       "slug": "Crash",
       "name": "Crash",
-      "description": "'Real' crash samples with playback speed, velocity, and a decay envelope",
+      "description": "'Real' acoustic crash samples with playback speed, velocity, and a decay envelope",
       "tags": [
         "Drum"
       ]
@@ -72,7 +72,7 @@
     {
       "slug": "Kick",
       "name": "Kick",
-      "description": "'Real' kick samples with playback speed, velocity, and a decay envelope",
+      "description": "'Real' acoustic kick samples with playback speed, velocity, and a decay envelope",
       "tags": [
         "Drum"
       ]
@@ -80,7 +80,7 @@
     {
       "slug": "OpenHat",
       "name": "OpenHat",
-      "description": "'Real' open hi-hat samples with playback speed, velocity, and a decay envelope",
+      "description": "'Real' acoustic open hi-hat samples with playback speed, velocity, and a decay envelope",
       "tags": [
         "Drum"
       ]
@@ -88,7 +88,7 @@
     {
       "slug": "Percussion",
       "name": "Percussion",
-      "description": "'Real' auxillary percussion samples with playback speed, velocity, and a decay envelope",
+      "description": "'Real' acoustic auxillary percussion samples with playback speed, velocity, and a decay envelope",
       "tags": [
         "Drum"
       ]
@@ -96,7 +96,7 @@
     {
       "slug": "Ride",
       "name": "Ride",
-      "description": "'Real' ride samples with playback speed, velocity, and a decay envelope",
+      "description": "'Real' acoustic ride samples with playback speed, velocity, and a decay envelope",
       "tags": [
         "Drum"
       ]
@@ -104,7 +104,7 @@
     {
       "slug": "Rimshot",
       "name": "Rimshot",
-      "description": "'Real' rimshot samples with playback speed, velocity, and a decay envelope",
+      "description": "'Real' acoustic rimshot samples with playback speed, velocity, and a decay envelope",
       "tags": [
         "Drum"
       ]
@@ -128,7 +128,7 @@
     {
       "slug": "Slap",
       "name": "Slap",
-      "description": "The only pitched bass sample anyone ever needs",
+      "description": "The best pitched slap bass sample in the whole wide world.",
       "tags": [
         "Synth Voice"
       ]
@@ -152,7 +152,7 @@
     {
       "slug": "Snare",
       "name": "Snare",
-      "description": "'Real' snare samples with playback speed, velocity, and a decay envelope",
+      "description": "'Real' acoustic snare samples with playback speed, velocity, and a decay envelope",
       "tags": [
         "Drum"
       ]
@@ -160,7 +160,7 @@
     {
       "slug": "Tom",
       "name": "Tom",
-      "description": "'Real' tom samples with playback speed, velocity, and a decay envelope",
+      "description": "'Real' acoustic tom samples with playback speed, velocity, and a decay envelope",
       "tags": [
         "Drum"
       ]
