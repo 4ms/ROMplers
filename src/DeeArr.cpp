@@ -149,7 +149,7 @@ struct DeeArr : Module {
 				busSum += outputs[v->outputId].getVoltage();
 			}
 		}
-		outputs[SUM_OUTPUT].setVoltage(std::clamp(busSum * mainVol, -10.f, 10.f));
+		outputs[SUM_OUTPUT].setVoltage(std::clamp(busSum * mainVol * 4.f, -10.f, 10.f));
 	}
 
 

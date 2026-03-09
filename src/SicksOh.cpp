@@ -184,7 +184,7 @@ struct SicksOh : Module {
 				busSum += outputs[v->outputId].getVoltage();
 			}
 		}
-		outputs[SUM_OUTPUT].setVoltage(std::clamp(busSum * mainVol, -10.f, 10.f));
+		outputs[SUM_OUTPUT].setVoltage(std::clamp(busSum * mainVol * 2.f, -10.f, 10.f));
 	}
 
 	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId,
