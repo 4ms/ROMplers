@@ -24,12 +24,12 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="1.8078145"
-     inkscape:cx="95.695659"
-     inkscape:cy="242.83465"
+     inkscape:cx="174.24354"
+     inkscape:cy="233.43103"
      inkscape:window-width="1192"
      inkscape:window-height="1027"
-     inkscape:window-x="2300"
-     inkscape:window-y="34"
+     inkscape:window-x="2301"
+     inkscape:window-y="25"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer1" />
   <g
@@ -412,6 +412,13 @@
          d="M 70.95,34.84 69,33.71 c -1.43,2.75 -2.3,5.84 -2.44,9.12 h 2.26 c 0.14,-2.87 0.89,-5.57 2.14,-8 z"
          id="path28-9" />
     </g>
+    <ellipse
+       style="fill:#000000;stroke-width:1.41732;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"
+       id="path5"
+       cx="116.93"
+       cy="133.23097"
+       rx="13.768279"
+       ry="14.173228" />
   </g>
   <g
      inkscape:groupmode="layer"

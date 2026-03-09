@@ -568,6 +568,12 @@
          d="m 93.8,357.06 h -4.6 v -7.44 h 4.53 v 1.49 h -2.69 v 1.36 h 2.56 v 1.5 h -2.56 v 1.59 h 2.76 z"
          id="path77" />
     </g>
+    <circle
+       style="fill:#000000;stroke-width:1.41732;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"
+       id="path1"
+       cx="125.29134"
+       cy="73.699997"
+       r="13.464567" />
   </g>
   <g
      inkscape:groupmode="layer"
