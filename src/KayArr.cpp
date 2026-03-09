@@ -221,8 +221,7 @@ struct KayArrWidget : ModuleWidget {
 
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(11.24, 15.501)), module, KayArr::LENGTH_PARAM));
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(31.249, 15.501)), module, KayArr::SPEED_PARAM));
-
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(49.731, 15.501)), module, KayArr::MAINVOL_PARAM));
+		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(49.731, 15.501)), module, KayArr::MAINVOL_PARAM));
 
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(6.999, 42.002)), module, KayArr::KICKPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(6.999, 42.002)), module, KayArr::KICK_LIGHT));

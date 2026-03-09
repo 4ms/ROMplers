@@ -276,8 +276,7 @@ struct SeaArrWidget : ModuleWidget {
 
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(16.799, 15.501)), module, SeaArr::LENGTH_PARAM));
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(38.799, 15.501)), module, SeaArr::SPEED_PARAM));
-
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(59.351, 15.501)), module, SeaArr::MAINVOL_PARAM));
+		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(59.351, 15.501)), module, SeaArr::MAINVOL_PARAM));
 
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(8.798, 42.002)), module, SeaArr::KICKPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(8.798, 42.002)), module, SeaArr::KICK_LIGHT));

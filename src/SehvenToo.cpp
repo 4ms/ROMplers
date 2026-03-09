@@ -275,8 +275,7 @@ struct SehvenTooWidget : ModuleWidget {
 
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(16.799, 15.501)), module, SehvenToo::LENGTH_PARAM));
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(38.799, 15.501)), module, SehvenToo::SPEED_PARAM));
-
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(59.351, 15.501)), module, SehvenToo::MAINVOL_PARAM));
+		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(59.351, 15.501)), module, SehvenToo::MAINVOL_PARAM));
 
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(8.798, 42.002)), module, SehvenToo::CONGALPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(8.798, 42.002)), module, SehvenToo::CONGAL_LIGHT));

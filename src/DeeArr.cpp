@@ -216,8 +216,7 @@ struct DeeArrWidget : ModuleWidget {
 
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(25.4, 19.001)), module, DeeArr::SPEED_PARAM));
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(9.751, 29.2)), module, DeeArr::LENGTH_PARAM));
-
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(41.25, 27.49)), module, DeeArr::MAINVOL_PARAM));
+		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(41.25, 29.2)), module, DeeArr::MAINVOL_PARAM));
 
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 67.0)), module, DeeArr::KICKPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 67.0)), module, DeeArr::KICK_LIGHT));

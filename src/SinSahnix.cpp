@@ -240,7 +240,7 @@ struct SinSahnixWidget : ModuleWidget {
 		addParam(createParamCentered<Knob9mm>(mm2px(Vec(7.751, 12.45)), module, SinSahnix::LENGTH_PARAM));
 		addParam(createParamCentered<Knob9mm>(mm2px(Vec(27.002, 12.45)), module, SinSahnix::SPEED_PARAM));
 
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(44.2, 12.45)), module, SinSahnix::MAINVOL_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(44.2, 12.45)), module, SinSahnix::MAINVOL_PARAM));
 
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 37)), module, SinSahnix::KICKPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 37)), module, SinSahnix::KICK_LIGHT));

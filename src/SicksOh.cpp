@@ -248,8 +248,7 @@ struct SicksOhWidget : ModuleWidget {
 
 		addParam(createParamCentered<Knob9mm>(mm2px(Vec(7.751, 12.45)), module, SicksOh::LENGTH_PARAM));
 		addParam(createParamCentered<Knob9mm>(mm2px(Vec(27.002, 12.45)), module, SicksOh::SPEED_PARAM));
-
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(44.2, 12.45)), module, SicksOh::MAINVOL_PARAM));
+		addParam(createParamCentered<Knob9mm>(mm2px(Vec(44.2, 12.45)), module, SicksOh::MAINVOL_PARAM));
 
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 37.0)), module, SicksOh::KICKPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 37.0)), module, SicksOh::KICK_LIGHT));
