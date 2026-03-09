@@ -7,24 +7,24 @@ Use this document to understand the behavior, controls, and design inspirations 
 ## CV + Knob Behavior
 
 - All unlabeled jacks are CV inputs for the associated parameter next to them. 
-- All CV inputs are bipolar and clamped to 10vpp. 
-- Each knob functions as a 10vpp offset. 
-- Trigger inputs are conditioned to have rising edge detection and ignore pulse width. 
-- Loop inputs respond to a rising edge gate or trigger above 0.6v
+- All CV inputs are bipolar and clamped to 10vpp.
+- Each knob functions as a 10vpp offset.
+- Trigger inputs are conditioned to have rising edge detection and ignore pulse width.
 
 ---
 ## AyysKing — Ace King drums
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/AyysKing.png" width="200">
 
-Ace Tone Rhythm King samples with playback speed, sample length, and looping.
+Ace Tone Rhythm King samples with playback speed, sample length, and a mix output.
 
 - **Length**: Sample file length.
 - **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
-- **Loop**: Turns looping on and off for entire drum kit.
+- **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
-- **Outputs**: Audio output, 10vpp.
+- **Outputs**: Individual audio outputs, ±5V.
+- **Sum**: Mix output. All drums not individually patched are summed at unity gain, averaged, scaled by Main Volume, and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## Clap — Acoustic claps
@@ -76,42 +76,45 @@ Ace Tone Rhythm King samples with playback speed, sample length, and looping.
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/DeeArr.png" width="150">
 
-DR-55 samples with playback speed, sample length, looping, and direct outs.
+DR-55 samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
 - **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
-- **Loop**: Turns looping on and off for all samples.
+- **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
-- **Outputs**: Audio output, 10vpp.
+- **Outputs**: Individual audio outputs, ±5V.
+- **Sum**: Mix output. All drums not individually patched are summed at unity gain, averaged, scaled by Main Volume, and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## KayArr — KR-55 drums
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/KayArr.png" width="150">
 
-KR55 samples with playback speed, sample length, and looping.
+KR55 samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
 - **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
-- **Loop**: Turns looping on and off for all samples.
+- **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
-- **Outputs**: Audio output, 10vpp.
+- **Outputs**: Individual audio outputs, ±5V.
+- **Sum**: Mix output. All drums not individually patched are summed at unity gain, averaged, scaled by Main Volume, and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## KayOne — SK-1 drums
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/KayOne.png" width="150">
 
-Casio SK-1 samples with playback speed, sample length, and looping.
+Casio SK-1 samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
 - **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
-- **Loop**: Turns looping on and off for all samples.
+- **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
-- **Outputs**: Audio output, 10vpp.
+- **Outputs**: Individual audio outputs, ±5V.
+- **Sum**: Mix output. All drums not individually patched are summed at unity gain, averaged, scaled by Main Volume, and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## Kick — Acoustic kick drums
@@ -209,56 +212,60 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/SeaArr.png" width="200">
 
-CR-78 samples with playback speed, sample length, looping, and direct outs.
+CR-78 samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
 - **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
-- **Loop**: Turns looping on and off for all samples.
+- **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
-- **Outputs**: Audio output, 10vpp.
+- **Outputs**: Individual audio outputs, ±5V.
+- **Sum**: Mix output. All drums not individually patched are summed at unity gain, averaged, scaled by Main Volume, and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## SehvenToo — TR-727 drums
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/SehvenToo.png" width="200">
 
-TR-727 samples with playback speed, sample length, looping, and direct outs.
+TR-727 samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
 - **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
-- **Loop**: Turns looping on and off for all samples.
+- **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
-- **Outputs**: Audio output, 10vpp.
+- **Outputs**: Individual audio outputs, ±5V.
+- **Sum**: Mix output. All drums not individually patched are summed at unity gain, averaged, scaled by Main Volume, and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## SicksOh — TR-606 drums
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/SicksOh.png" width="150">
 
-TR-606 samples with playback speed, sample length, and looping.
+TR-606 samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
 - **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
-- **Loop**: Turns looping on and off for all samples.
+- **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
-- **Outputs**: Audio output, 10vpp.
+- **Outputs**: Individual audio outputs, ±5V.
+- **Sum**: Mix output. All drums not individually patched are summed at unity gain, averaged, scaled by Main Volume, and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## SinSahnix — Synsonics drums
 
 <img src="https://github.com/4ms/ROMplers/blob/main/doc/SinSahnix.png" width="150">
 
-Synsonics samples with playback speed, sample length, and looping.
+Synsonics samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
 - **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
-- **Loop**: Turns looping on and off for all samples.
+- **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
-- **Outputs**: Audio output, 10vpp.
+- **Outputs**: Individual audio outputs, ±5V.
+- **Sum**: Mix output. All drums not individually patched are summed at unity gain, averaged, scaled by Main Volume, and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## Slap — Pitched slap bass

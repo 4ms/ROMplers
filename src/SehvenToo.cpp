@@ -13,7 +13,7 @@ struct SehvenToo : Module {
     enum ParamId {
         SPEED_PARAM,
         LENGTH_PARAM,
-        LOOP_PARAM,
+        MAINVOL_PARAM,
         CONGALPUSH_PARAM,
         CONGAHPUSH_PARAM,
         CONGAHMPUSH_PARAM,
@@ -31,7 +31,6 @@ struct SehvenToo : Module {
     enum InputId {
         SPEEDCVIN_INPUT,
         LENGTHCVIN_INPUT,
-        LOOPCVIN_INPUT,
         CONGALTRIGIN_INPUT,
         CONGAHTRIGIN_INPUT,
         CONGAHMTRIGIN_INPUT,
@@ -59,6 +58,7 @@ struct SehvenToo : Module {
         MARACAOUT_OUTPUT,
         CABASAOUT_OUTPUT,
         WHISTLEOUT_OUTPUT,
+        SUM_OUTPUT,
         OUTPUTS_LEN
     };
     enum LightId {
@@ -74,7 +74,6 @@ struct SehvenToo : Module {
         MARACA_LIGHT,
         CABASA_LIGHT,
         WHISTLE_LIGHT,
-        LOOP_LIGHT, 
         LIGHTS_LEN
     };
 
@@ -114,7 +113,7 @@ struct SehvenToo : Module {
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
         configParam<SpeedQuantity>(SPEED_PARAM, -1.f, 1.f, 0.f, "Speed");
         configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length", "%", 0.f, 100.f);
-        configSwitch(LOOP_PARAM, 0.f, 1.f, 0.f, "Loop", {"Off", "On"});
+        configParam(MAINVOL_PARAM, 0.f, 1.f, 1.f, "Main Volume", "%", 0.f, 100.f);
         configSwitch(CONGALPUSH_PARAM, 0.f, 1.f, 0.f, "Conga Lo Trig", {"Off", "On"});
         configSwitch(CONGAHPUSH_PARAM, 0.f, 1.f, 0.f, "Conga Hi Trig", {"Off", "On"});
         configSwitch(CONGAHMPUSH_PARAM, 0.f, 1.f, 0.f, "Conga Hi Mute Trig", {"Off", "On"});
@@ -129,7 +128,6 @@ struct SehvenToo : Module {
         configSwitch(WHISTLEPUSH_PARAM, 0.f, 1.f, 0.f, "Whistle Trig", {"Off", "On"});
         configInput(SPEEDCVIN_INPUT, "Speed CV");
         configInput(LENGTHCVIN_INPUT, "Length CV");
-        configInput(LOOPCVIN_INPUT, "Loop CV");
         configInput(CONGALTRIGIN_INPUT, "Conga Lo Trig");
         configInput(CONGAHTRIGIN_INPUT, "Conga Hi Trig");
         configInput(CONGAHMTRIGIN_INPUT, "Conga Hi Mute Trig");
@@ -154,8 +152,8 @@ struct SehvenToo : Module {
         configOutput(MARACAOUT_OUTPUT, "Maraca");
         configOutput(CABASAOUT_OUTPUT, "Cabasa");
         configOutput(WHISTLEOUT_OUTPUT, "Whistle");
+        configOutput(SUM_OUTPUT, "Sum");
 
-        // Sample-to-voice bindings
         congaLVoice = createVoice(STCongaL, sizeof(STCongaL), CONGALOUT_OUTPUT, CONGAL_LIGHT);
         congaHVoice = createVoice(STCongaHOpen, sizeof(STCongaHOpen), CONGAHOUT_OUTPUT, CONGAH_LIGHT);
         congaHMVoice = createVoice(STCongaHMute, sizeof(STCongaHMute), CONGAHMOUT_OUTPUT, CONGAHM_LIGHT);
@@ -171,27 +169,25 @@ struct SehvenToo : Module {
     }
 
     void processVoice(const ProcessArgs& args, Voice& v, int trigInId, int pushParamId,
-        float speed, float lengthRatio, bool loopEnabled) {
-    
+        float speed, float lengthRatio) {
+
         bool inTrig = inputs[trigInId].getVoltage() > 1.f;
         bool btnTrig = params[pushParamId].getValue() > 0.5f;
         bool inputRising = inTrig && !v.lastInputTrigger;
         bool buttonRising = btnTrig && !v.lastButtonTrigger;
-    
-        // track firing for lights
+
         bool fired = inputRising || buttonRising;
-    
-        if (fired || (loopEnabled && !v.playing)) {
+
+        if (fired) {
             v.playing = true;
             v.samplePos = 0.f;
-            fired = true; // ensure light triggers
         }
-    
+
         v.lastInputTrigger = inTrig;
         v.lastButtonTrigger = btnTrig;
-    
+
         int maxSamples = (int)(v.sampleLength * lengthRatio);
-    
+
         if (v.playing) {
             int idx = int(v.samplePos);
             if (idx < maxSamples) {
@@ -200,19 +196,13 @@ struct SehvenToo : Module {
                 outputs[v.outputId].setVoltage(out * 10.f);
                 v.samplePos += speed;
             } else {
-                if (loopEnabled) {
-                    v.samplePos = 0.f;
-                    fired = true; // 🔴 loop restart triggers light
-                } else {
-                    v.playing = false;
-                    outputs[v.outputId].setVoltage(0.f);
-                }
+                v.playing = false;
+                outputs[v.outputId].setVoltage(0.f);
             }
         } else {
             outputs[v.outputId].setVoltage(0.f);
         }
-    
-        // light handling: blink on trigger or loop restart
+
         if (v.lightId >= 0) {
             if (fired)
                 lights[v.lightId].setBrightness(1.f);
@@ -220,59 +210,58 @@ struct SehvenToo : Module {
                 lights[v.lightId].setBrightnessSmooth(0.f, args.sampleTime);
         }
     }
-    
-
-    bool loopState = false;           // the current loopState on/off state
-	bool lastLoopButton = false;      // previous frame state for the button
-	bool lastLoopCVTrigger = false;   // previous frame state for the CV
 
     void process(const ProcessArgs& args) override {
         // --- Speed ---
-        float knobSpeed = (params[SPEED_PARAM].getValue() + 1.f) * 2.5f;  // -1..1 → 0-5
+        float knobSpeed = (params[SPEED_PARAM].getValue() + 1.f) * 2.5f;
         float speedCV = inputs[SPEEDCVIN_INPUT].isConnected() ? inputs[SPEEDCVIN_INPUT].getVoltage() : 0.f;
-        speedCV = std::clamp(speedCV * 0.5f, -5.f, 5.f);         // -10..10 → -5..5
-        float combinedSpeed = knobSpeed + speedCV;               // sum
-        float normSpeed = std::clamp(combinedSpeed / 5.f, 0.f, 1.f); // normalize 0-1
+        speedCV = std::clamp(speedCV * 0.5f, -5.f, 5.f);
+        float combinedSpeed = knobSpeed + speedCV;
+        float normSpeed = std::clamp(combinedSpeed / 5.f, 0.f, 1.f);
         float speed = SPEED_MIN + normSpeed * (SPEED_MAX - SPEED_MIN);
-    
+
         // --- Length ---
-        float knobLength = params[LENGTH_PARAM].getValue() * 5.f;  // 0-1 → 0-5
+        float knobLength = params[LENGTH_PARAM].getValue() * 5.f;
         float lengthCV = inputs[LENGTHCVIN_INPUT].isConnected() ? inputs[LENGTHCVIN_INPUT].getVoltage() : 0.f;
-        lengthCV = std::clamp(lengthCV * 0.5f, -5.f, 5.f);        // -10..10 → -5..5
-        float combinedLength = knobLength + lengthCV;             // sum
-        float normLength = std::clamp(combinedLength / 5.f, 0.f, 1.f); // normalize 0-1
+        lengthCV = std::clamp(lengthCV * 0.5f, -5.f, 5.f);
+        float combinedLength = knobLength + lengthCV;
+        float normLength = std::clamp(combinedLength / 5.f, 0.f, 1.f);
         float lengthRatio = LENGTH_MIN + normLength * (LENGTH_MAX - LENGTH_MIN);
-    
-		// --- Loop mode ---
-		bool loopButton = params[LOOP_PARAM].getValue() > 0.5f;
-		float loopCV = inputs[LOOPCVIN_INPUT].isConnected() ? inputs[LOOPCVIN_INPUT].getVoltage() : 0.f;
-		bool loopButtonRising = loopButton && !lastLoopButton;
-		if (loopButtonRising)
-			loopState = !loopState;
-		static bool lastGateHigh = false; // keeps track of gate state across calls
-		bool gateHigh = loopCV > 0.6f;
-		if (gateHigh && !lastGateHigh)
-			loopState = !loopState;
-		lastGateHigh = gateHigh;
 
-		lastLoopButton = loopButton;
+        processVoice(args, congaLVoice, CONGALTRIGIN_INPUT, CONGALPUSH_PARAM, speed, lengthRatio);
+        processVoice(args, congaHVoice, CONGAHTRIGIN_INPUT, CONGAHPUSH_PARAM, speed, lengthRatio);
+        processVoice(args, congaHMVoice, CONGAHMTRIGIN_INPUT, CONGAHMPUSH_PARAM, speed, lengthRatio);
+        processVoice(args, bongoLVoice, BONGOLTRIGIN_INPUT, BONGOLPUSH_PARAM, speed, lengthRatio);
+        processVoice(args, bongoHVoice, BONGOHTRIGIN_INPUT, BONGOHPUSH_PARAM, speed, lengthRatio);
+        processVoice(args, timbaleLVoice, TIMBALELTRIGIN_INPUT, TIMBALELPUSH_PARAM, speed, lengthRatio);
+        processVoice(args, timbaleHVoice, TIMBALEHTRIGIN_INPUT, TIMBALEHPUSH_PARAM, speed, lengthRatio);
+        processVoice(args, agogoLVoice, AGOGOLTRIGIN_INPUT, AGOGOLPUSH_PARAM, speed, lengthRatio);
+        processVoice(args, agogoHVoice, AGOGOHTRIGIN_INPUT, AGOGOHPUSH_PARAM, speed, lengthRatio);
+        processVoice(args, maracaVoice, MARACATRIGIN_INPUT, MARACAPUSH_PARAM, speed, lengthRatio);
+        processVoice(args, cabasaVoice, CABASATRIGIN_INPUT, CABASAPUSH_PARAM, speed, lengthRatio);
+        processVoice(args, whistleVoice, WHISTLETRIGIN_INPUT, WHISTLEPUSH_PARAM, speed, lengthRatio);
 
-		lights[LOOP_LIGHT].setBrightnessSmooth(loopState, args.sampleTime);
-    
-        processVoice(args, congaLVoice, CONGALTRIGIN_INPUT, CONGALPUSH_PARAM, speed, lengthRatio, loopState);
-        processVoice(args, congaHVoice, CONGAHTRIGIN_INPUT, CONGAHPUSH_PARAM, speed, lengthRatio, loopState);
-        processVoice(args, congaHMVoice, CONGAHMTRIGIN_INPUT, CONGAHMPUSH_PARAM, speed, lengthRatio, loopState);
-        processVoice(args, bongoLVoice, BONGOLTRIGIN_INPUT, BONGOLPUSH_PARAM, speed, lengthRatio, loopState);
-        processVoice(args, bongoHVoice, BONGOHTRIGIN_INPUT, BONGOHPUSH_PARAM, speed, lengthRatio, loopState);
-        processVoice(args, timbaleLVoice, TIMBALELTRIGIN_INPUT, TIMBALELPUSH_PARAM, speed, lengthRatio, loopState);
-        processVoice(args, timbaleHVoice, TIMBALEHTRIGIN_INPUT, TIMBALEHPUSH_PARAM, speed, lengthRatio, loopState);
-        processVoice(args, agogoLVoice, AGOGOLTRIGIN_INPUT, AGOGOLPUSH_PARAM, speed, lengthRatio, loopState);
-        processVoice(args, agogoHVoice, AGOGOHTRIGIN_INPUT, AGOGOHPUSH_PARAM, speed, lengthRatio, loopState);
-        processVoice(args, maracaVoice, MARACATRIGIN_INPUT, MARACAPUSH_PARAM, speed, lengthRatio, loopState);
-        processVoice(args, cabasaVoice, CABASATRIGIN_INPUT, CABASAPUSH_PARAM, speed, lengthRatio, loopState);
-        processVoice(args, whistleVoice, WHISTLETRIGIN_INPUT, WHISTLEPUSH_PARAM, speed, lengthRatio, loopState);
+        // --- Sum output ---
+        float mainVol = params[MAINVOL_PARAM].getValue();
+        float busSum = 0.f;
+        int busCount = 0;
+        Voice* allVoices[] = {
+            &congaLVoice, &congaHVoice, &congaHMVoice,
+            &bongoLVoice, &bongoHVoice,
+            &timbaleLVoice, &timbaleHVoice,
+            &agogoLVoice, &agogoHVoice,
+            &maracaVoice, &cabasaVoice, &whistleVoice
+        };
+        for (Voice* v : allVoices) {
+            if (!outputs[v->outputId].isConnected()) {
+                busSum += outputs[v->outputId].getVoltage();
+                busCount++;
+            }
+        }
+        float sumOut = busCount > 0 ? (busSum / busCount) * mainVol : 0.f;
+        outputs[SUM_OUTPUT].setVoltage(std::clamp(sumOut, -5.f, 5.f));
     }
-};    
+};
 
 struct SehvenTooWidget : ModuleWidget {
 	SehvenTooWidget(SehvenToo* module) {
@@ -287,8 +276,7 @@ struct SehvenTooWidget : ModuleWidget {
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(16.799, 15.501)), module, SehvenToo::LENGTH_PARAM));
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(38.799, 15.501)), module, SehvenToo::SPEED_PARAM));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(59.351, 15.501)), module, SehvenToo::LOOP_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(59.351, 15.501)), module, SehvenToo::LOOP_LIGHT));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(59.351, 15.501)), module, SehvenToo::MAINVOL_PARAM));
 
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(8.798, 42.002)), module, SehvenToo::CONGALPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(8.798, 42.002)), module, SehvenToo::CONGAL_LIGHT));
@@ -328,7 +316,6 @@ struct SehvenTooWidget : ModuleWidget {
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.849, 30.801)), module, SehvenToo::LENGTHCVIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(38.851, 30.801)), module, SehvenToo::SPEEDCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(59.351, 30.801)), module, SehvenToo::LOOPCVIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.798, 56.0)), module, SehvenToo::CONGALTRIGIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.5, 56.0)), module, SehvenToo::CONGAHTRIGIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.3, 56.0)), module, SehvenToo::CONGAHMTRIGIN_INPUT));
@@ -342,6 +329,7 @@ struct SehvenTooWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55.7, 99.001)), module, SehvenToo::CABASATRIGIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(67.501, 99.001)), module, SehvenToo::WHISTLETRIGIN_INPUT));
 
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(59.351, 30.801)), module, SehvenToo::SUM_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(8.798, 70.002)), module, SehvenToo::CONGALOUT_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.5, 70.002)), module, SehvenToo::CONGAHOUT_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.3, 70.002)), module, SehvenToo::CONGAHMOUT_OUTPUT));

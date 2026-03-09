@@ -1,5 +1,5 @@
 #include "plugin.hpp"
-#include "SeaArrSamples.hpp"  // Your samples header
+#include "SeaArrSamples.hpp"
 
 struct SpeedQuantity : ParamQuantity {
 	std::string getDisplayValueString() override {
@@ -13,7 +13,7 @@ struct SeaArr : Module {
 	enum ParamId {
 		SPEED_PARAM,
 		LENGTH_PARAM,
-		LOOP_PARAM,
+		MAINVOL_PARAM,
 		KICKPUSH_PARAM,
 		SNAREPUSH_PARAM,
 		HATPUSH_PARAM,
@@ -31,7 +31,6 @@ struct SeaArr : Module {
 	enum InputId {
 		SPEEDCVIN_INPUT,
 		LENGTHCVIN_INPUT,
-		LOOPCVIN_INPUT,
 		KICKTRIGIN_INPUT,
 		SNARETRIGIN_INPUT,
 		HATTRIGIN_INPUT,
@@ -59,6 +58,7 @@ struct SeaArr : Module {
 		TAMOUT_OUTPUT,
 		GUIROOUT_OUTPUT,
 		CYMOUT_OUTPUT,
+		SUM_OUTPUT,
 		OUTPUTS_LEN
 	};
 	enum LightId {
@@ -74,7 +74,6 @@ struct SeaArr : Module {
 		TAM_LIGHT,
 		GUIRO_LIGHT,
 		CYM_LIGHT,
-		LOOP_LIGHT,
 		LIGHTS_LEN
 	};
 
@@ -107,7 +106,7 @@ struct SeaArr : Module {
 
 		configParam<SpeedQuantity>(SPEED_PARAM, -1.f, 1.f, 0.f, "Speed");
 		configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length", "%", 0.f, 100.f);
-		configSwitch(LOOP_PARAM, 0.f, 1.f, 0.f, "Loop", {"Off", "On"});
+		configParam(MAINVOL_PARAM, 0.f, 1.f, 1.f, "Main Volume", "%", 0.f, 100.f);
 
 		configSwitch(KICKPUSH_PARAM, 0.f, 1.f, 0.f, "Kick Trig", {"Off", "On"});
 		configSwitch(SNAREPUSH_PARAM, 0.f, 1.f, 0.f, "Snare Trig", {"Off", "On"});
@@ -124,7 +123,6 @@ struct SeaArr : Module {
 
 		configInput(SPEEDCVIN_INPUT, "Speed CV");
 		configInput(LENGTHCVIN_INPUT, "Length CV");
-		configInput(LOOPCVIN_INPUT, "Loop CV");
 		configInput(KICKTRIGIN_INPUT, "Kick Trig");
 		configInput(SNARETRIGIN_INPUT, "Snare Trig");
 		configInput(HATTRIGIN_INPUT, "Hi-Hat Trig");
@@ -150,8 +148,8 @@ struct SeaArr : Module {
 		configOutput(TAMOUT_OUTPUT, "Tambourine");
 		configOutput(GUIROOUT_OUTPUT, "Guiro");
 		configOutput(CYMOUT_OUTPUT, "Cymbal");
+		configOutput(SUM_OUTPUT, "Sum");
 
-		// Initialize voices with sample data from SeaArrSamples.hpp
 		kickVoice = createVoice(SAKick, sizeof(SAKick), KICKOUT_OUTPUT, KICK_LIGHT);
 		snareVoice = createVoice(SASnare, sizeof(SASnare), SNAREOUT_OUTPUT, SNARE_LIGHT);
 		hatVoice = createVoice(SAHiHat, sizeof(SAHiHat), HATOUT_OUTPUT, HAT_LIGHT);
@@ -169,33 +167,31 @@ struct SeaArr : Module {
 	Voice createVoice(const unsigned char* data, size_t size, int outputId, int lightId) {
 		Voice v;
 		v.rawData = data;
-		v.sampleLength = size / 2; // 16-bit samples
+		v.sampleLength = size / 2;
 		v.outputId = outputId;
 		v.lightId = lightId;
 		return v;
 	}
 
-	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId, float speed, float lengthRatio, bool loopEnabled) {
+	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId, float speed, float lengthRatio) {
 		bool inputTrigger = inputs[trigInputId].getVoltage() > 1.0f;
 		bool buttonTrigger = params[pushParamId].getValue() > 0.5f;
-	
+
 		bool inputRising = inputTrigger && !voice.lastInputTrigger;
 		bool buttonRising = buttonTrigger && !voice.lastButtonTrigger;
-	
-		// track firing for lights
+
 		bool fired = inputRising || buttonRising;
-	
-		if (fired || (loopEnabled && !voice.playing)) {
+
+		if (fired) {
 			voice.playing = true;
 			voice.samplePos = 0.f;
-			fired = true; // ensure light triggers
 		}
-	
+
 		voice.lastInputTrigger = inputTrigger;
 		voice.lastButtonTrigger = buttonTrigger;
-	
+
 		int maxSamplesToPlay = (int)(voice.sampleLength * lengthRatio);
-	
+
 		if (voice.playing) {
 			int idx = (int)voice.samplePos;
 			if (idx < maxSamplesToPlay) {
@@ -204,77 +200,67 @@ struct SeaArr : Module {
 				outputs[voice.outputId].setVoltage(sample * 10.f);
 				voice.samplePos += speed;
 			} else {
-				if (loopEnabled) {
-					voice.samplePos = 0.f;
-					fired = true; // 🔴 loop restart triggers light
-				} else {
-					voice.playing = false;
-					outputs[voice.outputId].setVoltage(0.f);
-				}
+				voice.playing = false;
+				outputs[voice.outputId].setVoltage(0.f);
 			}
 		} else {
 			outputs[voice.outputId].setVoltage(0.f);
 		}
-	
-		// light handling: blink on trigger or loop restart
+
 		if (voice.lightId >= 0) {
 			if (fired)
 				lights[voice.lightId].setBrightness(1.f);
 			else
 				lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
 		}
-	}	
-
-	bool loopState = false;           // the current loop on/off state
-	bool lastLoopButton = false;      // previous frame state for the button
-	bool lastLoopCVTrigger = false;   // previous frame state for the CV
+	}
 
 	void process(const ProcessArgs& args) override {
 		// --- Precalculate speed with CV ---
-		float knobSpeedV = (params[SPEED_PARAM].getValue() + 1.f) * 2.5f;  // -1..1 → 0–5V
+		float knobSpeedV = (params[SPEED_PARAM].getValue() + 1.f) * 2.5f;
 		float speedCVV = 0.f;
 		if (inputs[SPEEDCVIN_INPUT].isConnected())
-			speedCVV = std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -10.f, 10.f) * 0.5f; // -10..10 → -5..5
-		float normSpeed = std::clamp(knobSpeedV + speedCVV, 0.f, 5.f) / 5.f; // 0–1 normalized
+			speedCVV = std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -10.f, 10.f) * 0.5f;
+		float normSpeed = std::clamp(knobSpeedV + speedCVV, 0.f, 5.f) / 5.f;
 		float speed = SPEED_MIN + normSpeed * (SPEED_MAX - SPEED_MIN);
-		
+
 		// --- Length ---
-		float knobLength = params[LENGTH_PARAM].getValue() * 5.f;       // convert knob 0-1 → 0-5
+		float knobLength = params[LENGTH_PARAM].getValue() * 5.f;
 		float lengthCV = inputs[LENGTHCVIN_INPUT].isConnected() ? inputs[LENGTHCVIN_INPUT].getVoltage() : 0.f;
-		lengthCV = std::clamp(lengthCV * 0.5f, -5.f, 5.f);              // scale CV -10..10 → -5..5
-		float combined = knobLength + lengthCV;                          // sum knob + CV
-		float normLength = std::clamp(combined / 5.f, 0.f, 1.f);        // rescale to 0-1
+		lengthCV = std::clamp(lengthCV * 0.5f, -5.f, 5.f);
+		float combined = knobLength + lengthCV;
+		float normLength = std::clamp(combined / 5.f, 0.f, 1.f);
 		float lengthRatio = LENGTH_MIN + normLength * (LENGTH_MAX - LENGTH_MIN);
 
-		// --- Loop mode ---
-		bool loopButton = params[LOOP_PARAM].getValue() > 0.5f;
-		float loopCV = inputs[LOOPCVIN_INPUT].isConnected() ? inputs[LOOPCVIN_INPUT].getVoltage() : 0.f;
-		bool loopButtonRising = loopButton && !lastLoopButton;
-		if (loopButtonRising)
-			loopState = !loopState;
-		static bool lastGateHigh = false; // keeps track of gate state across calls
-		bool gateHigh = loopCV > 0.6f;
-		if (gateHigh && !lastGateHigh)
-			loopState = !loopState;
-		lastGateHigh = gateHigh;
+		processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, speed, lengthRatio);
+		processVoice(args, snareVoice, SNARETRIGIN_INPUT, SNAREPUSH_PARAM, speed, lengthRatio);
+		processVoice(args, hatVoice, HATTRIGIN_INPUT, HATPUSH_PARAM, speed, lengthRatio);
+		processVoice(args, hatMetalVoice, HATMETALTRIGIN_INPUT, HATMETALPUSH_PARAM, speed, lengthRatio);
+		processVoice(args, rimVoice, RIMTRIGIN_INPUT, RIMPUSH_PARAM, speed, lengthRatio);
+		processVoice(args, cowVoice, COWTRIGIN_INPUT, COWPUSH_PARAM, speed, lengthRatio);
+		processVoice(args, congaVoice, CONGATRIGIN_INPUT, CONGAPUSH_PARAM, speed, lengthRatio);
+		processVoice(args, bongoLVoice, BONGOLTRIGIN_INPUT, BONGOLPUSH_PARAM, speed, lengthRatio);
+		processVoice(args, bongoHVoice, BONGOHTRIGIN_INPUT, BONGOHPUSH_PARAM, speed, lengthRatio);
+		processVoice(args, tambVoice, TAMTRIGIN_INPUT, TAMPUSH_PARAM, speed, lengthRatio);
+		processVoice(args, guiroVoice, GUIROTRIGIN_INPUT, GUIROPUSH_PARAM, speed, lengthRatio);
+		processVoice(args, cymVoice, CYMTRIGIN_INPUT, CYMPUSH_PARAM, speed, lengthRatio);
 
-		lastLoopButton = loopButton;
-
-		bool loopEnabled = loopState;
-		lights[LOOP_LIGHT].setBrightnessSmooth(loopState, args.sampleTime);
-
-		processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, snareVoice, SNARETRIGIN_INPUT, SNAREPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, hatVoice, HATTRIGIN_INPUT, HATPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, hatMetalVoice, HATMETALTRIGIN_INPUT, HATMETALPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, rimVoice, RIMTRIGIN_INPUT, RIMPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, cowVoice, COWTRIGIN_INPUT, COWPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, congaVoice, CONGATRIGIN_INPUT, CONGAPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, bongoLVoice, BONGOLTRIGIN_INPUT, BONGOLPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, bongoHVoice, BONGOHTRIGIN_INPUT, BONGOHPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, tambVoice, TAMTRIGIN_INPUT, TAMPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, guiroVoice, GUIROTRIGIN_INPUT, GUIROPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, cymVoice, CYMTRIGIN_INPUT, CYMPUSH_PARAM, speed, lengthRatio, loopEnabled);
+		// --- Sum output ---
+		float mainVol = params[MAINVOL_PARAM].getValue();
+		float busSum = 0.f;
+		int busCount = 0;
+		Voice* allVoices[] = {
+			&kickVoice, &snareVoice, &hatVoice, &hatMetalVoice, &rimVoice,
+			&cowVoice, &congaVoice, &bongoLVoice, &bongoHVoice, &tambVoice, &guiroVoice, &cymVoice
+		};
+		for (Voice* v : allVoices) {
+			if (!outputs[v->outputId].isConnected()) {
+				busSum += outputs[v->outputId].getVoltage();
+				busCount++;
+			}
+		}
+		float sumOut = busCount > 0 ? (busSum / busCount) * mainVol : 0.f;
+		outputs[SUM_OUTPUT].setVoltage(std::clamp(sumOut, -5.f, 5.f));
 	}
 };
 
@@ -291,48 +277,46 @@ struct SeaArrWidget : ModuleWidget {
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(16.799, 15.501)), module, SeaArr::LENGTH_PARAM));
 		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(38.799, 15.501)), module, SeaArr::SPEED_PARAM));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(59.351, 15.501)), module, SeaArr::LOOP_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(59.351, 15.501)), module, SeaArr::LOOP_LIGHT));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(59.351, 15.501)), module, SeaArr::MAINVOL_PARAM));
 
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(8.798, 42.002)), module, SeaArr::KICKPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(8.798, 42.002)), module, SeaArr::KICK_LIGHT));
-		
+
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(20.5, 42.002)), module, SeaArr::SNAREPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(20.5, 42.002)), module, SeaArr::SNARE_LIGHT));
-		
+
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(32.3, 42.002)), module, SeaArr::HATPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(32.3, 42.002)), module, SeaArr::HAT_LIGHT));
-		
+
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(43.998, 42.002)), module, SeaArr::HATMETALPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(43.998, 42.002)), module, SeaArr::HATMETAL_LIGHT));
-		
+
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(55.7, 42.002)), module, SeaArr::RIMPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(55.7, 42.002)), module, SeaArr::RIM_LIGHT));
-		
+
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(67.501, 42.002)), module, SeaArr::COWPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(67.501, 42.002)), module, SeaArr::COW_LIGHT));
-		
+
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(8.798, 84.999)), module, SeaArr::CONGAPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(8.798, 84.999)), module, SeaArr::CONGA_LIGHT));
-		
+
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(20.5, 84.999)), module, SeaArr::BONGOLPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(20.5, 84.999)), module, SeaArr::BONGOL_LIGHT));
-		
+
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(32.3, 84.999)), module, SeaArr::BONGOHPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(32.3, 84.999)), module, SeaArr::BONGOH_LIGHT));
-		
+
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(43.998, 84.999)), module, SeaArr::TAMPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(43.998, 84.999)), module, SeaArr::TAM_LIGHT));
-		
+
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(55.7, 84.999)), module, SeaArr::GUIROPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(55.7, 84.999)), module, SeaArr::GUIRO_LIGHT));
-		
+
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(67.501, 84.999)), module, SeaArr::CYMPUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(67.501, 84.999)), module, SeaArr::CYM_LIGHT));		
+		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(67.501, 84.999)), module, SeaArr::CYM_LIGHT));
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.849, 30.801)), module, SeaArr::LENGTHCVIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(38.851, 30.801)), module, SeaArr::SPEEDCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(59.351, 30.801)), module, SeaArr::LOOPCVIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.798, 56.0)), module, SeaArr::KICKTRIGIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.5, 56.0)), module, SeaArr::SNARETRIGIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.3, 56.0)), module, SeaArr::HATTRIGIN_INPUT));
@@ -346,6 +330,7 @@ struct SeaArrWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55.7, 99.001)), module, SeaArr::GUIROTRIGIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(67.501, 99.001)), module, SeaArr::CYMTRIGIN_INPUT));
 
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(59.351, 30.801)), module, SeaArr::SUM_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(8.798, 70.002)), module, SeaArr::KICKOUT_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.5, 70.002)), module, SeaArr::SNAREOUT_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.3, 70.002)), module, SeaArr::HATOUT_OUTPUT));

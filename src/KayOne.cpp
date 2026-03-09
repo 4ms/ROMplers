@@ -13,7 +13,7 @@ struct KayOne : Module {
 	enum ParamId {
 		SPEED_PARAM,
 		LENGTH_PARAM,
-		LOOP_PARAM,
+		MAINVOL_PARAM,
 		KICKPUSH_PARAM,
 		SNAREPUSH_PARAM,
 		TOMLPUSH_PARAM,
@@ -25,7 +25,6 @@ struct KayOne : Module {
 	enum InputId {
 		SPEEDCVIN_INPUT,
 		LENGTHCVIN_INPUT,
-		LOOPCVIN_INPUT,
 		KICKTRIGIN_INPUT,
 		SNARETRIGIN_INPUT,
 		TOMLTRIG_INPUT,
@@ -41,6 +40,7 @@ struct KayOne : Module {
 		TOMHOUT_OUTPUT,
 		CLOUT_OUTPUT,
 		OHOUT_OUTPUT,
+		SUM_OUTPUT,
 		OUTPUTS_LEN
 	};
 	enum LightId {
@@ -50,27 +50,26 @@ struct KayOne : Module {
 		TOMH_LIGHT,
 		CL_LIGHT,
 		OH_LIGHT,
-		LOOP_LIGHT,
 		LIGHTS_LEN
 	};
 
 	struct Voice {
 		bool lastInputTrigger = false;
 		bool lastButtonTrigger = false;
-	
+
 		float samplePos = 0.f;
 		bool playing = false;
 		bool lastTriggerState = false;
 		const unsigned char* rawData = nullptr;
 		int sampleLength = 0;
 		int outputId = 0;
-		int lightId = -1;  
-	
+		int lightId = -1;
+
 		int16_t readSample16(int index) {
 			return (int16_t)(rawData[2 * index] | (rawData[2 * index + 1] << 8));
 		}
 	};
-	
+
 
 	Voice kickVoice;
 	Voice snareVoice;
@@ -89,7 +88,7 @@ struct KayOne : Module {
 
 		configParam<SpeedQuantity>(SPEED_PARAM, -1.f, 1.f, 0.f, "Speed");
 		configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length", "%", 0.f, 100.f);
-		configSwitch(LOOP_PARAM, 0.f, 1.f, 0.f, "Loop", {"Off", "On"});
+		configParam(MAINVOL_PARAM, 0.f, 1.f, 1.f, "Main Volume", "%", 0.f, 100.f);
 
 		configSwitch(KICKPUSH_PARAM, 0.f, 1.f, 0.f, "Kick Trig", {"Off", "On"});
 		configSwitch(SNAREPUSH_PARAM, 0.f, 1.f, 0.f, "Snare Trig", {"Off", "On"});
@@ -100,8 +99,6 @@ struct KayOne : Module {
 
 		configInput(SPEEDCVIN_INPUT, "Speed CV");
 		configInput(LENGTHCVIN_INPUT, "Length CV");
-		configInput(LOOPCVIN_INPUT, "Loop Gate");
-
 		configInput(KICKTRIGIN_INPUT, "Kick Trig");
 		configInput(SNARETRIGIN_INPUT, "Snare Trig");
 		configInput(TOMLTRIG_INPUT, "Tom Lo Trig");
@@ -115,6 +112,7 @@ struct KayOne : Module {
 		configOutput(TOMHOUT_OUTPUT, "Tom Hi");
 		configOutput(CLOUT_OUTPUT, "Closed Hat");
 		configOutput(OHOUT_OUTPUT, "Open Hat");
+		configOutput(SUM_OUTPUT, "Sum");
 
 		kickVoice.rawData = SKKick;
 		kickVoice.sampleLength = sizeof(SKKick) / 2;
@@ -147,74 +145,66 @@ struct KayOne : Module {
 		openHatVoice.lightId = OH_LIGHT;
 	}
 
-	bool loopState = false;           // the current loop on/off state
-	bool lastLoopButton = false;      // previous frame state for the button
-	bool lastLoopCVTrigger = false;   // previous frame state for the CV
-
 	void process(const ProcessArgs& args) override {
-		static const float speedCVScale = 0.1f;  // (1/5 * 0.5)
+		static const float speedCVScale = 0.1f;
 		static const float lengthCVScale = 0.1f;
-	
+
 		float knobSpeed = 0.01f + (params[SPEED_PARAM].getValue() + 1.f) * (1.0f - 0.01f);
 		float normSpeed = std::clamp(knobSpeed + inputs[SPEEDCVIN_INPUT].getVoltage() * speedCVScale, 0.01f, 2.0f);
 		float speed = SPEED_LOW + (normSpeed - 0.01f) * ((SPEED_HIGH - SPEED_LOW) / (1.0f - 0.01f));
-	
+
 		float knobLength = params[LENGTH_PARAM].getValue();
 		float normLength = std::clamp(knobLength + inputs[LENGTHCVIN_INPUT].getVoltage() * lengthCVScale, 0.1f, 1.0f);
 		float lengthRatio = LENGTH_MIN + (normLength - 0.1f) * ((LENGTH_MAX - LENGTH_MIN) / (1.0f - 0.1f));
-	
-		// --- Loop mode ---
-		bool loopButton = params[LOOP_PARAM].getValue() > 0.5f;
-		float loopCV = inputs[LOOPCVIN_INPUT].isConnected() ? inputs[LOOPCVIN_INPUT].getVoltage() : 0.f;
-		bool loopButtonRising = loopButton && !lastLoopButton;
-		if (loopButtonRising)
-			loopState = !loopState;
-		static bool lastGateHigh = false; // keeps track of gate state across calls
-		bool gateHigh = loopCV > 0.6f;
-		if (gateHigh && !lastGateHigh)
-			loopState = !loopState;
-		lastGateHigh = gateHigh;
 
-		lastLoopButton = loopButton;
-
-		bool loopEnabled = loopState;
-		lights[LOOP_LIGHT].setBrightnessSmooth(loopState, args.sampleTime);
-	
 		// Process all voices
-		processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, snareVoice, SNARETRIGIN_INPUT, SNAREPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, tomLoVoice, TOMLTRIG_INPUT, TOMLPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, tomHiVoice, TOMHTRIG_INPUT, TOMHPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, closedHatVoice, CLTRIG_INPUT, CLPUSH_PARAM, speed, lengthRatio, loopEnabled);
-		processVoice(args, openHatVoice, OHTRIG_INPUT, OHPUSH_PARAM, speed, lengthRatio, loopEnabled);
-	}
-	
-	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId, float speed, float lengthRatio, bool loopEnabled) {
-		static constexpr float SAMPLE_SCALE = 5.0f / 32768.0f;
-	
-		bool inputTrigger = inputs[trigInputId].getVoltage() > 1.0f;
-		bool buttonTrigger = params[pushParamId].getValue() > 0.5f;
-	
-		bool inputRising = inputTrigger && !voice.lastInputTrigger;
-		bool buttonRising = buttonTrigger && !voice.lastButtonTrigger;
-	
-		bool triggered = inputRising || buttonRising;
-		bool fired = triggered; // 🔴 track for light
-	
-		if (triggered || (loopEnabled && !voice.playing)) {
-			voice.playing = true;
-			voice.samplePos = 0.f;
-			if (voice.lightId >= 0) {
-				lights[voice.lightId].setBrightness(1.0f);
+		processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, speed, lengthRatio);
+		processVoice(args, snareVoice, SNARETRIGIN_INPUT, SNAREPUSH_PARAM, speed, lengthRatio);
+		processVoice(args, tomLoVoice, TOMLTRIG_INPUT, TOMLPUSH_PARAM, speed, lengthRatio);
+		processVoice(args, tomHiVoice, TOMHTRIG_INPUT, TOMHPUSH_PARAM, speed, lengthRatio);
+		processVoice(args, closedHatVoice, CLTRIG_INPUT, CLPUSH_PARAM, speed, lengthRatio);
+		processVoice(args, openHatVoice, OHTRIG_INPUT, OHPUSH_PARAM, speed, lengthRatio);
+
+		// --- Sum output ---
+		float mainVol = params[MAINVOL_PARAM].getValue();
+		float busSum = 0.f;
+		int busCount = 0;
+		Voice* allVoices[] = { &kickVoice, &snareVoice, &tomLoVoice, &tomHiVoice, &closedHatVoice, &openHatVoice };
+		for (Voice* v : allVoices) {
+			if (!outputs[v->outputId].isConnected()) {
+				busSum += outputs[v->outputId].getVoltage();
+				busCount++;
 			}
 		}
-	
+		float sumOut = busCount > 0 ? (busSum / busCount) * mainVol : 0.f;
+		outputs[SUM_OUTPUT].setVoltage(std::clamp(sumOut, -5.f, 5.f));
+	}
+
+	void processVoice(const ProcessArgs& args, Voice& voice, int trigInputId, int pushParamId, float speed, float lengthRatio) {
+		static constexpr float SAMPLE_SCALE = 5.0f / 32768.0f;
+
+		bool inputTrigger = inputs[trigInputId].getVoltage() > 1.0f;
+		bool buttonTrigger = params[pushParamId].getValue() > 0.5f;
+
+		bool inputRising = inputTrigger && !voice.lastInputTrigger;
+		bool buttonRising = buttonTrigger && !voice.lastButtonTrigger;
+
+		bool triggered = inputRising || buttonRising;
+		bool fired = triggered;
+
+		if (triggered) {
+			voice.playing = true;
+			voice.samplePos = 0.f;
+			if (voice.lightId >= 0)
+				lights[voice.lightId].setBrightness(1.0f);
+		}
+
 		voice.lastInputTrigger = inputTrigger;
 		voice.lastButtonTrigger = buttonTrigger;
-	
+
 		int maxSamplesToPlay = static_cast<int>(voice.sampleLength * lengthRatio);
 		float sample = 0.f;
-	
+
 		if (voice.playing) {
 			int idx = static_cast<int>(voice.samplePos);
 			if (idx < maxSamplesToPlay) {
@@ -222,28 +212,21 @@ struct KayOne : Module {
 				sample = sampleInt * SAMPLE_SCALE;
 				voice.samplePos += speed;
 			} else {
-				if (loopEnabled) {
-					voice.samplePos = 0.f;
-					fired = true; // 🔴 loop restart triggers light
-				} else {
-					voice.playing = false;
-				}
+				voice.playing = false;
 			}
 		}
-	
-		// Only set output voltage if needed
+
 		if (outputs[voice.outputId].getVoltage() != sample) {
 			outputs[voice.outputId].setVoltage(sample * 2.f);
 		}
-	
-		// Light handling: trigger on button/input OR loop restart
+
 		if (voice.lightId >= 0) {
 			if (fired)
 				lights[voice.lightId].setBrightness(1.0f);
 			else
 				lights[voice.lightId].setBrightnessSmooth(0.f, args.sampleTime);
 		}
-	}	
+	}
 };
 
 struct KayOneWidget : ModuleWidget {
@@ -259,8 +242,7 @@ struct KayOneWidget : ModuleWidget {
 		addParam(createParamCentered<Knob9mm>(mm2px(Vec(7.751, 12.45)), module, KayOne::LENGTH_PARAM));
 		addParam(createParamCentered<Knob9mm>(mm2px(Vec(27.002, 12.45)), module, KayOne::SPEED_PARAM));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(44.2, 12.45)), module, KayOne::LOOP_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(44.2, 12.45)), module, KayOne::LOOP_LIGHT));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(44.2, 12.45)), module, KayOne::MAINVOL_PARAM));
 
 		addParam(createParamCentered<LEDBezel>(mm2px(Vec(7.751, 37.0)), module, KayOne::KICKPUSH_PARAM));
 		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(7.751, 37.0)), module, KayOne::KICK_LIGHT));
@@ -282,7 +264,6 @@ struct KayOneWidget : ModuleWidget {
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.751, 26.0)), module, KayOne::LENGTHCVIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(27.002, 26.0)), module, KayOne::SPEEDCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(44.2, 26.0)), module, KayOne::LOOPCVIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 37.0)), module, KayOne::KICKTRIGIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 52.0)), module, KayOne::SNARETRIGIN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 67.0)), module, KayOne::TOMLTRIG_INPUT));
@@ -290,6 +271,7 @@ struct KayOneWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 97.0)), module, KayOne::CLTRIG_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.0, 112.0)), module, KayOne::OHTRIG_INPUT));
 
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(44.2, 26.0)), module, KayOne::SUM_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 37.0)), module, KayOne::KICKOUT_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 52.0)), module, KayOne::SNAREOUT_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 67.0)), module, KayOne::TOMLOUT_OUTPUT));
