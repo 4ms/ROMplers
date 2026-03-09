@@ -76,7 +76,7 @@ struct AyysKing : Module {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configParam<SpeedQuantity>(SPEED_PARAM, -1.f, 1.f, 0.f, "Speed");
 		configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length", "%", 0.f, 100.f);
-		configParam(MAINVOL_PARAM, 0.f, 1.f, 1.f, "Main Volume", "%", 0.f, 100.f);
+		configParam(MAINVOL_PARAM, 0.f, 1.f, 0.5f, "Main Volume", "%", 0.f, 100.f);
 
 		static const char* labels[10] = {
 			"Kick", "Snare 1", "Snare 2", "Closed Hat", "Open Hat",
@@ -176,18 +176,15 @@ struct AyysKing : Module {
 			processVoice(args, voices[i], KICKTRIGIN_INPUT + i, KICKPUSH_PARAM + i, speed, voiceMaxSamples);
 		}
 
-		// --- Sum output ---
+		// --- Sum output: raw sum of unpatched voices, clamped ---
 		float mainVol = params[MAINVOL_PARAM].getValue();
 		float busSum = 0.f;
-		int busCount = 0;
 		for (int i = 0; i < 10; i++) {
 			if (!outputs[voices[i].outputId].isConnected()) {
 				busSum += outputs[voices[i].outputId].getVoltage();
-				busCount++;
 			}
 		}
-		float sumOut = busCount > 0 ? (busSum / busCount) * mainVol : 0.f;
-		outputs[SUM_OUTPUT].setVoltage(std::clamp(sumOut, -5.f, 5.f));
+		outputs[SUM_OUTPUT].setVoltage(std::clamp(busSum * mainVol, -10.f, 10.f));
 	}
 };
 
