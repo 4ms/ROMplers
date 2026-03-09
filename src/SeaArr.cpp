@@ -106,7 +106,7 @@ struct SeaArr : Module {
 
 		configParam<SpeedQuantity>(SPEED_PARAM, -1.f, 1.f, 0.f, "Speed");
 		configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length", "%", 0.f, 100.f);
-		configParam(MAINVOL_PARAM, 0.f, 1.f, 1.f, "Main Volume", "%", 0.f, 100.f);
+		configParam(MAINVOL_PARAM, 0.f, 1.f, 0.5f, "Main Volume", "%", 0.f, 100.f);
 
 		configSwitch(KICKPUSH_PARAM, 0.f, 1.f, 0.f, "Kick Trig", {"Off", "On"});
 		configSwitch(SNAREPUSH_PARAM, 0.f, 1.f, 0.f, "Snare Trig", {"Off", "On"});
@@ -248,7 +248,6 @@ struct SeaArr : Module {
 		// --- Sum output ---
 		float mainVol = params[MAINVOL_PARAM].getValue();
 		float busSum = 0.f;
-		int busCount = 0;
 		Voice* allVoices[] = {
 			&kickVoice, &snareVoice, &hatVoice, &hatMetalVoice, &rimVoice,
 			&cowVoice, &congaVoice, &bongoLVoice, &bongoHVoice, &tambVoice, &guiroVoice, &cymVoice
@@ -256,11 +255,9 @@ struct SeaArr : Module {
 		for (Voice* v : allVoices) {
 			if (!outputs[v->outputId].isConnected()) {
 				busSum += outputs[v->outputId].getVoltage();
-				busCount++;
 			}
 		}
-		float sumOut = busCount > 0 ? (busSum / busCount) * mainVol : 0.f;
-		outputs[SUM_OUTPUT].setVoltage(std::clamp(sumOut, -5.f, 5.f));
+		outputs[SUM_OUTPUT].setVoltage(std::clamp(busSum * mainVol, -10.f, 10.f));
 	}
 };
 

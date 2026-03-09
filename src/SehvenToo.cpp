@@ -113,7 +113,7 @@ struct SehvenToo : Module {
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
         configParam<SpeedQuantity>(SPEED_PARAM, -1.f, 1.f, 0.f, "Speed");
         configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length", "%", 0.f, 100.f);
-        configParam(MAINVOL_PARAM, 0.f, 1.f, 1.f, "Main Volume", "%", 0.f, 100.f);
+        configParam(MAINVOL_PARAM, 0.f, 1.f, 0.5f, "Main Volume", "%", 0.f, 100.f);
         configSwitch(CONGALPUSH_PARAM, 0.f, 1.f, 0.f, "Conga Lo Trig", {"Off", "On"});
         configSwitch(CONGAHPUSH_PARAM, 0.f, 1.f, 0.f, "Conga Hi Trig", {"Off", "On"});
         configSwitch(CONGAHMPUSH_PARAM, 0.f, 1.f, 0.f, "Conga Hi Mute Trig", {"Off", "On"});
@@ -244,7 +244,6 @@ struct SehvenToo : Module {
         // --- Sum output ---
         float mainVol = params[MAINVOL_PARAM].getValue();
         float busSum = 0.f;
-        int busCount = 0;
         Voice* allVoices[] = {
             &congaLVoice, &congaHVoice, &congaHMVoice,
             &bongoLVoice, &bongoHVoice,
@@ -255,11 +254,9 @@ struct SehvenToo : Module {
         for (Voice* v : allVoices) {
             if (!outputs[v->outputId].isConnected()) {
                 busSum += outputs[v->outputId].getVoltage();
-                busCount++;
             }
         }
-        float sumOut = busCount > 0 ? (busSum / busCount) * mainVol : 0.f;
-        outputs[SUM_OUTPUT].setVoltage(std::clamp(sumOut, -5.f, 5.f));
+        outputs[SUM_OUTPUT].setVoltage(std::clamp(busSum * mainVol, -10.f, 10.f));
     }
 };
 
