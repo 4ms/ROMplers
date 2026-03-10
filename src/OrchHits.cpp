@@ -1,5 +1,6 @@
 #include "OrchHitsSamples.hpp"
 #include "plugin.hpp"
+#include "sample.hh"
 #include <cmath>
 
 struct OrchHits : Module {
@@ -22,8 +23,6 @@ struct OrchHits : Module {
   enum OutputId { AUDIOOUT_OUTPUT, OUTPUTS_LEN };
   enum LightId { ORCHHITS_LIGHT, LIGHTS_LEN };
 
-  const unsigned char *currentSample = Orch1;
-  int sampleLength = Orch1_len;
   float samplePos = 0.f;
   bool playing = false;
 
@@ -34,7 +33,12 @@ struct OrchHits : Module {
 
   static constexpr float sampleSampleRate = 44100.f;
 
-  int numSamples = 17;
+  static constexpr std::array samples = {
+      Sample{Orch1},  Sample{Orch2},  Sample{Orch3},  Sample{Orch4},
+      Sample{Orch5},  Sample{Orch6},  Sample{Orch7},  Sample{Orch8},
+      Sample{Orch9},  Sample{Orch10}, Sample{Orch11}, Sample{Orch12},
+      Sample{Orch13}, Sample{Orch14}, Sample{Orch15}, Sample{Orch16},
+  };
 
   const float minDecayTime = 0.1f;
   const float maxDecayTime = 5.f;
@@ -42,9 +46,9 @@ struct OrchHits : Module {
   OrchHits() {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
     std::vector<std::string> sampleChoices;
-    for (int i = 1; i <= numSamples; ++i)
+    for (auto i = 1u; i <= samples.size(); ++i)
       sampleChoices.push_back(std::to_string(i));
-    configSwitch(SAMPLE_PARAM, 0.f, (numSamples - 1), 0.f, "Sample",
+    configSwitch(SAMPLE_PARAM, 0.f, (samples.size() - 1), 0.f, "Sample",
                  sampleChoices);
     configSwitch(OCTAVE_PARAM, 0.f, 4.f, 2.f, "Octave transpose",
                  {"-2", "-1", "Unison", "+1", "+2"});
@@ -60,101 +64,19 @@ struct OrchHits : Module {
     configOutput(AUDIOOUT_OUTPUT, "Audio output");
   }
 
-  float fastPow2(float x) {
-    if (x < 0.f)
-      return 1.f / fastPow2(-x);
-    if (x > 8.f)
-      x = 8.f;
-    return 1.f + x * 0.69314718f;
-  }
-
   void process(const ProcessArgs &args) override {
     // --- SAMPLE SELECTION WITH CV ---
     float sampleKnob = params[SAMPLE_PARAM].getValue(); // 0 .. numSamples-1
     float cv = inputs[SAMPLECVIN_INPUT].isConnected()
                    ? inputs[SAMPLECVIN_INPUT].getVoltage()
                    : 0.f;
-    float cvScaled = cv * ((numSamples - 1) / 2.f) / 5.f;
-    float center = (numSamples - 1) / 2.f;
+    float cvScaled = cv * ((samples.size() - 1) / 2.f) / 5.f;
+    float center = (samples.size() - 1) / 2.f;
     float sampleParam = center + (sampleKnob - center) + cvScaled;
-    sampleParam =
-        std::clamp(sampleParam, 0.f, static_cast<float>(numSamples - 1));
+    sampleParam = std::clamp<float>(sampleParam, 0.f, samples.size() - 1);
     int selectedIndex = static_cast<int>(std::round(sampleParam));
 
-    switch (selectedIndex) {
-    case 0:
-      currentSample = Orch1;
-      sampleLength = Orch1_len;
-      break;
-    case 1:
-      currentSample = Orch2;
-      sampleLength = Orch2_len;
-      break;
-    case 2:
-      currentSample = Orch3;
-      sampleLength = Orch3_len;
-      break;
-    case 3:
-      currentSample = Orch4;
-      sampleLength = Orch4_len;
-      break;
-    case 4:
-      currentSample = Orch5;
-      sampleLength = Orch5_len;
-      break;
-    case 5:
-      currentSample = Orch6;
-      sampleLength = Orch6_len;
-      break;
-    case 6:
-      currentSample = Orch7;
-      sampleLength = Orch7_len;
-      break;
-    case 7:
-      currentSample = Orch8;
-      sampleLength = Orch8_len;
-      break;
-    case 8:
-      currentSample = Orch9;
-      sampleLength = Orch9_len;
-      break;
-    case 9:
-      currentSample = Orch10;
-      sampleLength = Orch10_len;
-      break;
-    case 10:
-      currentSample = Orch11;
-      sampleLength = Orch11_len;
-      break;
-    case 11:
-      currentSample = Orch12;
-      sampleLength = Orch12_len;
-      break;
-    case 12:
-      currentSample = Orch13;
-      sampleLength = Orch13_len;
-      break;
-    case 13:
-      currentSample = Orch14;
-      sampleLength = Orch14_len;
-      break;
-    case 14:
-      currentSample = Orch15;
-      sampleLength = Orch15_len;
-      break;
-    case 15:
-      currentSample = Orch16;
-      sampleLength = Orch16_len;
-      break;
-    case 16:
-      currentSample = Orch17;
-      sampleLength = Orch17_len;
-      break;
-    default:
-      currentSample = Orch1;
-      sampleLength = Orch1_len;
-      break;
-    }
+    auto &s = samples[selectedIndex];
 
     float trigIn = inputs[TRIGIN_INPUT].getVoltage();
     float buttonIn = params[PUSH_PARAM].getValue();
@@ -179,7 +101,7 @@ struct OrchHits : Module {
 
     float output = 0.f;
 
-    if (playing && currentSample) {
+    if (playing) {
       // --- OCTAVE CONTROL WITH QUANTIZED CV (±5V) ---
       float octaveKnob = params[OCTAVE_PARAM].getValue(); // 0 .. 4
       float octaveCV = inputs[OCTAVECVIN_INPUT].isConnected()
@@ -207,23 +129,20 @@ struct OrchHits : Module {
       float sampleRateRatio = sampleSampleRate / args.sampleRate;
       samplePos += pitchRatio * sampleRateRatio;
 
-      int numSamplesInSample = sampleLength / 2;
+      const auto numSamplesInSample = s.size();
 
-      if ((int)samplePos >= numSamplesInSample) {
+      if ((uint)samplePos >= numSamplesInSample) {
         playing = false;
         output = 0.f;
       } else {
-        int idx = (int)samplePos;
+        auto idx = (uint)samplePos;
         int nextIdx = (idx + 1 < numSamplesInSample) ? idx + 1 : idx;
         float frac = samplePos - idx;
 
-        const unsigned char *d = currentSample;
-        int16_t s1s = (int16_t)(d[idx * 2] | (d[idx * 2 + 1] << 8));
-        int16_t s2s = (int16_t)(d[nextIdx * 2] | (d[nextIdx * 2 + 1] << 8));
-        float s1 = s1s * (1.f / 32768.f);
-        float s2 = s2s * (1.f / 32768.f);
+        const auto s1 = s[idx];
+        const auto s2 = s[nextIdx];
 
-        float sampleValue = s1 + frac * (s2 - s1);
+        const auto sampleValue = s1 + frac * (s2 - s1);
 
         float knobDecayTime = params[DECAY_PARAM].getValue(); // already 0..5
         float cv = inputs[DECAYCVIN_INPUT].isConnected()
