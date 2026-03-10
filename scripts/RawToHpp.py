@@ -24,7 +24,7 @@ How to Export in Audacity:
 
 def sanitize_array_name(filename):
     base = os.path.splitext(os.path.basename(filename))[0]
-    sanitized = re.sub(r'\W', '_', base)
+    sanitized =  re.sub(r'\W', '_', base)
     return sanitized
 
 def fix_array_names(xxd_output, new_name):
@@ -33,13 +33,13 @@ def fix_array_names(xxd_output, new_name):
     if not match:
         return xxd_output
     old_name = match.group(1)
-    fixed_output = re.sub(rf"\b{re.escape(old_name)}\b", new_name, xxd_output)
+    fixed_output = "inline constexpr " + re.sub(rf"\b{re.escape(old_name)}\b", new_name, xxd_output)
 
     # Fix the length line: replace any "unsigned int <old_name>_len = <num>;"
     # with "unsigned int <new_name>_len = <num>;"
     len_pattern = re.compile(r"unsigned int (\w+_len) = (\d+);")
     def repl_len(m):
-        return f"unsigned int {new_name}_len = {m.group(2)};"
+        return f"inline constexpr unsigned int {new_name}_len = {m.group(2)};"
     
     fixed_output = len_pattern.sub(repl_len, fixed_output)
 
