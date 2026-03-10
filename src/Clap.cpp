@@ -1,248 +1,302 @@
-#include "plugin.hpp"
 #include "ClapSamples.hpp"
+#include "plugin.hpp"
 
 struct SpeedQuantity : ParamQuantity {
-	std::string getDisplayValueString() override {
-		float v = getValue();
-		float display = (v >= 0.f) ? (v + 1.f) : (v - 1.f);
-		return string::f("%.3gx", display);
-	}
+  std::string getDisplayValueString() override {
+    float v = getValue();
+    float display = (v >= 0.f) ? (v + 1.f) : (v - 1.f);
+    return string::f("%.3gx", display);
+  }
 };
 
 struct Clap : Module {
-	enum ParamId {
-		SAMPLE_PARAM,
-		PITCH_PARAM,
-		DECAY_PARAM,
-		PUSH_PARAM,
-		PARAMS_LEN
-	};
-	enum InputId {
-		SAMPLECVIN_INPUT,
-		PITCHCVIN_INPUT,
-		DECAYCVIN_INPUT,
-		TRIGIN_INPUT,
-		VOLCVIN_INPUT,
-		INPUTS_LEN
-	};
-	enum OutputId {
-		AUDIOOUT_OUTPUT,
-		OUTPUTS_LEN
-	};
-	enum LightId {
-		CLAP_LIGHT,
-		LIGHTS_LEN
-	};
+  enum ParamId {
+    SAMPLE_PARAM,
+    PITCH_PARAM,
+    DECAY_PARAM,
+    PUSH_PARAM,
+    PARAMS_LEN
+  };
+  enum InputId {
+    SAMPLECVIN_INPUT,
+    PITCHCVIN_INPUT,
+    DECAYCVIN_INPUT,
+    TRIGIN_INPUT,
+    VOLCVIN_INPUT,
+    INPUTS_LEN
+  };
+  enum OutputId { AUDIOOUT_OUTPUT, OUTPUTS_LEN };
+  enum LightId { CLAP_LIGHT, LIGHTS_LEN };
 
-	// Pre-decoded sample buffer (float samples)
-	std::vector<float> decodedSample;
-	const float* currentSampleFloat = nullptr;
-	int decodedSampleLength = 0;
+  // Pre-decoded sample buffer (float samples)
+  std::vector<float> decodedSample;
+  const float *currentSampleFloat = nullptr;
+  int decodedSampleLength = 0;
 
-	float samplePos = 0.f;
-	bool playing = false;
+  float samplePos = 0.f;
+  bool playing = false;
 
-	float env = 0.f;
-	float lastTrigValue = 0.f;
-	float lastButtonValue = 0.f;
-	float ClapLightBrightness = 0.f;
+  float env = 0.f;
+  float lastTrigValue = 0.f;
+  float lastButtonValue = 0.f;
+  float ClapLightBrightness = 0.f;
 
-	const float MIN_PLAYBACK_SPEED = 0.01f;
-	const float MAX_PLAYBACK_SPEED = 2.0f;
+  const float MIN_PLAYBACK_SPEED = 0.01f;
+  const float MAX_PLAYBACK_SPEED = 2.0f;
 
-	int numSamples = 16;
+  int numSamples = 16;
 
-	Clap() {
-		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		std::vector<std::string> sampleChoices;
-		for (int i = 1; i <= numSamples; ++i)
-			sampleChoices.push_back(std::to_string(i));
-		configSwitch(SAMPLE_PARAM, 0.f, (numSamples - 1), 0.f, "Sample", sampleChoices);
-		configParam<SpeedQuantity>(PITCH_PARAM, -1.f, 1.f, 0.f, "Pitch");
-		configParam(DECAY_PARAM, 0.f, 1.f, 1.f, "Decay", "s");
-		configParam(PUSH_PARAM, 0.f, 1.f, 0.f, "Trigger button");
-		configInput(SAMPLECVIN_INPUT, "Sample CV");
-		configInput(PITCHCVIN_INPUT, "Pitch CV");
-		configInput(DECAYCVIN_INPUT, "Decay CV");
-		configInput(VOLCVIN_INPUT, "Volume CV");
-		configInput(TRIGIN_INPUT, "Trig");
-		configOutput(AUDIOOUT_OUTPUT, "Audio output");
-	}
+  Clap() {
+    config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
+    std::vector<std::string> sampleChoices;
+    for (int i = 1; i <= numSamples; ++i)
+      sampleChoices.push_back(std::to_string(i));
+    configSwitch(SAMPLE_PARAM, 0.f, (numSamples - 1), 0.f, "Sample",
+                 sampleChoices);
+    configParam<SpeedQuantity>(PITCH_PARAM, -1.f, 1.f, 0.f, "Pitch");
+    configParam(DECAY_PARAM, 0.f, 1.f, 1.f, "Decay", "s");
+    configParam(PUSH_PARAM, 0.f, 1.f, 0.f, "Trigger button");
+    configInput(SAMPLECVIN_INPUT, "Sample CV");
+    configInput(PITCHCVIN_INPUT, "Pitch CV");
+    configInput(DECAYCVIN_INPUT, "Decay CV");
+    configInput(VOLCVIN_INPUT, "Volume CV");
+    configInput(TRIGIN_INPUT, "Trig");
+    configOutput(AUDIOOUT_OUTPUT, "Audio output");
+  }
 
-	const unsigned char* getSampleByIndex(int index) {
-	switch (index) {
-		case 0:  return Clap1;
-		case 1:  return Clap2;
-		case 2:  return Clap3;
-		case 3:  return Clap4;
-		case 4:  return Clap5;
-		case 5:  return Clap6;
-		case 6:  return Clap7;
-		case 7:  return Clap8;
-		case 8:  return Clap9;
-		case 9:  return Clap10;
-		case 10: return Clap11;
-		case 11: return Clap12;
-		case 12: return Clap13;
-		case 13: return Clap14;
-		case 14: return Clap15;
-		case 15: return Clap16;
-		default: return nullptr;
-	}
-}
+  const unsigned char *getSampleByIndex(int index) {
+    switch (index) {
+    case 0:
+      return Clap1;
+    case 1:
+      return Clap2;
+    case 2:
+      return Clap3;
+    case 3:
+      return Clap4;
+    case 4:
+      return Clap5;
+    case 5:
+      return Clap6;
+    case 6:
+      return Clap7;
+    case 7:
+      return Clap8;
+    case 8:
+      return Clap9;
+    case 9:
+      return Clap10;
+    case 10:
+      return Clap11;
+    case 11:
+      return Clap12;
+    case 12:
+      return Clap13;
+    case 13:
+      return Clap14;
+    case 14:
+      return Clap15;
+    case 15:
+      return Clap16;
+    default:
+      return nullptr;
+    }
+  }
 
-int getSampleLengthByIndex(int index) {
-	switch (index) {
-		case 0:  return Clap1_len;
-		case 1:  return Clap2_len;
-		case 2:  return Clap3_len;
-		case 3:  return Clap4_len;
-		case 4:  return Clap5_len;
-		case 5:  return Clap6_len;
-		case 6:  return Clap7_len;
-		case 7:  return Clap8_len;
-		case 8:  return Clap9_len;
-		case 9:  return Clap10_len;
-		case 10: return Clap11_len;
-		case 11: return Clap12_len;
-		case 12: return Clap13_len;
-		case 13: return Clap14_len;
-		case 14: return Clap15_len;
-		case 15: return Clap16_len;
-		default: return 0;
-	}
-}
-	// Predecode sample bytes to float buffer once per sample change
-	void loadSample(int index) {
-		const unsigned char* sampleData = getSampleByIndex(index);
-		int length = getSampleLengthByIndex(index);
+  int getSampleLengthByIndex(int index) {
+    switch (index) {
+    case 0:
+      return Clap1_len;
+    case 1:
+      return Clap2_len;
+    case 2:
+      return Clap3_len;
+    case 3:
+      return Clap4_len;
+    case 4:
+      return Clap5_len;
+    case 5:
+      return Clap6_len;
+    case 6:
+      return Clap7_len;
+    case 7:
+      return Clap8_len;
+    case 8:
+      return Clap9_len;
+    case 9:
+      return Clap10_len;
+    case 10:
+      return Clap11_len;
+    case 11:
+      return Clap12_len;
+    case 12:
+      return Clap13_len;
+    case 13:
+      return Clap14_len;
+    case 14:
+      return Clap15_len;
+    case 15:
+      return Clap16_len;
+    default:
+      return 0;
+    }
+  }
+  // Predecode sample bytes to float buffer once per sample change
+  void loadSample(int index) {
+    const unsigned char *sampleData = getSampleByIndex(index);
+    int length = getSampleLengthByIndex(index);
 
-		if (!sampleData || length < 2) {
-			currentSampleFloat = nullptr;
-			decodedSampleLength = 0;
-			decodedSample.clear();
-			return;
-		}
+    if (!sampleData || length < 2) {
+      currentSampleFloat = nullptr;
+      decodedSampleLength = 0;
+      decodedSample.clear();
+      return;
+    }
 
-		int numSamplesInt = length / 2;
-		decodedSample.resize(numSamplesInt);
+    int numSamplesInt = length / 2;
+    decodedSample.resize(numSamplesInt);
 
-		for (int i = 0; i < numSamplesInt; ++i) {
-			int16_t s = (int16_t)(sampleData[i * 2] | (sampleData[i * 2 + 1] << 8));
-			decodedSample[i] = (float)s / 32768.f;
-		}
+    for (int i = 0; i < numSamplesInt; ++i) {
+      int16_t s = (int16_t)(sampleData[i * 2] | (sampleData[i * 2 + 1] << 8));
+      decodedSample[i] = (float)s / 32768.f;
+    }
 
-		currentSampleFloat = decodedSample.data();
-		decodedSampleLength = numSamplesInt;
-	}
+    currentSampleFloat = decodedSample.data();
+    decodedSampleLength = numSamplesInt;
+  }
 
-	void process(const ProcessArgs& args) override {
-		float trigIn = inputs[TRIGIN_INPUT].getVoltage();
-		float buttonIn = params[PUSH_PARAM].getValue();
+  void process(const ProcessArgs &args) override {
+    float trigIn = inputs[TRIGIN_INPUT].getVoltage();
+    float buttonIn = params[PUSH_PARAM].getValue();
 
-		bool trigRising = (lastTrigValue <= 1.f && trigIn > 1.f);
-		bool buttonRising = (lastButtonValue <= 0.5f && buttonIn > 0.5f);
+    bool trigRising = (lastTrigValue <= 1.f && trigIn > 1.f);
+    bool buttonRising = (lastButtonValue <= 0.5f && buttonIn > 0.5f);
 
-		lastTrigValue = trigIn;
-		lastButtonValue = buttonIn;
+    lastTrigValue = trigIn;
+    lastButtonValue = buttonIn;
 
-		bool triggered = trigRising || buttonRising;
+    bool triggered = trigRising || buttonRising;
 
-		if (triggered) {
-			ClapLightBrightness = 1.0f;
+    if (triggered) {
+      ClapLightBrightness = 1.0f;
 
-			int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() + inputs[SAMPLECVIN_INPUT].getVoltage());
-			sampleIndex = std::clamp(sampleIndex, 0, numSamples - 1);
+      int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() +
+                                   inputs[SAMPLECVIN_INPUT].getVoltage());
+      sampleIndex = std::clamp(sampleIndex, 0, numSamples - 1);
 
-			loadSample(sampleIndex);
+      loadSample(sampleIndex);
 
-			samplePos = 0.f;
-			playing = (currentSampleFloat != nullptr && decodedSampleLength > 1);
+      samplePos = 0.f;
+      playing = (currentSampleFloat != nullptr && decodedSampleLength > 1);
 
-			env = 1.0f;
-		}
+      env = 1.0f;
+    }
 
-		ClapLightBrightness = std::max(0.f, ClapLightBrightness - (float)(args.sampleTime * 10.f));
-		lights[CLAP_LIGHT].setBrightnessSmooth(ClapLightBrightness, args.sampleTime);
+    ClapLightBrightness =
+        std::max(0.f, ClapLightBrightness - (float)(args.sampleTime * 10.f));
+    lights[CLAP_LIGHT].setBrightnessSmooth(ClapLightBrightness,
+                                           args.sampleTime);
 
-		float output = 0.f;
+    float output = 0.f;
 
-		if (playing && currentSampleFloat) {
-			// --- PITCH ---
-			float pitchKnob = params[PITCH_PARAM].getValue(); // -1 to 1
-			float pitchCV = inputs[PITCHCVIN_INPUT].isConnected() ? inputs[PITCHCVIN_INPUT].getVoltage() / 5.0f : 0.f; // -1 to 1
-			pitchCV = std::clamp(pitchCV, -1.f, 1.f);
-		
-			float pitchMod = pitchKnob + (1.0f - fabs(pitchKnob)) * pitchCV; 
-			// Explanation: CV influence is scaled so full knob sweep + full CV covers -1..1
-			pitchMod = std::clamp(pitchMod, -1.f, 1.f);
-		
-			float normalizedPitch = (pitchMod + 1.f) * 0.5f;
-			float pitchRatio = MIN_PLAYBACK_SPEED + normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
-		
-			// --- DECAY ---
-			float decayKnob = params[DECAY_PARAM].getValue(); // 0 to 1
-			float decayCV = inputs[DECAYCVIN_INPUT].isConnected() ? inputs[DECAYCVIN_INPUT].getVoltage() / 5.0f : 0.f; // -1 to 1
-			decayCV = std::clamp(decayCV, -1.f, 1.f);
-		
-			float decayMod = decayKnob + ((decayCV > 0 ? (1.0f - decayKnob) : decayKnob) * decayCV); 
-			// scale CV so that +5V pushes to max, -5V pushes to min, respecting knob
-			decayMod = std::clamp(decayMod, 0.f, 1.f);
-		
-			float minDecayTime = 0.005f;
-			float maxDecayTime = (float)decodedSampleLength / 44100.f;
-			float decayTime = minDecayTime + decayMod * (maxDecayTime - minDecayTime);
-			float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
-		
-			// --- Sample playback ---
-			samplePos += pitchRatio * (44100.f / args.sampleRate);
-		
-			if ((int)samplePos >= decodedSampleLength) {
-				playing = false;
-			} else {
-				int idx = (int)samplePos;
-				int nextIdx = (idx + 1 < decodedSampleLength) ? idx + 1 : idx;
-				float frac = samplePos - idx;
-				float sampleValue = currentSampleFloat[idx] + frac * (currentSampleFloat[nextIdx] - currentSampleFloat[idx]);
-				env *= decayCoef;
-				output = sampleValue * env;
-			}
-		}		
+    if (playing && currentSampleFloat) {
+      // --- PITCH ---
+      float pitchKnob = params[PITCH_PARAM].getValue(); // -1 to 1
+      float pitchCV = inputs[PITCHCVIN_INPUT].isConnected()
+                          ? inputs[PITCHCVIN_INPUT].getVoltage() / 5.0f
+                          : 0.f; // -1 to 1
+      pitchCV = std::clamp(pitchCV, -1.f, 1.f);
 
-		float volumeCV = 5.f;
-		if (inputs[VOLCVIN_INPUT].isConnected()) {
-			volumeCV = std::clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
-		}
+      float pitchMod = pitchKnob + (1.0f - fabs(pitchKnob)) * pitchCV;
+      // Explanation: CV influence is scaled so full knob sweep + full CV covers
+      // -1..1
+      pitchMod = std::clamp(pitchMod, -1.f, 1.f);
 
-		output *= volumeCV / 5.f;
+      float normalizedPitch = (pitchMod + 1.f) * 0.5f;
+      float pitchRatio =
+          MIN_PLAYBACK_SPEED +
+          normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
 
-		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 10.0f);
-	}
+      // --- DECAY ---
+      float decayKnob = params[DECAY_PARAM].getValue(); // 0 to 1
+      float decayCV = inputs[DECAYCVIN_INPUT].isConnected()
+                          ? inputs[DECAYCVIN_INPUT].getVoltage() / 5.0f
+                          : 0.f; // -1 to 1
+      decayCV = std::clamp(decayCV, -1.f, 1.f);
+
+      float decayMod =
+          decayKnob +
+          ((decayCV > 0 ? (1.0f - decayKnob) : decayKnob) * decayCV);
+      // scale CV so that +5V pushes to max, -5V pushes to min, respecting knob
+      decayMod = std::clamp(decayMod, 0.f, 1.f);
+
+      float minDecayTime = 0.005f;
+      float maxDecayTime = (float)decodedSampleLength / 44100.f;
+      float decayTime = minDecayTime + decayMod * (maxDecayTime - minDecayTime);
+      float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
+
+      // --- Sample playback ---
+      samplePos += pitchRatio * (44100.f / args.sampleRate);
+
+      if ((int)samplePos >= decodedSampleLength) {
+        playing = false;
+      } else {
+        int idx = (int)samplePos;
+        int nextIdx = (idx + 1 < decodedSampleLength) ? idx + 1 : idx;
+        float frac = samplePos - idx;
+        float sampleValue =
+            currentSampleFloat[idx] +
+            frac * (currentSampleFloat[nextIdx] - currentSampleFloat[idx]);
+        env *= decayCoef;
+        output = sampleValue * env;
+      }
+    }
+
+    float volumeCV = 5.f;
+    if (inputs[VOLCVIN_INPUT].isConnected()) {
+      volumeCV = std::clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f);
+    }
+
+    output *= volumeCV / 5.f;
+
+    outputs[AUDIOOUT_OUTPUT].setVoltage(output * 10.0f);
+  }
 };
 
 struct ClapWidget : ModuleWidget {
-	ClapWidget(Clap* module) {
-		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/Clap.svg")));
+  ClapWidget(Clap *module) {
+    setModule(module);
+    setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/Clap.svg")));
 
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+    addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
+    addChild(createWidget<ScrewBlack>(
+        Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 12.45)), module, Clap::SAMPLE_PARAM));
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 36.199)), module, Clap::PITCH_PARAM));
-		addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 60.001)), module, Clap::DECAY_PARAM));
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 84.3)), module, Clap::PUSH_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(10.16, 84.3)), module, Clap::CLAP_LIGHT));
+    addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 12.45)), module,
+                                          Clap::SAMPLE_PARAM));
+    addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 36.199)), module,
+                                          Clap::PITCH_PARAM));
+    addParam(createParamCentered<Knob9mm>(mm2px(Vec(10.16, 60.001)), module,
+                                          Clap::DECAY_PARAM));
+    addParam(createParamCentered<LEDBezel>(mm2px(Vec(10.16, 84.3)), module,
+                                           Clap::PUSH_PARAM));
+    addChild(createLightCentered<LEDBezelLight<WhiteLight>>(
+        mm2px(Vec(10.16, 84.3)), module, Clap::CLAP_LIGHT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 25.15)), module, Clap::SAMPLECVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 49.001)), module, Clap::PITCHCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 72.701)), module, Clap::DECAYCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.5, 98.002)), module, Clap::TRIGIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.799, 98.002)), module, Clap::VOLCVIN_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 25.15)), module,
+                                             Clap::SAMPLECVIN_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 49.001)), module,
+                                             Clap::PITCHCVIN_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 72.701)), module,
+                                             Clap::DECAYCVIN_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.5, 98.002)), module,
+                                             Clap::TRIGIN_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.799, 98.002)), module,
+                                             Clap::VOLCVIN_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.16, 112.0)), module, Clap::AUDIOOUT_OUTPUT));
-	}
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.16, 112.0)), module,
+                                               Clap::AUDIOOUT_OUTPUT));
+  }
 };
 
-
-Model* modelClap = createModel<Clap, ClapWidget>("Clap");
+Model *modelClap = createModel<Clap, ClapWidget>("Clap");

@@ -5,78 +5,91 @@
 using namespace rack;
 
 // Declare the Plugin, defined in plugin.cpp
-extern Plugin* pluginInstance;
+extern Plugin *pluginInstance;
 
 // Declare each Model, defined in each module source file
-extern Model* modelAyysKing;
-extern Model* modelClap;
-extern Model* modelClosedHat;
-extern Model* modelCrash;
-extern Model* modelDeeArr;
-extern Model* modelKayArr;
-extern Model* modelKayOne;
-extern Model* modelKick;
-extern Model* modelOpenHat;
-extern Model* modelPercussion;
-extern Model* modelRide;
-extern Model* modelRimshot;
-extern Model* modelSeaArr;
-extern Model* modelSehvenToo;
-extern Model* modelSicksOh;
-extern Model* modelSinSahnix;
-extern Model* modelSlap;
-extern Model* modelSnare;
-extern Model* modelTom;
-extern Model* modelOrchHits;
+extern Model *modelAyysKing;
+extern Model *modelClap;
+extern Model *modelClosedHat;
+extern Model *modelCrash;
+extern Model *modelDeeArr;
+extern Model *modelKayArr;
+extern Model *modelKayOne;
+extern Model *modelKick;
+extern Model *modelOpenHat;
+extern Model *modelPercussion;
+extern Model *modelRide;
+extern Model *modelRimshot;
+extern Model *modelSeaArr;
+extern Model *modelSehvenToo;
+extern Model *modelSicksOh;
+extern Model *modelSinSahnix;
+extern Model *modelSlap;
+extern Model *modelSnare;
+extern Model *modelTom;
+extern Model *modelOrchHits;
 
 struct Knob9mm : RoundKnob {
-    Knob9mm() {
-        setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/9mm_knob.svg")));
-    }
+  Knob9mm() {
+    setSvg(APP->window->loadSvg(
+        asset::plugin(pluginInstance, "res/components/9mm_knob.svg")));
+  }
 };
 
 struct Davies1900hBlack : RoundKnob {
-    Davies1900hBlack() {
-        setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/Davies1900hBlack.svg")));
-    }
+  Davies1900hBlack() {
+    setSvg(APP->window->loadSvg(
+        asset::plugin(pluginInstance, "res/components/Davies1900hBlack.svg")));
+  }
 };
 
 struct Davies_large : RoundKnob {
-    Davies_large() {
-        setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/Davies_large.svg")));
-    }
+  Davies_large() {
+    setSvg(APP->window->loadSvg(
+        asset::plugin(pluginInstance, "res/components/Davies_large.svg")));
+  }
 };
 
 struct Switch2Pos : SvgSwitch {
-    Switch2Pos() {
-        momentary = false; // true for momentary behavior
-        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/SubMiniToggle_0.svg")));
-        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/SubMiniToggle_2.svg")));
-    }
+  Switch2Pos() {
+    momentary = false; // true for momentary behavior
+    addFrame(APP->window->loadSvg(
+        asset::plugin(pluginInstance, "res/components/SubMiniToggle_0.svg")));
+    addFrame(APP->window->loadSvg(
+        asset::plugin(pluginInstance, "res/components/SubMiniToggle_2.svg")));
+  }
 };
 
 struct Switch2PosHorizontal : SvgSwitch {
-    Switch2PosHorizontal() {
-        momentary = false; // true for momentary behavior
-        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/SubMiniToggleH_0.svg")));
-        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/SubMiniToggleH_2.svg")));
-    }
+  Switch2PosHorizontal() {
+    momentary = false; // true for momentary behavior
+    addFrame(APP->window->loadSvg(
+        asset::plugin(pluginInstance, "res/components/SubMiniToggleH_0.svg")));
+    addFrame(APP->window->loadSvg(
+        asset::plugin(pluginInstance, "res/components/SubMiniToggleH_2.svg")));
+  }
 };
 
 struct Switch3Pos : SvgSwitch {
-    Switch3Pos() {
-        momentary = false; // true for momentary behavior
-        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/SubMiniToggle_0.svg")));
-        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/SubMiniToggle_1.svg")));
-        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/SubMiniToggle_2.svg")));
-    }
+  Switch3Pos() {
+    momentary = false; // true for momentary behavior
+    addFrame(APP->window->loadSvg(
+        asset::plugin(pluginInstance, "res/components/SubMiniToggle_0.svg")));
+    addFrame(APP->window->loadSvg(
+        asset::plugin(pluginInstance, "res/components/SubMiniToggle_1.svg")));
+    addFrame(APP->window->loadSvg(
+        asset::plugin(pluginInstance, "res/components/SubMiniToggle_2.svg")));
+  }
 };
 
 struct Switch3PosHorizontal : SvgSwitch {
-    Switch3PosHorizontal() {
-        momentary = false; // true for momentary behavior
-        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/SubMiniToggleH_0.svg")));
-        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/SubMiniToggleH_1.svg")));
-        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/components/SubMiniToggleH_2.svg")));
-    }
+  Switch3PosHorizontal() {
+    momentary = false; // true for momentary behavior
+    addFrame(APP->window->loadSvg(
+        asset::plugin(pluginInstance, "res/components/SubMiniToggleH_0.svg")));
+    addFrame(APP->window->loadSvg(
+        asset::plugin(pluginInstance, "res/components/SubMiniToggleH_1.svg")));
+    addFrame(APP->window->loadSvg(
+        asset::plugin(pluginInstance, "res/components/SubMiniToggleH_2.svg")));
+  }
 };
