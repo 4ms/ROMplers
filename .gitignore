@@ -6,3 +6,4 @@
 .DS_Store
 /metamodule-plugins
 compile_commands.json
+.cache
