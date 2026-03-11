@@ -346,3 +346,125 @@ public:
                                                module, W::DRUM11_OUTPUT));
   }
 };
+
+template <typename T, typename W>
+class DrumMachine10BaseWidget : public ModuleWidget {
+public:
+  DrumMachine10BaseWidget(W *module) {
+    setModule(module);
+    setPanel(createPanel(asset::plugin(pluginInstance, T::panel)));
+
+    addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
+    addChild(
+        createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+    addChild(createWidget<ScrewBlack>(
+        Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+    addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH,
+                                          RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+
+    addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(11.24, 15.501)),
+                                                   module, W::LENGTH_PARAM));
+    addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(31.249, 15.501)),
+                                                   module, W::SPEED_PARAM));
+    addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(49.731, 15.501)),
+                                                   module, W::MAINVOL_PARAM));
+
+    addParam(createParamCentered<LEDBezel>(mm2px(Vec(6.999, 42.002)), module,
+                                           W::DRUM0_PARAM));
+    addChild(createLightCentered<LEDBezelLight<WhiteLight>>(
+        mm2px(Vec(6.999, 42.002)), module, W::DRUM0_LIGHT));
+
+    addParam(createParamCentered<LEDBezel>(mm2px(Vec(18.75, 42.002)), module,
+                                           W::DRUM1_PARAM));
+    addChild(createLightCentered<LEDBezelLight<WhiteLight>>(
+        mm2px(Vec(18.75, 42.002)), module, W::DRUM1_LIGHT));
+
+    addParam(createParamCentered<LEDBezel>(mm2px(Vec(30.501, 42.002)), module,
+                                           W::DRUM2_PARAM));
+    addChild(createLightCentered<LEDBezelLight<WhiteLight>>(
+        mm2px(Vec(30.501, 42.002)), module, W::DRUM2_LIGHT));
+
+    addParam(createParamCentered<LEDBezel>(mm2px(Vec(42.249, 42.002)), module,
+                                           W::DRUM3_PARAM));
+    addChild(createLightCentered<LEDBezelLight<WhiteLight>>(
+        mm2px(Vec(42.249, 42.002)), module, W::DRUM3_LIGHT));
+
+    addParam(createParamCentered<LEDBezel>(mm2px(Vec(54.0, 42.002)), module,
+                                           W::DRUM4_PARAM));
+    addChild(createLightCentered<LEDBezelLight<WhiteLight>>(
+        mm2px(Vec(54.0, 42.002)), module, W::DRUM4_LIGHT));
+
+    addParam(createParamCentered<LEDBezel>(mm2px(Vec(6.999, 84.999)), module,
+                                           W::DRUM5_PARAM));
+    addChild(createLightCentered<LEDBezelLight<WhiteLight>>(
+        mm2px(Vec(6.999, 84.999)), module, W::DRUM5_LIGHT));
+
+    addParam(createParamCentered<LEDBezel>(mm2px(Vec(18.75, 84.999)), module,
+                                           W::DRUM6_PARAM));
+    addChild(createLightCentered<LEDBezelLight<WhiteLight>>(
+        mm2px(Vec(18.75, 84.999)), module, W::DRUM6_LIGHT));
+
+    addParam(createParamCentered<LEDBezel>(mm2px(Vec(30.501, 84.999)), module,
+                                           W::DRUM7_PARAM));
+    addChild(createLightCentered<LEDBezelLight<WhiteLight>>(
+        mm2px(Vec(30.501, 84.999)), module, W::DRUM7_LIGHT));
+
+    addParam(createParamCentered<LEDBezel>(mm2px(Vec(42.249, 84.999)), module,
+                                           W::DRUM8_PARAM));
+    addChild(createLightCentered<LEDBezelLight<WhiteLight>>(
+        mm2px(Vec(42.249, 84.999)), module, W::DRUM8_LIGHT));
+
+    addParam(createParamCentered<LEDBezel>(mm2px(Vec(54.0, 84.999)), module,
+                                           W::DRUM9_PARAM));
+    addChild(createLightCentered<LEDBezelLight<WhiteLight>>(
+        mm2px(Vec(54.0, 84.999)), module, W::DRUM9_LIGHT));
+
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.24, 30.801)), module,
+                                             W::LENGTHCVIN_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31.249, 30.801)), module,
+                                             W::SPEEDCVIN_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.999, 56.0)), module,
+                                             W::DRUM0_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(18.75, 56.0)), module,
+                                             W::DRUM1_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(30.501, 56.0)), module,
+                                             W::DRUM2_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(42.249, 56.0)), module,
+                                             W::DRUM3_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(54.0, 56.0)), module,
+                                             W::DRUM4_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.999, 99.001)), module,
+                                             W::DRUM5_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(18.75, 99.001)), module,
+                                             W::DRUM6_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(30.501, 99.001)), module,
+                                             W::DRUM7_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(42.249, 99.001)), module,
+                                             W::DRUM8_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(54.0, 99.001)), module,
+                                             W::DRUM9_INPUT));
+
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(49.731, 30.801)),
+                                               module, W::SUM_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(6.999, 70.002)),
+                                               module, W::DRUM0_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.75, 70.002)),
+                                               module, W::DRUM1_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(30.501, 70.002)),
+                                               module, W::DRUM2_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(42.249, 70.002)),
+                                               module, W::DRUM3_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(54.0, 70.002)), module,
+                                               W::DRUM4_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(6.999, 112.999)),
+                                               module, W::DRUM5_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.75, 112.999)),
+                                               module, W::DRUM6_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(30.501, 112.999)),
+                                               module, W::DRUM7_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(42.249, 112.999)),
+                                               module, W::DRUM8_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(54.0, 112.999)),
+                                               module, W::DRUM9_OUTPUT));
+  }
+};
