@@ -4,16 +4,11 @@
 
 struct KayArr : DrumMachineBaseModule<KayArr> {
   static constexpr auto drums = std::array{
-      DrumSample{"Kick Trig", KRKick},
-      DrumSample{"Snare Trig", KRSnare},
-      DrumSample{"Tom Trig", KRTom},
-      DrumSample{"Closed Hat Trig", KRClosedHat},
-      DrumSample{"Open Hat Trig", KROpenHat},
-      DrumSample{"Clave Trig", KRClave},
-      DrumSample{"Rimshot Trig", KRRimshot},
-      DrumSample{"Cowbell Trig", KRCowbell},
-      DrumSample{"Cymbal Trig", KRCymbal},
-      DrumSample{"Conga Trig", KRConga},
+      DrumSample{"Kick", KRKick},        DrumSample{"Snare", KRSnare},
+      DrumSample{"Tom", KRTom},          DrumSample{"Closed Hat", KRClosedHat},
+      DrumSample{"Open Hat", KROpenHat}, DrumSample{"Clave", KRClave},
+      DrumSample{"Rimshot", KRRimshot},  DrumSample{"Cowbell", KRCowbell},
+      DrumSample{"Cymbal", KRCymbal},    DrumSample{"Conga", KRConga},
   };
 };
 
