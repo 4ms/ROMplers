@@ -1,5 +1,6 @@
 #include "SlapSamples.hpp"
 #include "plugin.hpp"
+#include "sample.hh"
 #include <cmath>
 
 struct Slap : Module {
@@ -15,8 +16,7 @@ struct Slap : Module {
   enum OutputId { AUDIOOUT_OUTPUT, OUTPUTS_LEN };
   enum LightId { SLAP_LIGHT, LIGHTS_LEN };
 
-  const unsigned char *currentSample = Slap1;
-  int sampleLength = Slap1_len;
+  Sample slap{Slap1};
   float samplePos = 0.f;
   bool playing = false;
 
@@ -41,21 +41,6 @@ struct Slap : Module {
     configInput(TRIGIN_INPUT, "Trig");
     configInput(VOLCVIN_INPUT, "Volume CV");
     configOutput(AUDIOOUT_OUTPUT, "Audio");
-  }
-
-  float fastPow2(float x) {
-    // Approximate 2^x for typical pitch range (x in [0..8])
-    // Using a simple polynomial or linear approx to avoid std::pow cost
-    // For small CPU optimization, linear approx is OK here:
-    // 2^x ≈ 1 + x * 0.69314718 (ln2) for x near 0, std::clamp for larger x.
-    // Since pitch can be 0..8 (4 oct + 4V?), std::clamp and do powf only if
-    // needed.
-
-    if (x < 0.f)
-      return 1.f / fastPow2(-x);
-    if (x > 8.f)
-      x = 8.f;
-    return 1.f + x * 0.69314718f;
   }
 
   void process(const ProcessArgs &args) override {
@@ -84,7 +69,7 @@ struct Slap : Module {
 
     float output = 0.f;
 
-    if (playing && currentSample) {
+    if (playing) {
       // Pitch calculation: knob + CV, std::clamp CV if disconnected
       // --- Octave parameter with CV scaling ---
       // --- 1V/oct pitch calculation ---
@@ -109,27 +94,22 @@ struct Slap : Module {
       const float sampleRateRatio = sampleSampleRate / args.sampleRate;
       samplePos += pitchRatio * sampleRateRatio;
 
-      const int numSamples = sampleLength / 2;
+      const auto numSamples = slap.size();
 
       // Check if sample done
-      if ((int)samplePos >= numSamples) {
+      if (static_cast<unsigned>(samplePos) >= numSamples) {
         playing = false;
         output = 0.f;
       } else {
         // Linear interpolate sample
-        const int idx = (int)samplePos;
-        const int nextIdx = (idx + 1 < numSamples) ? idx + 1 : idx;
-        const float frac = samplePos - idx;
+        const auto idx = (uint)samplePos;
+        const auto nextIdx = (idx + 1 < numSamples) ? idx + 1 : idx;
+        const auto frac = samplePos - idx;
 
-        // Read sample data once
-        const unsigned char *d = currentSample;
-        const int16_t s1s = (int16_t)(d[idx * 2] | (d[idx * 2 + 1] << 8));
-        const int16_t s2s =
-            (int16_t)(d[nextIdx * 2] | (d[nextIdx * 2 + 1] << 8));
-        const float s1 = s1s * (1.f / 32768.f);
-        const float s2 = s2s * (1.f / 32768.f);
+        const auto s1 = slap[idx];
+        const auto s2 = slap[nextIdx];
 
-        const float sampleValue = s1 + frac * (s2 - s1);
+        const auto sampleValue = s1 + frac * (s2 - s1);
         // --- Decay parameter with 0-5 knob + -10..10 CV ---
         float decayKnob = params[DECAY_PARAM].getValue() * 5.f; // 0-1 → 0-5
         float decayCV = 0.f;
