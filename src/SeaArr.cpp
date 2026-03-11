@@ -4,12 +4,12 @@
 
 struct SeaArr : DrumMachineBaseModule<SeaArr> {
   static constexpr auto drums = std::array{
-      DrumSample{"Kick", SAKick},       DrumSample{"Snare", SASnare},
-      DrumSample{"Hat", SAHiHat},       DrumSample{"Hat Metal", SAHiHatMetal},
-      DrumSample{"Rimshot", SARim},     DrumSample{"Cowbell", SACowbell},
-      DrumSample{"Conga", SACongaL},    DrumSample{"Bongo Lo", SABongoL},
-      DrumSample{"Bongo Hi", SABongoH}, DrumSample{"Tambourine", SATamb},
-      DrumSample{"Guiro", SAGuiro},     DrumSample{"Cymbal", SACym},
+      NamedSample{"Kick", SAKick},       NamedSample{"Snare", SASnare},
+      NamedSample{"Hat", SAHiHat},       NamedSample{"Hat Metal", SAHiHatMetal},
+      NamedSample{"Rimshot", SARim},     NamedSample{"Cowbell", SACowbell},
+      NamedSample{"Conga", SACongaL},    NamedSample{"Bongo Lo", SABongoL},
+      NamedSample{"Bongo Hi", SABongoH}, NamedSample{"Tambourine", SATamb},
+      NamedSample{"Guiro", SAGuiro},     NamedSample{"Cymbal", SACym},
 
   };
 };

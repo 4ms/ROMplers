@@ -11,7 +11,7 @@ struct SpeedQuantity : ParamQuantity {
   }
 };
 
-struct DrumSample {
+struct NamedSample {
   const char *name;
   Sample sample;
 };
