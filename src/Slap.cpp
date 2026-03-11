@@ -16,7 +16,7 @@ struct Slap : Module {
   enum OutputId { AUDIOOUT_OUTPUT, OUTPUTS_LEN };
   enum LightId { SLAP_LIGHT, LIGHTS_LEN };
 
-  Sample slap{Slap1};
+  static constexpr Sample slap{Slap1};
   float samplePos = 0.f;
   bool playing = false;
 
@@ -94,7 +94,7 @@ struct Slap : Module {
       const float sampleRateRatio = sampleSampleRate / args.sampleRate;
       samplePos += pitchRatio * sampleRateRatio;
 
-      const auto numSamples = slap.size();
+      static constexpr auto numSamples = slap.size();
 
       // Check if sample done
       if (static_cast<unsigned>(samplePos) >= numSamples) {
@@ -121,8 +121,8 @@ struct Slap : Module {
         decayParam = std::clamp(decayParam, 0.f, 5.f);
         decayParam /= 5.f; // normalize back to 0-1
 
-        const float minDecayTime = 0.005f;
-        const float maxDecayTime = numSamples / sampleSampleRate;
+        static constexpr float minDecayTime = 0.005f;
+        static constexpr float maxDecayTime = numSamples / sampleSampleRate;
         const float decayTime =
             minDecayTime + decayParam * (maxDecayTime - minDecayTime);
 
