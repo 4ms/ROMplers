@@ -102,7 +102,7 @@ struct Slap : Module {
         output = 0.f;
       } else {
         // Linear interpolate sample
-        const auto idx = (uint)samplePos;
+        const auto idx = (uint32_t)samplePos;
         const auto nextIdx = (idx + 1 < numSamples) ? idx + 1 : idx;
         const auto frac = samplePos - idx;
 

@@ -131,11 +131,11 @@ struct OrchHits : Module {
 
       const auto numSamplesInSample = s.size();
 
-      if ((uint)samplePos >= numSamplesInSample) {
+      if ((uint32_t)samplePos >= numSamplesInSample) {
         playing = false;
         output = 0.f;
       } else {
-        auto idx = (uint)samplePos;
+        auto idx = (uint32_t)samplePos;
         int nextIdx = (idx + 1 < numSamplesInSample) ? idx + 1 : idx;
         float frac = samplePos - idx;
 
