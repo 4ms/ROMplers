@@ -4,7 +4,7 @@
 #include "sample.hh"
 
 struct OpenHat : OneShotBaseModule<OpenHat> {
-  static constexpr auto min_rate = .01f;
+  static constexpr auto min_rate = 2.f;
   static constexpr auto max_rate = 8.f;
 
   static constexpr std::array samples = {
