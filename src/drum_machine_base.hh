@@ -100,6 +100,7 @@ public:
   static constexpr unsigned LIGHTS_LEN = T::drums.size();
 
   static constexpr float outputScale = 1.f;
+  static constexpr float sumScale = 1.f;
 
   static constexpr float SPEED_MIN = 0.05f;
   static constexpr float SPEED_MAX = 2.0f;
@@ -205,7 +206,7 @@ public:
     }
 
     outputs[SUM_OUTPUT].setVoltage(
-        std::clamp(busSum / (float)T::drums.size() * mainVol * 10.f, -10.f, 10.f));
+        std::clamp(busSum / (float)T::drums.size() * mainVol * 10.f * T::sumScale, -10.f, 10.f));
   }
 };
 
