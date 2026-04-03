@@ -182,11 +182,11 @@ struct SinSahnix : Module {
                           &tomMedVoice, &tomHiVoice, &cymbalVoice};
     for (Voice *v : allVoices) {
       if (!outputs[v->outputId].isConnected()) {
-        busSum += outputs[v->outputId].getVoltage();
+        busSum += outputs[v->outputId].getVoltage() / 2.f;
       }
     }
     outputs[SUM_OUTPUT].setVoltage(
-        std::clamp(busSum * mainVol * 2.f, -10.f, 10.f));
+        std::clamp(busSum / 6.f * mainVol * 6.25f, -10.f, 10.f));
   }
 
   void processVoice(const ProcessArgs &args, Voice &voice, int trigInputId,
@@ -221,7 +221,7 @@ struct SinSahnix : Module {
     if (idx < maxSamplesToPlay) {
       const int16_t sampleInt = voice.readSample16(idx);
       const float sample = (float)sampleInt / 32768.f;
-      outputs[voice.outputId].setVoltage(sample * 5.f);
+      outputs[voice.outputId].setVoltage(sample * 10.f);
       voice.samplePos += speed;
     } else {
       voice.playing = false;
