@@ -4,19 +4,18 @@
 
 struct SehvenToo : DrumMachineBaseModule<SehvenToo> {
   static constexpr auto drums = std::array{
-      NamedSample{"Conga Lo", STCongaL},
-      NamedSample{"Conga Hi", STCongaHOpen},
-      NamedSample{"Conga Hi Mute", STCongaHMute},
-      NamedSample{"Bongo Lo", STBongoL},
-      NamedSample{"Bongo Hi", STBongoH},
+      NamedSample{"Conga Lo", STCongaL, 2.f},
+      NamedSample{"Conga Hi", STCongaHOpen, 2.f},
+      NamedSample{"Conga Hi Mute", STCongaHMute, 2.f},
+      NamedSample{"Bongo Lo", STBongoL, 2.f},
+      NamedSample{"Bongo Hi", STBongoH, 2.f},
       NamedSample{"Timbale Lo", STTimbaleL},
       NamedSample{"Timbale Hi", STTimbaleH},
-      NamedSample{"Agogo Lo", STAgogoL},
-      NamedSample{"Agogo Hi", STAgogoH},
-      NamedSample{"Maraca", STMaracas},
-      NamedSample{"Cabasa", STCabasa},
-      NamedSample{"Whistle", STWhistle},
-
+      NamedSample{"Agogo Lo", STAgogoL, 2.f},
+      NamedSample{"Agogo Hi", STAgogoH, 2.f},
+      NamedSample{"Maraca", STMaracas, 2.f},
+      NamedSample{"Cabasa", STCabasa, 2.f},
+      NamedSample{"Whistle", STWhistle, 2.f},
   };
 };
 

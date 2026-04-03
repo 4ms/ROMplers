@@ -14,6 +14,7 @@ struct SpeedQuantity : ParamQuantity {
 struct NamedSample {
   const char *name;
   Sample sample;
+  float scale = 1.f;
 };
 
 template <typename T> class DrumMachineBaseModule : public Module {
@@ -183,7 +184,7 @@ public:
         const auto idx = static_cast<uint32_t>(v.samplePos);
         if (idx < maxSamples) {
           const auto sumVoltage = samp[idx] * 5.f;
-          outputs[output_id].setVoltage(sumVoltage * T::outputScale);
+          outputs[output_id].setVoltage(sumVoltage * T::outputScale * T::drums[i].scale);
           v.samplePos += speed;
         } else {
           v.playing = false;
@@ -201,7 +202,7 @@ public:
       }
 
       if (!outputs[output_id].isConnected()) {
-        busSum += outputs[output_id].getVoltage() / T::outputScale;
+        busSum += outputs[output_id].getVoltage() / T::outputScale / T::drums[i].scale;
       }
     }
 
