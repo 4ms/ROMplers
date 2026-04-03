@@ -77,9 +77,9 @@ public:
     DRUM9_OUTPUT,
     DRUM10_OUTPUT,
     DRUM11_OUTPUT,
-    SUM_OUTPUT,
   };
 
+  static constexpr unsigned SUM_OUTPUT = T::drums.size();
   static constexpr unsigned OUTPUTS_LEN = T::drums.size() + 1;
 
   enum LightId {
@@ -180,7 +180,7 @@ public:
         const auto idx = static_cast<uint32_t>(v.samplePos);
         if (idx < maxSamples) {
           const auto out = samp[idx];
-          outputs[output_id].setVoltage(out * 10.f);
+          outputs[output_id].setVoltage(out * 5.f);
           v.samplePos += speed;
         } else {
           v.playing = false;
@@ -203,7 +203,7 @@ public:
     }
 
     outputs[SUM_OUTPUT].setVoltage(
-        std::clamp(busSum * mainVol * 0.75f, -10.f, 10.f));
+        std::clamp(busSum / (float)T::drums.size() * mainVol * 10.f, -10.f, 10.f));
   }
 };
 
