@@ -120,7 +120,7 @@ struct OrchHits : Module {
 
       // Use in pitch calculation
       float pitchCV = inputs[PITCHCVIN_INPUT].isConnected()
-                          ? inputs[PITCHCVIN_INPUT].getVoltage()
+                          ? std::clamp(inputs[PITCHCVIN_INPUT].getVoltage(), -1.f, 1.f)
                           : 0.f;
       float totalVolts =
           (totalOctave - 2.f) + pitchCV; // centered around Unison

@@ -30,8 +30,8 @@ struct Slap : Module {
   Slap() {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
-    configSwitch(OCTAVE_PARAM, 0.f, 4.f, 0.f, "Octave transpose",
-                 {"Unison", "+1", "+2", "+3", "+4"});
+    configSwitch(OCTAVE_PARAM, 0.f, 4.f, 1.f, "Octave transpose",
+                 {"-1", "Unison", "+1", "+2", "+3"});
     configParam(DECAY_PARAM, 0.f, 1.f, 1.f, "Decay", "s");
     configParam(PUSH_PARAM, 0.f, 1.f, 0.f, "Trigger button");
 
@@ -80,7 +80,7 @@ struct Slap : Module {
                   0.4f)),
           0, 4);
       float pitchCV = inputs[PITCHCVIN_INPUT].isConnected()
-                          ? inputs[PITCHCVIN_INPUT].getVoltage()
+                          ? std::clamp(inputs[PITCHCVIN_INPUT].getVoltage(), -1.f, 1.f)
                           : 0.f;
 
       // Sum everything in volts for 1V/oct tracking
