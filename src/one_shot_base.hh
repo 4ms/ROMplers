@@ -76,8 +76,9 @@ public:
     if (triggered) {
       LightBrightness = 1.0f;
 
+      float sampleCV = std::clamp(inputs[SAMPLECVIN_INPUT].getVoltage(), -5.f, 5.f);
       int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() +
-                                   inputs[SAMPLECVIN_INPUT].getVoltage());
+                                   sampleCV / 5.f * 8.f);
       cur_sample_idx =
           std::clamp<uint32_t>(sampleIndex, 0, T::samples.size() - 1);
 
