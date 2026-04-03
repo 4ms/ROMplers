@@ -201,7 +201,7 @@ struct SicksOh : Module {
       }
     }
     outputs[SUM_OUTPUT].setVoltage(
-        std::clamp(busSum * mainVol * 2.f, -10.f, 10.f));
+        std::clamp(busSum / 7.f * mainVol * (10.f / 3.f), -10.f, 10.f));
   }
 
   void processVoice(const ProcessArgs &args, Voice &voice, int trigInputId,
@@ -233,7 +233,7 @@ struct SicksOh : Module {
 
     if (idx < maxSamples) {
       int16_t sample = voice.readSample16(idx);
-      float out = (float)sample / 32768.f * 5.f;
+      float out = (float)sample / 32768.f * 12.5f;
       outputs[voice.outputId].setVoltage(out);
       voice.samplePos += speed;
     } else {
