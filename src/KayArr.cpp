@@ -3,6 +3,7 @@
 #include "plugin.hpp"
 
 struct KayArr : DrumMachineBaseModule<KayArr> {
+  static constexpr float outputScale = 2.f;
   static constexpr auto drums = std::array{
       NamedSample{"Kick", KRKick},
       NamedSample{"Snare", KRSnare},

@@ -99,6 +99,8 @@ public:
 
   static constexpr unsigned LIGHTS_LEN = T::drums.size();
 
+  static constexpr float outputScale = 1.f;
+
   static constexpr float SPEED_MIN = 0.05f;
   static constexpr float SPEED_MAX = 2.0f;
   static constexpr float LENGTH_MIN = 0.1f;
@@ -179,8 +181,8 @@ public:
       if (v.playing) {
         const auto idx = static_cast<uint32_t>(v.samplePos);
         if (idx < maxSamples) {
-          const auto out = samp[idx];
-          outputs[output_id].setVoltage(out * 5.f);
+          const auto sumVoltage = samp[idx] * 5.f;
+          outputs[output_id].setVoltage(sumVoltage * T::outputScale);
           v.samplePos += speed;
         } else {
           v.playing = false;
@@ -198,7 +200,7 @@ public:
       }
 
       if (!outputs[output_id].isConnected()) {
-        busSum += outputs[output_id].getVoltage();
+        busSum += outputs[output_id].getVoltage() / T::outputScale;
       }
     }
 
