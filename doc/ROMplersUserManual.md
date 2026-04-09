@@ -14,7 +14,7 @@ Use this document to understand the behavior, controls, and design inspirations 
 ---
 ## AyysKing — Ace King drums
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/AyysKing.png" width="200">
+<p align="center"><img src="https://github.com/4ms/ROMplers/blob/main/doc/AyysKing.png" width="200"></p>
 
 Ace Tone Rhythm King samples with playback speed, sample length, and a mix output.
 
@@ -29,7 +29,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and a mix outpu
 ---
 ## Clap — Acoustic claps
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/Clap.png" width="60">
+<p align="center"><img src="https://github.com/4ms/ROMplers/blob/main/doc/Clap.png" width="60"></p>
 
 “Real” acoustic clap samples with playback speed, velocity, and a decay envelope.
 
@@ -44,7 +44,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and a mix outpu
 ---
 ## ClosedHat — Acoustic closed hi-hats
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/ClosedHiHat.png" width="60">
+<p align="center"><img src="https://github.com/4ms/ROMplers/blob/main/doc/ClosedHiHat.png" width="60"></p>
 
 “Real” acoustic closed hi-hat samples with playback speed, velocity, and a decay envelope.
 
@@ -59,7 +59,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and a mix outpu
 ---
 ## Crash — Acoustic crash cymbals
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/Crash.png" width="60">
+<p align="center"><img src="https://github.com/4ms/ROMplers/blob/main/doc/Crash.png" width="60"></p>
 
 “Real” acoustic crash samples with playback speed, velocity, and a decay envelope.
 
@@ -74,7 +74,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and a mix outpu
 ---
 ## DeeArr — DR-55 drums
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/DeeArr.png" width="150">
+<p align="center"><img src="https://github.com/4ms/ROMplers/blob/main/doc/DeeArr.png" width="150"></p>
 
 DR-55 samples with playback speed, sample length, direct outs, and a mix output.
 
@@ -89,7 +89,7 @@ DR-55 samples with playback speed, sample length, direct outs, and a mix output.
 ---
 ## KayArr — KR-55 drums
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/KayArr.png" width="150">
+<p align="center"><img src="https://github.com/4ms/ROMplers/blob/main/doc/KayArr.png" width="150"></p>
 
 KR55 samples with playback speed, sample length, direct outs, and a mix output.
 
@@ -104,7 +104,7 @@ KR55 samples with playback speed, sample length, direct outs, and a mix output.
 ---
 ## KayOne — SK-1 drums
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/KayOne.png" width="150">
+<p align="center"><img src="https://github.com/4ms/ROMplers/blob/main/doc/KayOne.png" width="150"></p>
 
 Casio SK-1 samples with playback speed, sample length, direct outs, and a mix output.
 
@@ -119,7 +119,7 @@ Casio SK-1 samples with playback speed, sample length, direct outs, and a mix ou
 ---
 ## Kick — Acoustic kick drums
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/Kick.png" width="60">
+<p align="center"><img src="https://github.com/4ms/ROMplers/blob/main/doc/Kick.png" width="60"></p>
 
 “Real” acoustic kick samples with playback speed, velocity, and a decay envelope.
 
@@ -134,7 +134,7 @@ Casio SK-1 samples with playback speed, sample length, direct outs, and a mix ou
 ---
 ## OpenHat — Acoustic open hi-hats
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/OpenHiHat.png" width="60">
+<p align="center"><img src="https://github.com/4ms/ROMplers/blob/main/doc/OpenHiHat.png" width="60"></p>
 
 “Real” acoustic open hi-hat samples with playback speed, velocity, and a decay envelope.
 
@@ -149,7 +149,7 @@ Casio SK-1 samples with playback speed, sample length, direct outs, and a mix ou
 ---
 ## OrchHits — Pitched orchestra hits
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/OrchestraHits.png" width="60">
+<p align="center"><img src="https://github.com/4ms/ROMplers/blob/main/doc/OrchestraHits.png" width="60"></p>
 
 Pitched orchestra hits, meant to be controlled with a 1v per octave source such as a keyboard or sequencer.
 
@@ -165,7 +165,7 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 ---
 ## Percussion — Assorted acoustic hand percussion 
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/Percussion.png" width="60">
+<p align="center"><img src="https://github.com/4ms/ROMplers/blob/main/doc/Percussion.png" width="60"></p>
 
 “Real” acoustic auxiliary percussion samples with playback speed, velocity, and a decay envelope.
 
@@ -180,7 +180,7 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 ---
 ## Ride — Acoustic ride cymbals
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/Ride.png" width="60">
+<p align="center"><img src="https://github.com/4ms/ROMplers/blob/main/doc/Ride.png" width="60"></p>
 
 “Real” acoustic ride samples with playback speed, velocity, and a decay envelope.
 
@@ -195,7 +195,7 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 ---
 ## Rimshot — Acoustic rimshots
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/Rimshot.png" width="60">
+<p align="center"><img src="https://github.com/4ms/ROMplers/blob/main/doc/Rimshot.png" width="60"></p>
 
 “Real” acoustic rimshot samples with playback speed, velocity, and a decay envelope.
 
@@ -210,7 +210,7 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 ---
 ## SeaArr — CR-78 drums
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/SeaArr.png" width="200">
+<p align="center"><img src="https://github.com/4ms/ROMplers/blob/main/doc/SeaArr.png" width="200"></p>
 
 CR-78 samples with playback speed, sample length, direct outs, and a mix output.
 
@@ -225,7 +225,7 @@ CR-78 samples with playback speed, sample length, direct outs, and a mix output.
 ---
 ## SehvenToo — TR-727 drums
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/SehvenToo.png" width="200">
+<p align="center"><img src="https://github.com/4ms/ROMplers/blob/main/doc/SehvenToo.png" width="200"></p>
 
 TR-727 samples with playback speed, sample length, direct outs, and a mix output.
 
@@ -240,7 +240,7 @@ TR-727 samples with playback speed, sample length, direct outs, and a mix output
 ---
 ## SicksOh — TR-606 drums
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/SicksOh.png" width="150">
+<p align="center"><img src="https://github.com/4ms/ROMplers/blob/main/doc/SicksOh.png" width="150"></p>
 
 TR-606 samples with playback speed, sample length, direct outs, and a mix output.
 
@@ -255,7 +255,7 @@ TR-606 samples with playback speed, sample length, direct outs, and a mix output
 ---
 ## SinSahnix — Synsonics drums
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/SinSahnix.png" width="150">
+<p align="center"><img src="https://github.com/4ms/ROMplers/blob/main/doc/SinSahnix.png" width="150"></p>
 
 Synsonics samples with playback speed, sample length, direct outs, and a mix output.
 
@@ -270,7 +270,7 @@ Synsonics samples with playback speed, sample length, direct outs, and a mix out
 ---
 ## Slap — Pitched slap bass
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/Slap.png" width="60">
+<p align="center"><img src="https://github.com/4ms/ROMplers/blob/main/doc/Slap.png" width="60"></p>
 
 A slap bass sample meant to be controlled with a 1v per octave source such as a keyboard or sequencer.
 
@@ -285,7 +285,7 @@ A slap bass sample meant to be controlled with a 1v per octave source such as a 
 ---
 ## Snare — Acoustic snare drums
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/Snare.png" width="60">
+<p align="center"><img src="https://github.com/4ms/ROMplers/blob/main/doc/Snare.png" width="60"></p>
 
 “Real” acoustic snare samples with playback speed, velocity, and a decay envelope.
 
@@ -300,7 +300,7 @@ A slap bass sample meant to be controlled with a 1v per octave source such as a 
 ---
 ## Tom — Acoustic tom drums
 
-<img src="https://github.com/4ms/ROMplers/blob/main/doc/Tom.png" width="60">
+<p align="center"><img src="https://github.com/4ms/ROMplers/blob/main/doc/Tom.png" width="60"></p>
 
 “Real” acoustic tom samples with playback speed, velocity, and a decay envelope.
 
