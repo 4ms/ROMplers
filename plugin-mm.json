@@ -1,10 +1,6 @@
 {
-	"MetaModuleBrandName": "4ms-ROMplers",
+	"MetaModuleBrandName": "ROMplers",
 	"MetaModuleBrandSlug": "4ms-ROMplers",
-	"MetaModuleBrandAliases": [
-		"4msROMplers",
-		"ROMplers"
-	],
 	"MetaModulePluginMaintainer": "4ms Company",
 	"MetaModulePluginMaintainerEmail": "4ms@4mscompany.com",
 	"MetaModulePluginMaintainerUrl": "https://4mscompany.com/",
