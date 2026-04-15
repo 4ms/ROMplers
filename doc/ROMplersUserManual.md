@@ -7,8 +7,8 @@ Use this document to understand the behavior, controls, and design inspirations 
 ## CV + Knob Behavior
 
 - All unlabeled jacks are CV inputs for the associated parameter next to them. 
-- All CV inputs are bipolar and clamped to 10vpp.
-- Each knob functions as a 10vpp offset.
+- All CV inputs are -5v to +5v.
+- Each knob is a -5v to +5v offset.
 - Trigger inputs are conditioned to have rising edge detection and ignore pulse width.
 
 ---
@@ -19,12 +19,12 @@ Use this document to understand the behavior, controls, and design inspirations 
 Ace Tone Rhythm King samples with playback speed, sample length, and a mix output.
 
 - **Length**: Sample file length.
-- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
 - **Outputs**: Individual audio outputs, ±5V.
-- **Sum**: Mix output. All drums not individually patched are summed at unity gain, averaged, scaled by Main Volume, and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
+- **Sum**: Mix output. All drums not individually patched are summed and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## Clap — Acoustic claps
@@ -34,7 +34,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and a mix outpu
 “Real” acoustic clap samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -49,7 +49,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and a mix outpu
 “Real” acoustic closed hi-hat samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -64,7 +64,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and a mix outpu
 “Real” acoustic crash samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -79,12 +79,12 @@ Ace Tone Rhythm King samples with playback speed, sample length, and a mix outpu
 DR-55 samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
-- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
 - **Outputs**: Individual audio outputs, ±5V.
-- **Sum**: Mix output. All drums not individually patched are summed at unity gain, averaged, scaled by Main Volume, and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
+- **Sum**: Mix output. All drums not individually patched are summed and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## KayArr — KR-55 drums
@@ -94,12 +94,12 @@ DR-55 samples with playback speed, sample length, direct outs, and a mix output.
 KR55 samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
-- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
 - **Outputs**: Individual audio outputs, ±5V.
-- **Sum**: Mix output. All drums not individually patched are summed at unity gain, averaged, scaled by Main Volume, and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
+- **Sum**: Mix output. All drums not individually patched are summed and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## KayOne — SK-1 drums
@@ -109,12 +109,12 @@ KR55 samples with playback speed, sample length, direct outs, and a mix output.
 Casio SK-1 samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
-- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
 - **Outputs**: Individual audio outputs, ±5V.
-- **Sum**: Mix output. All drums not individually patched are summed at unity gain, averaged, scaled by Main Volume, and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
+- **Sum**: Mix output. All drums not individually patched are summed and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## Kick — Acoustic kick drums
@@ -124,7 +124,7 @@ Casio SK-1 samples with playback speed, sample length, direct outs, and a mix ou
 “Real” acoustic kick samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -139,7 +139,7 @@ Casio SK-1 samples with playback speed, sample length, direct outs, and a mix ou
 “Real” acoustic open hi-hat samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -170,7 +170,7 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 “Real” acoustic auxiliary percussion samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -185,7 +185,7 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 “Real” acoustic ride samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -200,7 +200,7 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 “Real” acoustic rimshot samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -215,12 +215,12 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 CR-78 samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
-- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
 - **Outputs**: Individual audio outputs, ±5V.
-- **Sum**: Mix output. All drums not individually patched are summed at unity gain, averaged, scaled by Main Volume, and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
+- **Sum**: Mix output. All drums not individually patched are summed and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## SehvenToo — TR-727 drums
@@ -230,12 +230,12 @@ CR-78 samples with playback speed, sample length, direct outs, and a mix output.
 TR-727 samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
-- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
 - **Outputs**: Individual audio outputs, ±5V.
-- **Sum**: Mix output. All drums not individually patched are summed at unity gain, averaged, scaled by Main Volume, and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
+- **Sum**: Mix output. All drums not individually patched are summed and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## SicksOh — TR-606 drums
@@ -245,12 +245,12 @@ TR-727 samples with playback speed, sample length, direct outs, and a mix output
 TR-606 samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
-- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
 - **Outputs**: Individual audio outputs, ±5V.
-- **Sum**: Mix output. All drums not individually patched are summed at unity gain, averaged, scaled by Main Volume, and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
+- **Sum**: Mix output. All drums not individually patched are summed and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## SinSahnix — Synsonics drums
@@ -260,12 +260,12 @@ TR-606 samples with playback speed, sample length, direct outs, and a mix output
 Synsonics samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
-- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
 - **Outputs**: Individual audio outputs, ±5V.
-- **Sum**: Mix output. All drums not individually patched are summed at unity gain, averaged, scaled by Main Volume, and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
+- **Sum**: Mix output. All drums not individually patched are summed and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## Slap — Pitched slap bass
@@ -290,7 +290,7 @@ A slap bass sample meant to be controlled with a 1v per octave source such as a 
 “Real” acoustic snare samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -305,7 +305,7 @@ A slap bass sample meant to be controlled with a 1v per octave source such as a 
 “Real” acoustic tom samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x, turn left to decrease to -2x.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
