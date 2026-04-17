@@ -7,14 +7,14 @@ struct KayArr : DrumMachineBaseModule<KayArr> {
   static constexpr auto drums = std::array{
       NamedSample{"Kick", KRKick},
       NamedSample{"Snare", KRSnare},
-      NamedSample{"Tom", KRTom},
       NamedSample{"Closed Hat", KRClosedHat},
       NamedSample{"Open Hat", KROpenHat},
+      NamedSample{"Low Tom", KRTom},
+      NamedSample{"Conga", KRConga},
       NamedSample{"Clave", KRClave},
       NamedSample{"Rimshot", KRRimshot},
       NamedSample{"Cowbell", KRCowbell},
       NamedSample{"Cymbal", KRCymbal},
-      NamedSample{"Conga", KRConga},
   };
 };
 
