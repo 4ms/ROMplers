@@ -1,15 +1,11 @@
 # ROMplers User Manual
 
-Use this document to understand the behavior, controls, and design inspirations behind each module.
 
----
-
-## CV + Knob Behavior
+## All Modules: CV + Knob Behavior
 
 - All unlabeled jacks are CV inputs for the associated parameter next to them. 
-- All CV inputs are -5v to +5v.
-- Each knob is a -5v to +5v offset.
-- Trigger inputs are conditioned to have rising edge detection and ignore pulse width.
+- Unless otherwise noted, CV inputs are -5v to +5v, effectively moving the knob up or down along its entire range. Vol CV are usually 0-5V
+- Trigger inputs detect rising edge and ignore pulse width.
 
 ---
 ## AyysKing — Ace King drums
@@ -23,8 +19,8 @@ Ace Tone Rhythm King samples with playback speed, sample length, and a mix outpu
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
-- **Outputs**: Individual audio outputs, ±5V.
-- **Sum**: Mix output. All drums not individually patched are summed and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
+- **Outputs**: Individual audio outputs
+- **Sum**: Mix output. All drums not individually patched are summed. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## Clap — Acoustic claps
@@ -39,7 +35,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and a mix outpu
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
 - **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
-- **Out**: Audio output, 10vpp.
+- **Out**: Audio output
 
 ---
 ## ClosedHat — Acoustic closed hi-hats
@@ -54,7 +50,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and a mix outpu
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
 - **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
-- **Out**: Audio output, 10vpp.
+- **Out**: Audio output
 
 ---
 ## Crash — Acoustic crash cymbals
@@ -69,7 +65,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and a mix outpu
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
 - **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
-- **Out**: Audio output, 10vpp.
+- **Out**: Audio output
 
 ---
 ## DeeArr — DR-55 drums
@@ -83,7 +79,7 @@ DR-55 samples with playback speed, sample length, direct outs, and a mix output.
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
-- **Outputs**: Individual audio outputs, ±5V.
+- **Outputs**: Individual audio outputs.
 - **Sum**: Mix output. All drums not individually patched are summed and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
 
 ---
@@ -98,8 +94,8 @@ KR55 samples with playback speed, sample length, direct outs, and a mix output.
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
-- **Outputs**: Individual audio outputs, ±5V.
-- **Sum**: Mix output. All drums not individually patched are summed and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
+- **Outputs**: Individual audio outputs.
+- **Sum**: Mix output. All drums not individually patched are summed. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## KayOne — SK-1 drums
@@ -113,8 +109,8 @@ Casio SK-1 samples with playback speed, sample length, direct outs, and a mix ou
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
-- **Outputs**: Individual audio outputs, ±5V.
-- **Sum**: Mix output. All drums not individually patched are summed and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
+- **Outputs**: Individual audio outputs.
+- **Sum**: Mix output. All drums not individually patched are summed. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## Kick — Acoustic kick drums
@@ -129,7 +125,7 @@ Casio SK-1 samples with playback speed, sample length, direct outs, and a mix ou
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
 - **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
-- **Out**: Audio output, 10vpp.
+- **Out**: Audio output.
 
 ---
 ## OpenHat — Acoustic open hi-hats
@@ -144,7 +140,7 @@ Casio SK-1 samples with playback speed, sample length, direct outs, and a mix ou
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
 - **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
-- **Out**: Audio output, 10vpp.
+- **Out**: Audio output.
 
 ---
 ## OrchHits — Pitched orchestra hits
@@ -160,7 +156,7 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
 - **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
-- **Out**: Audio output, 10vpp.
+- **Out**: Audio output.
 
 ---
 ## Percussion — Assorted acoustic hand percussion 
@@ -175,7 +171,7 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
 - **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
-- **Out**: Audio output, 10vpp.
+- **Out**: Audio output.
 
 ---
 ## Ride — Acoustic ride cymbals
@@ -190,7 +186,7 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
 - **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
-- **Out**: Audio output, 10vpp.
+- **Out**: Audio output.
 
 ---
 ## Rimshot — Acoustic rimshots
@@ -205,7 +201,7 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
 - **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
-- **Out**: Audio output, 10vpp.
+- **Out**: Audio output.
 
 ---
 ## SeaArr — CR-78 drums
@@ -219,8 +215,8 @@ CR-78 samples with playback speed, sample length, direct outs, and a mix output.
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
-- **Outputs**: Individual audio outputs, ±5V.
-- **Sum**: Mix output. All drums not individually patched are summed and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
+- **Outputs**: Individual audio outputs.
+- **Sum**: Mix output. All drums not individually patched are summed. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## SehvenToo — TR-727 drums
@@ -234,8 +230,8 @@ TR-727 samples with playback speed, sample length, direct outs, and a mix output
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
-- **Outputs**: Individual audio outputs, ±5V.
-- **Sum**: Mix output. All drums not individually patched are summed and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
+- **Outputs**: Individual audio outputs.
+- **Sum**: Mix output. All drums not individually patched are summed. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## SicksOh — TR-606 drums
@@ -249,8 +245,8 @@ TR-606 samples with playback speed, sample length, direct outs, and a mix output
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
-- **Outputs**: Individual audio outputs, ±5V.
-- **Sum**: Mix output. All drums not individually patched are summed and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
+- **Outputs**: Individual audio outputs.
+- **Sum**: Mix output. All drums not individually patched are summed. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## SinSahnix — Synsonics drums
@@ -264,8 +260,8 @@ Synsonics samples with playback speed, sample length, direct outs, and a mix out
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
-- **Outputs**: Individual audio outputs, ±5V.
-- **Sum**: Mix output. All drums not individually patched are summed and clamped to ±5V. Patching a drum's direct output removes it from the Sum bus.
+- **Outputs**: Individual audio outputs.
+- **Sum**: Mix output. All drums not individually patched are summed. Patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## Slap — Pitched slap bass
@@ -280,7 +276,7 @@ A slap bass sample meant to be controlled with a 1v per octave source such as a 
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
 - **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
-- **Out**: Audio output, 10vpp.
+- **Out**: Audio output.
 
 ---
 ## Snare — Acoustic snare drums
@@ -295,7 +291,7 @@ A slap bass sample meant to be controlled with a 1v per octave source such as a 
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
 - **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
-- **Out**: Audio output, 10vpp.
+- **Out**: Audio output.
 
 ---
 ## Tom — Acoustic tom drums
@@ -310,5 +306,5 @@ A slap bass sample meant to be controlled with a 1v per octave source such as a 
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
 - **Vol**: VCA input, responds 0-5v. This jack can be viewed as a "velocity" input.
-- **Out**: Audio output, 10vpp.
+- **Out**: Audio output.
 
