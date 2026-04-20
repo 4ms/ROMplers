@@ -103,8 +103,8 @@ public:
   static constexpr float outputScale = 1.f;
   static constexpr float sumScale = 1.f;
 
-  static constexpr float SPEED_MIN = 0.05f;
-  static constexpr float SPEED_MAX = 2.0f;
+  static constexpr float MIN_PLAYBACK_SPEED = 0.05f;
+  static constexpr float MAX_PLAYBACK_SPEED = 2.0f;
   static constexpr float LENGTH_MIN = 0.1f;
   static constexpr float LENGTH_MAX = 1.0f;
 
@@ -131,12 +131,16 @@ public:
   void process(const ProcessArgs &args) override {
     // --- Speed ---
     // Knob (-1..1) rescaled to -5..5V offset; CV added and clamped to ±5V
-    const auto knobSpeedOffset = params[SPEED_PARAM].getValue() * 5.f;
-    const auto speedCV = inputs[SPEEDCVIN_INPUT].isConnected()
-                             ? inputs[SPEEDCVIN_INPUT].getVoltage()
-                             : 0.f;
-    const auto normSpeed = rescale(std::clamp(knobSpeedOffset + speedCV, -5.f, 5.f), -5.f, 5.f, 0.f, 1.f);
-    const auto speed = SPEED_MIN + normSpeed * (SPEED_MAX - SPEED_MIN);
+    const float knobPitchOffset = params[SPEED_PARAM].getValue() * 5.f;
+    const float pitchCV = inputs[SPEEDCVIN_INPUT].isConnected()
+                              ? inputs[SPEEDCVIN_INPUT].getVoltage()
+                              : 0.f;
+    float pitchMod = rescale(std::clamp(knobPitchOffset + pitchCV, -5.f, 5.f), -5.f, 5.f, -1.f, 1.f);
+
+    float normalizedPitch = (pitchMod + 1.f) * 0.5f;
+    float pitchRatio =
+        MIN_PLAYBACK_SPEED +
+        normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
 
     // --- Length ---
     // Knob (0..1) rescaled to -5..5V offset; CV added and clamped to ±5V
@@ -183,7 +187,7 @@ public:
         if (idx < maxSamples) {
           const auto sumVoltage = samp[idx] * 5.f;
           outputs[output_id].setVoltage(sumVoltage * T::outputScale * T::drums[i].scale);
-          v.samplePos += speed;
+          v.samplePos += pitchRatio;
         } else {
           v.playing = false;
           outputs[output_id].setVoltage(0.f);

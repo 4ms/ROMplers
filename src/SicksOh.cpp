@@ -81,8 +81,8 @@ struct SicksOh : Module {
   Voice openHatVoice;
   Voice cymVoice;
 
-  const float SPEED_LOW = 0.05f;
-  const float SPEED_HIGH = 1.0f;
+  const float MIN_PLAYBACK_SPEED = 0.05f;
+  const float MAX_PLAYBACK_SPEED = 1.0f;
   const float LENGTH_MIN = 0.1f;
   const float LENGTH_MAX = 1.0f;
 
@@ -158,10 +158,16 @@ struct SicksOh : Module {
 
   void process(const ProcessArgs &args) override {
     // Knob (-1..1) rescaled to -5..5V offset; CV added and clamped to ±5V
-    float knobSpeedOffset = params[SPEED_PARAM].getValue() * 5.f;
-    float speedCV = inputs[SPEEDCVIN_INPUT].getVoltage();
-    float normSpeed = rescale(std::clamp(knobSpeedOffset + speedCV, -5.f, 5.f), -5.f, 5.f, 0.f, 1.f);
-    float speed = SPEED_LOW + normSpeed * (SPEED_HIGH - SPEED_LOW);
+    const float knobPitchOffset = params[SPEED_PARAM].getValue() * 5.f;
+    const float pitchCV = inputs[SPEEDCVIN_INPUT].isConnected()
+                              ? inputs[SPEEDCVIN_INPUT].getVoltage()
+                              : 0.f;
+    float pitchMod = rescale(std::clamp(knobPitchOffset + pitchCV, -5.f, 5.f), -5.f, 5.f, -1.f, 1.f);
+
+    float normalizedPitch = (pitchMod + 1.f) * 0.5f;
+    float pitchRatio =
+        MIN_PLAYBACK_SPEED +
+        normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
 
     // Knob (0..1) rescaled to -5..5V offset; CV added and clamped to ±5V
     float knobLengthOffset = rescale(params[LENGTH_PARAM].getValue(), 0.f, 1.f, -5.f, 5.f);
@@ -169,19 +175,19 @@ struct SicksOh : Module {
     float normLength = rescale(std::clamp(knobLengthOffset + lengthCV, -5.f, 5.f), -5.f, 5.f, 0.f, 1.f);
     float lengthRatio = LENGTH_MIN + normLength * (LENGTH_MAX - LENGTH_MIN);
 
-    processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, speed,
+    processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, pitchRatio,
                  lengthRatio);
-    processVoice(args, snareVoice, SNARETRIGIN_INPUT, SNAREPUSH_PARAM, speed,
+    processVoice(args, snareVoice, SNARETRIGIN_INPUT, SNAREPUSH_PARAM, pitchRatio,
                  lengthRatio);
-    processVoice(args, tomLoVoice, TOMLTRIGIN_INPUT, TOMLPUSH_PARAM, speed,
+    processVoice(args, tomLoVoice, TOMLTRIGIN_INPUT, TOMLPUSH_PARAM, pitchRatio,
                  lengthRatio);
-    processVoice(args, tomHiVoice, TOMHTRIGIN_INPUT, TOMHPUSH_PARAM, speed,
+    processVoice(args, tomHiVoice, TOMHTRIGIN_INPUT, TOMHPUSH_PARAM, pitchRatio,
                  lengthRatio);
-    processVoice(args, closedHatVoice, CLTRIGIN_INPUT, CLPUSH_PARAM, speed,
+    processVoice(args, closedHatVoice, CLTRIGIN_INPUT, CLPUSH_PARAM, pitchRatio,
                  lengthRatio);
-    processVoice(args, openHatVoice, OHTRIGIN_INPUT, OHPUSH_PARAM, speed,
+    processVoice(args, openHatVoice, OHTRIGIN_INPUT, OHPUSH_PARAM, pitchRatio,
                  lengthRatio);
-    processVoice(args, cymVoice, CYMTRIGIN_INPUT, CYMPUSH_PARAM, speed,
+    processVoice(args, cymVoice, CYMTRIGIN_INPUT, CYMPUSH_PARAM, pitchRatio,
                  lengthRatio);
 
     // --- Sum output ---
@@ -200,7 +206,7 @@ struct SicksOh : Module {
   }
 
   void processVoice(const ProcessArgs &args, Voice &voice, int trigInputId,
-                    int pushParamId, float speed, float lengthRatio) {
+                    int pushParamId, float pitchRatio, float lengthRatio) {
     bool inputTrig = inputs[trigInputId].getVoltage() > 1.f;
     bool buttonTrig = params[pushParamId].getValue() > 0.5f;
 
@@ -230,7 +236,7 @@ struct SicksOh : Module {
       int16_t sample = voice.readSample16(idx);
       float out = (float)sample / 32768.f * 12.5f;
       outputs[voice.outputId].setVoltage(out);
-      voice.samplePos += speed;
+      voice.samplePos += pitchRatio;
     } else {
       voice.playing = false;
       outputs[voice.outputId].setVoltage(0.f);

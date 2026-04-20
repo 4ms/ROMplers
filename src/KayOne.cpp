@@ -77,8 +77,8 @@ struct KayOne : Module {
   Voice closedHatVoice;
   Voice openHatVoice;
 
-  const float SPEED_LOW = 0.05f;
-  const float SPEED_HIGH = 1.0f;
+  const float MIN_PLAYBACK_SPEED = 0.05f;
+  const float MAX_PLAYBACK_SPEED = 1.0f;
   const float LENGTH_MIN = 0.1f;
   const float LENGTH_MAX = 1.0f;
 
@@ -145,16 +145,19 @@ struct KayOne : Module {
   }
 
   void process(const ProcessArgs &args) override {
-    static const float speedCVScale = 0.1f;
     static const float lengthCVScale = 0.1f;
 
-    float knobSpeed =
-        0.01f + (params[SPEED_PARAM].getValue() + 1.f) * (1.0f - 0.01f);
-    float normSpeed = std::clamp(
-        knobSpeed + inputs[SPEEDCVIN_INPUT].getVoltage() * speedCVScale, 0.01f,
-        2.0f);
-    float speed = SPEED_LOW + (normSpeed - 0.01f) *
-                                  ((SPEED_HIGH - SPEED_LOW) / (1.0f - 0.01f));
+    // Knob (-1..1) rescaled to -5..5V offset; CV added and clamped to ±5V
+    const float knobPitchOffset = params[SPEED_PARAM].getValue() * 5.f;
+    const float pitchCV = inputs[SPEEDCVIN_INPUT].isConnected()
+                              ? inputs[SPEEDCVIN_INPUT].getVoltage()
+                              : 0.f;
+    float pitchMod = rescale(std::clamp(knobPitchOffset + pitchCV, -5.f, 5.f), -5.f, 5.f, -1.f, 1.f);
+
+    float normalizedPitch = (pitchMod + 1.f) * 0.5f;
+    float pitchRatio =
+        MIN_PLAYBACK_SPEED +
+        normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
 
     float knobLength = params[LENGTH_PARAM].getValue();
     float normLength = std::clamp(
@@ -165,17 +168,17 @@ struct KayOne : Module {
         (normLength - 0.1f) * ((LENGTH_MAX - LENGTH_MIN) / (1.0f - 0.1f));
 
     // Process all voices
-    processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, speed,
+    processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, pitchRatio,
                  lengthRatio);
-    processVoice(args, snareVoice, SNARETRIGIN_INPUT, SNAREPUSH_PARAM, speed,
+    processVoice(args, snareVoice, SNARETRIGIN_INPUT, SNAREPUSH_PARAM, pitchRatio,
                  lengthRatio);
-    processVoice(args, tomLoVoice, TOMLTRIG_INPUT, TOMLPUSH_PARAM, speed,
+    processVoice(args, tomLoVoice, TOMLTRIG_INPUT, TOMLPUSH_PARAM, pitchRatio,
                  lengthRatio);
-    processVoice(args, tomHiVoice, TOMHTRIG_INPUT, TOMHPUSH_PARAM, speed,
+    processVoice(args, tomHiVoice, TOMHTRIG_INPUT, TOMHPUSH_PARAM, pitchRatio,
                  lengthRatio);
-    processVoice(args, closedHatVoice, CLTRIG_INPUT, CLPUSH_PARAM, speed,
+    processVoice(args, closedHatVoice, CLTRIG_INPUT, CLPUSH_PARAM, pitchRatio,
                  lengthRatio);
-    processVoice(args, openHatVoice, OHTRIG_INPUT, OHPUSH_PARAM, speed,
+    processVoice(args, openHatVoice, OHTRIG_INPUT, OHPUSH_PARAM, pitchRatio,
                  lengthRatio);
 
     // --- Sum output ---
@@ -192,7 +195,7 @@ struct KayOne : Module {
   }
 
   void processVoice(const ProcessArgs &args, Voice &voice, int trigInputId,
-                    int pushParamId, float speed, float lengthRatio) {
+                    int pushParamId, float pitchRatio, float lengthRatio) {
     static constexpr float SAMPLE_SCALE = 5.0f / 32768.0f;
 
     bool inputTrigger = inputs[trigInputId].getVoltage() > 1.0f;
@@ -222,7 +225,7 @@ struct KayOne : Module {
       if (idx < maxSamplesToPlay) {
         int16_t sampleInt = voice.readSample16(idx);
         sample = sampleInt * SAMPLE_SCALE;
-        voice.samplePos += speed;
+        voice.samplePos += pitchRatio;
       } else {
         voice.playing = false;
       }

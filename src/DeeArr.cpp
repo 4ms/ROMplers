@@ -66,8 +66,8 @@ struct DeeArr : Module {
     }
   };
 
-  const float SPEED_LOW = 0.05f;
-  const float SPEED_HIGH = 2.0f;
+  const float MIN_PLAYBACK_SPEED = 0.05f;
+  const float MAX_PLAYBACK_SPEED = 2.0f;
   const float LENGTH_MIN = 0.1f;
   const float LENGTH_MAX = 1.0f;
 
@@ -115,13 +115,17 @@ struct DeeArr : Module {
 
   void process(const ProcessArgs &args) override {
     // --- Precalculate speed with CV ---
-    float knobSpeedV = (params[SPEED_PARAM].getValue() + 1.f) * 2.5f;
-    float speedCVV = 0.f;
-    if (inputs[SPEEDCVIN_INPUT].isConnected())
-      speedCVV =
-          std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -10.f, 10.f) * 0.5f;
-    float normSpeed = (std::clamp(knobSpeedV + speedCVV, 0.f, 5.f) / 5.f);
-    float speed = SPEED_LOW + normSpeed * (SPEED_HIGH - SPEED_LOW);
+    // Knob (-1..1) rescaled to -5..5V offset; CV added and clamped to ±5V
+    const float knobPitchOffset = params[SPEED_PARAM].getValue() * 5.f;
+    const float pitchCV = inputs[SPEEDCVIN_INPUT].isConnected()
+                              ? inputs[SPEEDCVIN_INPUT].getVoltage()
+                              : 0.f;
+    float pitchMod = rescale(std::clamp(knobPitchOffset + pitchCV, -5.f, 5.f), -5.f, 5.f, -1.f, 1.f);
+
+    float normalizedPitch = (pitchMod + 1.f) * 0.5f;
+    float pitchRatio =
+        MIN_PLAYBACK_SPEED +
+        normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
 
     // --- Precalculate length with CV ---
     float knobLengthV = params[LENGTH_PARAM].getValue() * 5.f;
@@ -133,13 +137,13 @@ struct DeeArr : Module {
     float lengthRatio = LENGTH_MIN + normLength * (LENGTH_MAX - LENGTH_MIN);
 
     // --- Process each voice ---
-    processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, speed,
+    processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, pitchRatio,
                  lengthRatio);
-    processVoice(args, snareVoice, SNARETRIGIN_INPUT, SNAREPUSH_PARAM, speed,
+    processVoice(args, snareVoice, SNARETRIGIN_INPUT, SNAREPUSH_PARAM, pitchRatio,
                  lengthRatio);
-    processVoice(args, hatVoice, HATTRIGIN_INPUT, HATPUSH_PARAM, speed,
+    processVoice(args, hatVoice, HATTRIGIN_INPUT, HATPUSH_PARAM, pitchRatio,
                  lengthRatio);
-    processVoice(args, rimVoice, RIMTRIGIN_INPUT, RIMPUSH_PARAM, speed,
+    processVoice(args, rimVoice, RIMTRIGIN_INPUT, RIMPUSH_PARAM, pitchRatio,
                  lengthRatio);
 
     // --- Sum output ---
@@ -156,7 +160,7 @@ struct DeeArr : Module {
   }
 
   void processVoice(const ProcessArgs &args, Voice &voice, int trigInputId,
-                    int pushParamId, float speed, float lengthRatio) {
+                    int pushParamId, float pitchRatio, float lengthRatio) {
     const bool inputTrigger = inputs[trigInputId].getVoltage() > 1.0f;
     const bool buttonTrigger = params[pushParamId].getValue() > 0.5f;
 
@@ -184,7 +188,7 @@ struct DeeArr : Module {
       if (idx < maxSamplesToPlay) {
         float sample = voice.decodedSample[idx];
         outputs[voice.outputId].setVoltage(sample * 12.5f);
-        voice.samplePos += speed;
+        voice.samplePos += pitchRatio;
       } else {
         voice.playing = false;
         outputs[voice.outputId].setVoltage(0.f);
