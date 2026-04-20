@@ -1,4 +1,5 @@
 #include "OrchHitsSamples.hpp"
+#include "cv_func.hh"
 #include "plugin.hpp"
 #include "sample.hh"
 #include <cmath>
@@ -66,15 +67,7 @@ struct OrchHits : Module {
 
   void process(const ProcessArgs &args) override {
     // --- SAMPLE SELECTION WITH CV ---
-    float sampleKnob = params[SAMPLE_PARAM].getValue(); // 0 .. numSamples-1
-    float cv = inputs[SAMPLECVIN_INPUT].isConnected()
-                   ? inputs[SAMPLECVIN_INPUT].getVoltage()
-                   : 0.f;
-    float cvScaled = cv * ((samples.size() - 1) / 2.f) / 5.f;
-    float center = (samples.size() - 1) / 2.f;
-    float sampleParam = center + (sampleKnob - center) + cvScaled;
-    sampleParam = std::clamp<float>(sampleParam, 0.f, samples.size() - 1);
-    int selectedIndex = static_cast<int>(std::round(sampleParam));
+	int selectedIndex = indexed_cv_knob<samples.size()>(inputs[SAMPLECVIN_INPUT].getNormalVoltage(0), params[SAMPLE_PARAM].getValue());
 
     auto &s = samples[selectedIndex];
 
