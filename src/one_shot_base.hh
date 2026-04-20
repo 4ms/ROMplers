@@ -80,7 +80,7 @@ public:
       int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() +
                                    sampleCV / 5.f * 8.f);
       cur_sample_idx =
-          std::clamp<uint32_t>(sampleIndex, 0, T::samples.size() - 1);
+          (uint32_t)std::clamp<int>(sampleIndex, 0, (int)T::samples.size() - 1);
 
       samplePos = 0.f;
       playing = true;
