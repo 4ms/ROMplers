@@ -108,8 +108,10 @@ public:
 	static constexpr float LENGTH_MIN = 0.1f;
 	static constexpr float LENGTH_MAX = 1.0f;
 
-	static constexpr float min_rate = 0.01f;
-	static constexpr float max_rate = 2.f;
+	struct PitchMinMax {
+		static constexpr float min_rate = 0.01f;
+		static constexpr float max_rate = 2.f;
+	};
 
 	std::array<Voice, 12> voice{};
 
@@ -135,7 +137,7 @@ public:
 		// --- Speed ---
 		float pitchKnob = params[SPEED_PARAM].getValue(); // -1 to 1
 		float pitchCV = inputs[SPEEDCVIN_INPUT].getNormalVoltage(0);
-		float pitchRatio = pitch_cv_knob<min_rate, max_rate>(pitchCV, pitchKnob);
+		float pitchRatio = pitch_cv_knob<PitchMinMax>(pitchCV, pitchKnob);
 
 		// --- Length ---
 		const auto lengthCV = inputs[LENGTHCVIN_INPUT].getNormalVoltage(0);

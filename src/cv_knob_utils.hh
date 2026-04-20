@@ -44,10 +44,10 @@ constexpr int indexed_cv_knob(float cv, float knob) {
 	return std::clamp<int>(sampleIndex, 0, NumSamples - 1);
 }
 
-template<float MIN_PLAYBACK_SPEED, float MAX_PLAYBACK_SPEED>
+template<typename T>
 constexpr float pitch_cv_knob(float cv, float knob) {
 	float pitchCV = cv / 5.f;
 	float pitchMod = std::clamp(knob + pitchCV, -1.f, 1.f);
 	float normalizedPitch = (pitchMod + 1.f) * 0.5f;
-	return MIN_PLAYBACK_SPEED + normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
+	return T::min_rate + normalizedPitch * (T::max_rate - T::min_rate);
 }

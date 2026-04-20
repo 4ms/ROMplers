@@ -5,7 +5,7 @@
 template<typename T>
 struct SpeedQuantity : ParamQuantity {
 	std::string getDisplayValueString() override {
-		float v = pitch_cv_knob<T::min_rate, T::max_rate>(0, getValue());
+		float v = pitch_cv_knob<T>(0, getValue());
 		return string::f("%.3gx", v);
 	}
 };
@@ -30,8 +30,10 @@ public:
 	float lastButtonValue = 0.f;
 	float LightBrightness = 0.f;
 
-	static constexpr float MIN_PLAYBACK_SPEED = T::min_rate;
-	static constexpr float MAX_PLAYBACK_SPEED = T::max_rate;
+	struct PitchMinMax {
+		static constexpr float min_rate = 0.01f;
+		static constexpr float max_rate = 2.f;
+	};
 	static constexpr size_t NumSamples = T::samples.size();
 
 	OneShotBaseModule() {
@@ -40,7 +42,7 @@ public:
 		for (auto i = 1u; i <= NumSamples; ++i)
 			sampleChoices.push_back(std::to_string(i));
 		configSwitch(SAMPLE_PARAM, 0.f, (NumSamples - 1), 0.f, "Sample", sampleChoices);
-		configParam<SpeedQuantity<T>>(PITCH_PARAM, -1.f, 1.f, 0.f, "Pitch");
+		configParam<SpeedQuantity<PitchMinMax>>(PITCH_PARAM, -1.f, 1.f, 0.f, "Pitch");
 		configParam(DECAY_PARAM, 0.f, 1.f, 1.f, "Decay", "s");
 		configParam(PUSH_PARAM, 0.f, 1.f, 0.f, "Trigger button");
 		configInput(SAMPLECVIN_INPUT, "Sample CV");
@@ -83,7 +85,7 @@ public:
 			// --- PITCH ---
 			float pitchKnob = params[PITCH_PARAM].getValue(); // -1 to 1
 			float pitchCV = inputs[PITCHCVIN_INPUT].getNormalVoltage(0);
-			float pitchRatio = pitch_cv_knob<MIN_PLAYBACK_SPEED, MAX_PLAYBACK_SPEED>(pitchCV, pitchKnob);
+			float pitchRatio = pitch_cv_knob<PitchMinMax>(pitchCV, pitchKnob);
 
 			// --- DECAY ---
 			float decayCV = inputs[DECAYCVIN_INPUT].getNormalVoltage(0);
