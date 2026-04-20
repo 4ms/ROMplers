@@ -1,5 +1,14 @@
  cmake_minimum_required(VERSION 3.19)
 
+option(BUILD_TESTS "Build unit tests (native host build, skips plugin SDK)" OFF)
+
+if(BUILD_TESTS)
+    project(4ms-ROMplers-tests LANGUAGES C CXX)
+    enable_testing()
+    add_subdirectory(tests)
+    return()
+endif()
+
 if(NOT "${METAMODULE_SDK_DIR}" STREQUAL "")
 	message("METAMODULE_SDK_DIR set by CMake variable ${METAMODULE_SDK_DIR}")
 elseif (DEFINED ENV{METAMODULE_SDK_DIR})

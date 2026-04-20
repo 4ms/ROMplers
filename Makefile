@@ -20,3 +20,15 @@ DISTRIBUTABLES += $(wildcard presets)
 
 # Include the Rack plugin Makefile framework
 include $(RACK_DIR)/plugin.mk
+
+tests/build:
+	cmake --fresh -B tests/build -DBUILD_TESTS=ON
+
+tests: tests/build
+	cmake --build tests/build
+	tests/build/tests/romplers_tests
+
+tests-clean:
+	rm -rf tests/build
+
+.PHONY: tests-clean tests
