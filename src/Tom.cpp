@@ -4,8 +4,6 @@
 #include "sample.hh"
 
 struct Tom : OneShotBaseModule<Tom> {
-  static constexpr auto min_rate = .01f;
-  static constexpr auto max_rate = 2.f;
   static constexpr std::array samples = {
       Sample{Tom1},  Sample{Tom2},  Sample{Tom3},  Sample{Tom4},
       Sample{Tom5},  Sample{Tom6},  Sample{Tom7},  Sample{Tom8},

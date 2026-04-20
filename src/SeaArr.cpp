@@ -3,16 +3,13 @@
 #include "plugin.hpp"
 
 struct SeaArr : DrumMachineBaseModule<SeaArr> {
-  static constexpr float outputScale = 2.f;
-  static constexpr float sumScale = 4.f / 3.f;
   static constexpr auto drums = std::array{
-      NamedSample{"Kick", SAKick},       NamedSample{"Snare", SASnare},
-      NamedSample{"Hat", SAHiHat},       NamedSample{"Hat Metal", SAHiHatMetal},
-      NamedSample{"Rimshot", SARim},     NamedSample{"Cowbell", SACowbell},
-      NamedSample{"Conga", SACongaL},    NamedSample{"Bongo Lo", SABongoL},
-      NamedSample{"Bongo Hi", SABongoH}, NamedSample{"Tambourine", SATamb},
-      NamedSample{"Guiro", SAGuiro},     NamedSample{"Cymbal", SACym},
-
+      NamedSample{"Kick", SAKick, 2.f},       NamedSample{"Snare", SASnare, 2.f},
+      NamedSample{"Hat", SAHiHat, 2.f},       NamedSample{"Hat Metal", SAHiHatMetal, 2.f},
+      NamedSample{"Rimshot", SARim, 2.f},     NamedSample{"Cowbell", SACowbell, 2.f},
+      NamedSample{"Conga", SACongaL, 2.f},    NamedSample{"Bongo Lo", SABongoL, 2.f},
+      NamedSample{"Bongo Hi", SABongoH, 2.f}, NamedSample{"Tambourine", SATamb, 2.f},
+      NamedSample{"Guiro", SAGuiro, 2.f},     NamedSample{"Cymbal", SACym, 2.f},
   };
 };
 

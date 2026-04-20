@@ -1,4 +1,5 @@
 #include "OrchHitsSamples.hpp"
+#include "dsp_utils.hh"
 #include "cv_func.hh"
 #include "plugin.hpp"
 #include "sample.hh"
@@ -97,27 +98,18 @@ struct OrchHits : Module {
     if (playing) {
       // --- OCTAVE CONTROL WITH QUANTIZED CV (±5V) ---
       float octaveKnob = params[OCTAVE_PARAM].getValue(); // 0 .. 4
-      float octaveCV = inputs[OCTAVECVIN_INPUT].isConnected()
-                           ? inputs[OCTAVECVIN_INPUT].getVoltage()
-                           : 0.f;
+      float octaveCV = inputs[OCTAVECVIN_INPUT].getNormalVoltage(0);
 
       // Scale CV: ±5V maps to full knob range (0..4)
       float cvScaled = octaveCV * 2.f / 5.f; // 5V → +2, -5V → -2
 
-      // Combine knob + CV relative to center
-      float center = 2.f;
-      float combined = center + (octaveKnob - center) + cvScaled;
-
       // Quantize to discrete steps 0..4
-      float totalOctave = std::clamp(std::round(combined), 0.f, 4.f);
+      float totalOctave = std::clamp(std::round(octaveKnob + cvScaled), 0.f, 4.f);
 
-      // Use in pitch calculation
-      float pitchCV = inputs[PITCHCVIN_INPUT].isConnected()
-                          ? std::clamp(inputs[PITCHCVIN_INPUT].getVoltage(), -1.f, 1.f)
-                          : 0.f;
-      float totalVolts =
-          (totalOctave - 2.f) + pitchCV; // centered around Unison
-      float pitchRatio = std::pow(2.f, totalVolts);
+      // standard 1V/oct, clamped to ±1V: 0V=unison, ±1V=±1oct
+      float pitchCV = std::clamp(inputs[PITCHCVIN_INPUT].getNormalVoltage(0), -1.f, 1.f);
+      float totalVolts = (totalOctave - 2.f) + pitchCV;
+      float pitchRatio = calc1VperOctPitchRatio(totalVolts);
 
       float sampleRateRatio = sampleSampleRate / args.sampleRate;
       samplePos += pitchRatio * sampleRateRatio;
@@ -137,13 +129,8 @@ struct OrchHits : Module {
 
         const auto sampleValue = s1 + frac * (s2 - s1);
 
-        float knobDecayTime = params[DECAY_PARAM].getValue(); // already 0..5
-        float cv = inputs[DECAYCVIN_INPUT].isConnected()
-                       ? inputs[DECAYCVIN_INPUT].getVoltage()
-                       : 0.f;
-        float cvScaled = cv * 0.5f; // -10..10 -> -5..5
-        float combined = knobDecayTime + cvScaled;
-        float decayParam = std::clamp(combined / 5.f, 0.f, 1.f);
+        const float cv = inputs[DECAYCVIN_INPUT].getNormalVoltage(0);
+        const float decayParam = calcDecayModScaled(params[DECAY_PARAM].getValue(), cv);
 
         float decayTime =
             minDecayTime + decayParam * (maxDecayTime - minDecayTime);
@@ -154,10 +141,7 @@ struct OrchHits : Module {
       }
     }
 
-    float volumeCV =
-        inputs[VOLCVIN_INPUT].isConnected()
-            ? std::clamp(inputs[VOLCVIN_INPUT].getVoltage(), 0.f, 5.f)
-            : 5.f;
+    float volumeCV = std::clamp(inputs[VOLCVIN_INPUT].getNormalVoltage(5.f), 0.f, 5.f);
     output *= volumeCV / 5.f;
     outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.f);
   }

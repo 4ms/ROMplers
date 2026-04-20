@@ -2,6 +2,7 @@
 
 #include "cv_func.hh"
 #include "plugin.hpp"
+#include "dsp_utils.hh"
 
 template <typename T>
 struct SpeedQuantity : ParamQuantity {
@@ -13,6 +14,8 @@ struct SpeedQuantity : ParamQuantity {
 
 template <typename T> class OneShotBaseModule : public Module {
 public:
+  static constexpr float min_rate = 0.01f;
+  static constexpr float max_rate = 2.f;
   enum ParamId {
     SAMPLE_PARAM,
     PITCH_PARAM,
@@ -97,10 +100,8 @@ public:
       float pitchRatio = pitch_cv_knob<MIN_PLAYBACK_SPEED, MAX_PLAYBACK_SPEED>(pitchCV, pitchKnob);
 
       // --- DECAY ---
-      float decayKnob = params[DECAY_PARAM].getValue(); // 0 to 1
-      float decayCV = inputs[DECAYCVIN_INPUT].getNormalVoltage(0); // -1 to 1
-      float decayMod = decayKnob + decayCV / 5.f;
-      decayMod = std::clamp(decayMod, 0.f, 1.f);
+      float decayCV = inputs[DECAYCVIN_INPUT].getNormalVoltage(0);
+      float decayMod = calcDecayMod(params[DECAY_PARAM].getValue(), decayCV);
 
       static constexpr auto minDecayTime = 0.005f;
       const auto maxDecayTime = T::samples[cur_sample_idx].size() / 44100.f;

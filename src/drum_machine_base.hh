@@ -1,5 +1,6 @@
 #pragma once
 
+#include "dsp_utils.hh"
 #include "plugin.hpp"
 #include "sample.hh"
 
@@ -103,8 +104,6 @@ public:
   static constexpr float outputScale = 1.f;
   static constexpr float sumScale = 1.f;
 
-  static constexpr float SPEED_MIN = 0.05f;
-  static constexpr float SPEED_MAX = 2.0f;
   static constexpr float LENGTH_MIN = 0.1f;
   static constexpr float LENGTH_MAX = 1.0f;
 
@@ -130,23 +129,17 @@ public:
 
   void process(const ProcessArgs &args) override {
     // --- Speed ---
-    const auto knobSpeed = (params[SPEED_PARAM].getValue() + 1.f) * 2.5f;
-    auto speedCV = inputs[SPEEDCVIN_INPUT].isConnected()
-                       ? inputs[SPEEDCVIN_INPUT].getVoltage()
-                       : 0.f;
-    speedCV = std::clamp(speedCV * 0.5f, -5.f, 5.f);
-    const auto combinedSpeed = knobSpeed + speedCV;
-    const auto normSpeed = std::clamp(combinedSpeed / 5.f, 0.f, 1.f);
-    const auto speed = SPEED_MIN + normSpeed * (SPEED_MAX - SPEED_MIN);
+    float pitchKnob = params[SPEED_PARAM].getValue(); // -1 to 1
+    float pitchCV = inputs[SPEEDCVIN_INPUT].getNormalVoltage(0);
+    float pitchRatio = pitch_cv_knob<SPEED_MIN, SPEED_MAX>(pitchCV, pitchKnob);
+
+
+    float normalizedPitch = (pitchMod + 1.f) * 0.5f;
+    float pitchRatio = calcPitchRatio(normalizedPitch);
 
     // --- Length ---
-    const auto knobLength = params[LENGTH_PARAM].getValue() * 5.f;
-    auto lengthCV = inputs[LENGTHCVIN_INPUT].isConnected()
-                        ? inputs[LENGTHCVIN_INPUT].getVoltage()
-                        : 0.f;
-    lengthCV = std::clamp(lengthCV * 0.5f, -5.f, 5.f);
-    const auto combinedLength = knobLength + lengthCV;
-    const auto normLength = std::clamp(combinedLength / 5.f, 0.f, 1.f);
+    const auto lengthCV = inputs[LENGTHCVIN_INPUT].getNormalVoltage(0);
+    const auto normLength = std::clamp(params[LENGTH_PARAM].getValue() + (lengthCV * 0.1f), 0.1f, 1.0f);
     const auto lengthRatio =
         LENGTH_MIN + normLength * (LENGTH_MAX - LENGTH_MIN);
 
@@ -185,7 +178,7 @@ public:
         if (idx < maxSamples) {
           const auto sumVoltage = samp[idx] * 5.f;
           outputs[output_id].setVoltage(sumVoltage * T::outputScale * T::drums[i].scale);
-          v.samplePos += speed;
+          v.samplePos += pitchRatio;
         } else {
           v.playing = false;
           outputs[output_id].setVoltage(0.f);

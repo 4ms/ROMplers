@@ -4,16 +4,16 @@
 
 struct AyysKing : DrumMachineBaseModule<AyysKing> {
   static constexpr auto drums = std::array{
-      NamedSample{"Kick", AKKick},
-      NamedSample{"Snare 1", AKSnare},
-      NamedSample{"Snare 2", AKSnare2},
-      NamedSample{"Closed Hat", AKClosedHiHat},
-      NamedSample{"Open Hat", AKOpenHiHat},
-      NamedSample{"Bongo 1", AKBongo},
-      NamedSample{"Bongo 2", AKBongo2},
-      NamedSample{"Bongo 3", AKBongo3},
-      NamedSample{"Clave", AKWood},
-      NamedSample{"Cymbal", AKCrash},
+      NamedSample{"Kick", AKKick, 2.f},
+      NamedSample{"Snare 1", AKSnare, 2.f},
+      NamedSample{"Snare 2", AKSnare2, 2.f},
+      NamedSample{"Closed Hat", AKClosedHiHat, 2.f},
+      NamedSample{"Open Hat", AKOpenHiHat, 2.f},
+      NamedSample{"Bongo 1", AKBongo, 2.f},
+      NamedSample{"Bongo 2", AKBongo2, 2.f},
+      NamedSample{"Bongo 3", AKBongo3, 2.f},
+      NamedSample{"Clave", AKWood, 2.f},
+      NamedSample{"Cymbal", AKCrash, 2.f},
   };
 };
 

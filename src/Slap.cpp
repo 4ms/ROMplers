@@ -1,4 +1,5 @@
 #include "SlapSamples.hpp"
+#include "dsp_utils.hh"
 #include "plugin.hpp"
 #include "sample.hh"
 #include <cmath>
@@ -45,7 +46,7 @@ struct Slap : Module {
 
   void process(const ProcessArgs &args) override {
     // Trigger detection (avoid floats >1 comparisons repeatedly)
-    const float trigIn = inputs[TRIGIN_INPUT].getVoltage();
+    const float trigIn = inputs[TRIGIN_INPUT].getNormalVoltage(0);
     const float buttonIn = params[PUSH_PARAM].getValue();
 
     bool trigRising = (lastTrigValue <= 1.f && trigIn > 1.f);
@@ -70,31 +71,27 @@ struct Slap : Module {
     float output = 0.f;
 
     if (playing) {
-      // Pitch calculation: knob + CV, std::clamp CV if disconnected
-      // --- Octave parameter with CV scaling ---
-      // --- 1V/oct pitch calculation ---
-      int finalOctave = std::clamp(
-          static_cast<int>(params[OCTAVE_PARAM].getValue()) +
-              static_cast<int>(std::round(
-                  std::clamp(inputs[OCTAVECVIN_INPUT].getVoltage(), -5.f, 5.f) *
-                  0.4f)),
-          0, 4);
-      float pitchCV = inputs[PITCHCVIN_INPUT].isConnected()
-                          ? std::clamp(inputs[PITCHCVIN_INPUT].getVoltage(), -1.f, 1.f)
-                          : 0.f;
+      float octaveKnob = params[OCTAVE_PARAM].getValue(); // 0 .. 4
+      float octaveCV = inputs[OCTAVECVIN_INPUT].getNormalVoltage(0);
 
-      // Sum everything in volts for 1V/oct tracking
-      // Each volt = 1 octave, so total pitch in volts:
-      float totalVolts = finalOctave + pitchCV;
+      // Scale CV: ±5V maps to full knob range (0..4)
+      float cvScaled = octaveCV * 2.f / 5.f; // 5V → +2, -5V → -2
+
+      // Quantize to discrete steps 0..4
+      float totalOctave = std::clamp(std::round(octaveKnob + cvScaled), 0.f, 4.f);
+
+      // standard 1V/oct, clamped to ±1V: 0V=unison, ±1V=±1oct
+      float pitchCV = std::clamp(inputs[PITCHCVIN_INPUT].getNormalVoltage(0), -1.f, 1.f);
+      float totalVolts = (static_cast<float>(totalOctave) - 1.f) + pitchCV;
 
       // Convert volts to playback rate
       // playbackRate = 2^(V) to get correct 1V/oct frequency
-      float pitchRatio = std::pow(2.f, totalVolts);
+      float pitchRatio = calc1VperOctPitchRatio(totalVolts) * 4.f; // shift 2 octaves up
 
       const float sampleRateRatio = sampleSampleRate / args.sampleRate;
       samplePos += pitchRatio * sampleRateRatio;
 
-      static constexpr auto numSamples = slap.size();
+      constexpr auto numSamples = slap.size();
 
       // Check if sample done
       if (static_cast<unsigned>(samplePos) >= numSamples) {
@@ -110,21 +107,14 @@ struct Slap : Module {
         const auto s2 = slap[nextIdx];
 
         const auto sampleValue = s1 + frac * (s2 - s1);
-        // --- Decay parameter with 0-5 knob + -10..10 CV ---
-        float decayKnob = params[DECAY_PARAM].getValue() * 5.f; // 0-1 → 0-5
-        float decayCV = 0.f;
-        if (inputs[DECAYCVIN_INPUT].isConnected()) {
-          decayCV =
-              inputs[DECAYCVIN_INPUT].getVoltage() * 0.5f; // -10..10 → -5..5
-        }
-        float decayParam = decayKnob + decayCV; // sum knob + CV
-        decayParam = std::clamp(decayParam, 0.f, 5.f);
-        decayParam /= 5.f; // normalize back to 0-1
+        const float decayCV = inputs[DECAYCVIN_INPUT].isConnected()
+                                  ? inputs[DECAYCVIN_INPUT].getVoltage()
+                                  : 0.f;
+        const float decayParam = calcDecayModScaled(params[DECAY_PARAM].getValue() * 5.f, decayCV);
 
-        static constexpr float minDecayTime = 0.005f;
-        static constexpr float maxDecayTime = numSamples / sampleSampleRate;
-        const float decayTime =
-            minDecayTime + decayParam * (maxDecayTime - minDecayTime);
+        constexpr float minDecayTime = 0.005f;
+        constexpr float maxDecayTime = numSamples / sampleSampleRate;
+        const float decayTime = calcExpDecayTime(decayParam, minDecayTime, maxDecayTime);
 
         // Calculate decay coefficient once per sample
         const float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
