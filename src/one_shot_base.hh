@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cv_func.hh"
 #include "plugin.hpp"
 
 struct SpeedQuantity : ParamQuantity {
@@ -76,11 +77,8 @@ public:
     if (triggered) {
       LightBrightness = 1.0f;
 
-      float sampleCV = std::clamp(inputs[SAMPLECVIN_INPUT].getVoltage(), -5.f, 5.f);
-      int sampleIndex = (int)round(params[SAMPLE_PARAM].getValue() +
-                                   sampleCV / 5.f * 8.f);
-      cur_sample_idx =
-          std::clamp<uint32_t>(sampleIndex, 0, T::samples.size() - 1);
+      constexpr size_t NumSamples = T::samples.size();
+      cur_sample_idx = indexed_cv_knob<NumSamples>(inputs[SAMPLECVIN_INPUT].getNormalVoltage(0), params[SAMPLE_PARAM].getValue());
 
       samplePos = 0.f;
       playing = true;
@@ -97,31 +95,19 @@ public:
       // --- PITCH ---
       float pitchKnob = params[PITCH_PARAM].getValue(); // -1 to 1
       float pitchCV = inputs[PITCHCVIN_INPUT].isConnected()
-                          ? inputs[PITCHCVIN_INPUT].getVoltage() / 5.0f
-                          : 0.f; // -1 to 1
-      pitchCV = std::clamp(pitchCV, -1.f, 1.f);
+                          ? inputs[PITCHCVIN_INPUT].getVoltage()
+                          : 0.f; // -10V to +10V
 
-      float pitchMod = pitchKnob + (1.0f - fabs(pitchKnob)) * pitchCV;
-      // Explanation: CV influence is scaled so full knob sweep + full CV covers
-      // -1..1
-      pitchMod = std::clamp(pitchMod, -1.f, 1.f);
-
-      float normalizedPitch = (pitchMod + 1.f) * 0.5f;
       float pitchRatio =
-          MIN_PLAYBACK_SPEED +
-          normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
+          pitch_cv_knob<MIN_PLAYBACK_SPEED, MAX_PLAYBACK_SPEED>(pitchCV, pitchKnob);
 
       // --- DECAY ---
       float decayKnob = params[DECAY_PARAM].getValue(); // 0 to 1
       float decayCV = inputs[DECAYCVIN_INPUT].isConnected()
                           ? inputs[DECAYCVIN_INPUT].getVoltage() / 5.0f
                           : 0.f; // -1 to 1
-      decayCV = std::clamp(decayCV, -1.f, 1.f);
+      float decayMod = decayKnob + decayCV;
 
-      float decayMod =
-          decayKnob +
-          ((decayCV > 0 ? (1.0f - decayKnob) : decayKnob) * decayCV);
-      // scale CV so that +5V pushes to max, -5V pushes to min, respecting knob
       decayMod = std::clamp(decayMod, 0.f, 1.f);
 
       static constexpr auto minDecayTime = 0.005f;
