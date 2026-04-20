@@ -4,8 +4,6 @@
 #include "sample.hh"
 
 struct Snare : OneShotBaseModule<Snare> {
-  static constexpr auto min_rate = .01f;
-  static constexpr auto max_rate = 2.f;
   static constexpr std::array samples = {
       Sample{Snare1},  Sample{Snare2},  Sample{Snare3},  Sample{Snare4},
       Sample{Snare5},  Sample{Snare6},  Sample{Snare7},  Sample{Snare8},

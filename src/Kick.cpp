@@ -4,8 +4,6 @@
 #include "sample.hh"
 
 struct Kick : OneShotBaseModule<Kick> {
-  static constexpr auto min_rate = .01f;
-  static constexpr auto max_rate = 2.f;
   static constexpr std::array samples = {
       Sample{Kick1},  Sample{Kick2},  Sample{Kick3},  Sample{Kick4},
       Sample{Kick5},  Sample{Kick6},  Sample{Kick7},  Sample{Kick8},

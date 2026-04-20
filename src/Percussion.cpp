@@ -4,8 +4,6 @@
 #include "sample.hh"
 
 struct Percussion : OneShotBaseModule<Percussion> {
-  static constexpr auto min_rate = .01f;
-  static constexpr auto max_rate = 2.f;
   static constexpr std::array samples = {
       Sample{Percussion1},  Sample{Percussion2},  Sample{Percussion3},
       Sample{Percussion4},  Sample{Percussion5},  Sample{Percussion6},

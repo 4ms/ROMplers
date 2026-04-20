@@ -3,8 +3,6 @@
 #include "sample.hh"
 
 struct ClosedHat : OneShotBaseModule<ClosedHat> {
-  static constexpr auto min_rate = .01f;
-  static constexpr auto max_rate = 2.f;
   static constexpr std::array samples = {
       Sample{ClosedHat1},  Sample{ClosedHat2},  Sample{ClosedHat3},
       Sample{ClosedHat4},  Sample{ClosedHat5},  Sample{ClosedHat6},

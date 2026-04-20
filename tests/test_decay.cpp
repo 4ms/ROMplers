@@ -112,6 +112,33 @@ TEST_CASE("calcDecayModScaled: knob 5, +10V CV clamps to 1.0") {
     CHECK(calcDecayModScaled(5.f, 10.f) == doctest::Approx(1.f));
 }
 
+// calcExpDecayTime: logarithmic mapping from param (0..1) to time (minTime..maxTime)
+// Each equal knob step covers the same number of doublings.
+
+TEST_CASE("calcExpDecayTime: param 0 -> minTime") {
+    CHECK(calcExpDecayTime(0.f, 0.005f, 1.f) == doctest::Approx(0.005f));
+}
+
+TEST_CASE("calcExpDecayTime: param 1 -> maxTime") {
+    CHECK(calcExpDecayTime(1.f, 0.005f, 1.f) == doctest::Approx(1.f));
+}
+
+TEST_CASE("calcExpDecayTime: param 0.5 -> geometric mean of min and max") {
+    CHECK(calcExpDecayTime(0.5f, 0.005f, 1.f) == doctest::Approx(std::sqrt(0.005f * 1.f)));
+}
+
+TEST_CASE("calcExpDecayTime: lower half and upper half span equal doublings") {
+    float t0   = calcExpDecayTime(0.f,  0.005f, 1.f);
+    float tmid = calcExpDecayTime(0.5f, 0.005f, 1.f);
+    float t1   = calcExpDecayTime(1.f,  0.005f, 1.f);
+    CHECK(tmid / t0 == doctest::Approx(t1 / tmid));
+}
+
+TEST_CASE("calcExpDecayTime: strictly increasing") {
+    CHECK(calcExpDecayTime(0.25f, 0.005f, 1.f) < calcExpDecayTime(0.5f, 0.005f, 1.f));
+    CHECK(calcExpDecayTime(0.5f,  0.005f, 1.f) < calcExpDecayTime(0.75f, 0.005f, 1.f));
+}
+
 // calcLengthMod: KayOne-style length — knob (0..1) + CV * 0.1, hard floor at 0.1
 // Returns length ratio 0.1..1.0 directly
 

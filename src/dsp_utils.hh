@@ -20,6 +20,12 @@ inline float calcLengthMod(float knobValue, float cvVoltage) {
     return std::clamp(knobValue + cvVoltage * 0.1f, 0.1f, 1.0f);
 }
 
+// Exponential (logarithmic) decay time: param 0..1 maps to minTime..maxTime
+// on a log scale so each half of the knob spans the same number of doublings.
+inline float calcExpDecayTime(float param, float minTime, float maxTime) {
+    return minTime * std::pow(maxTime / minTime, param);
+}
+
 // 1V/oct pitch ratio for Slap/OrchHits: each volt = one octave.
 // totalVolts = (octaveKnobIndex - unisonIndex) + pitchCV
 inline float calc1VperOctPitchRatio(float totalVolts) {

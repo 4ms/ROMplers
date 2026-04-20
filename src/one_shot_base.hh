@@ -13,6 +13,8 @@ struct SpeedQuantity : ParamQuantity {
 
 template <typename T> class OneShotBaseModule : public Module {
 public:
+  static constexpr float min_rate = 0.01f;
+  static constexpr float max_rate = 2.f;
   enum ParamId {
     SAMPLE_PARAM,
     PITCH_PARAM,
@@ -101,7 +103,7 @@ public:
       float pitchMod = rescale(std::clamp(knobPitchOffset + pitchCV, -5.f, 5.f), -5.f, 5.f, -1.f, 1.f);
 
       float normalizedPitch = (pitchMod + 1.f) * 0.5f;
-      float pitchRatio = calcPitchRatio(normalizedPitch);
+      float pitchRatio = T::min_rate + normalizedPitch * (T::max_rate - T::min_rate);
 
       // --- DECAY ---
       const float decayCV = inputs[DECAYCVIN_INPUT].isConnected()

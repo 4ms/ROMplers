@@ -117,8 +117,7 @@ struct Slap : Module {
 
         constexpr float minDecayTime = 0.005f;
         constexpr float maxDecayTime = numSamples / sampleSampleRate;
-        const float decayTime =
-            minDecayTime + decayParam * (maxDecayTime - minDecayTime);
+        const float decayTime = calcExpDecayTime(decayParam, minDecayTime, maxDecayTime);
 
         // Calculate decay coefficient once per sample
         const float decayCoef = expf(-1.f / (decayTime * args.sampleRate));

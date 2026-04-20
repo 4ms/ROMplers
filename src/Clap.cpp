@@ -3,8 +3,6 @@
 #include "sample.hh"
 
 struct Clap : OneShotBaseModule<Clap> {
-  static constexpr auto min_rate = .01f;
-  static constexpr auto max_rate = 2.f;
 
   static constexpr std::array samples = {
       Sample{Clap1},  Sample{Clap2},  Sample{Clap3},  Sample{Clap4},
