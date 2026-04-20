@@ -3,10 +3,10 @@
 #include "cv_func.hh"
 #include "plugin.hpp"
 
-template <size_t MIN, size_t MAX>
+template <typename T>
 struct SpeedQuantity : ParamQuantity {
   std::string getDisplayValueString() override {
-    float v = pitch_cv_knob<MIN, MAX>(0, getValue());
+    float v = pitch_cv_knob<T::min_rate, T::max_rate>(0, getValue());
     return string::f("%.3gx", v);
   }
 };
@@ -43,15 +43,15 @@ public:
 
   static constexpr float MIN_PLAYBACK_SPEED = T::min_rate;
   static constexpr float MAX_PLAYBACK_SPEED = T::max_rate;
+  static constexpr size_t NumSamples = T::samples.size();
 
   OneShotBaseModule() {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
     std::vector<std::string> sampleChoices;
-    for (auto i = 1u; i <= T::samples.size(); ++i)
+    for (auto i = 1u; i <= NumSamples; ++i)
       sampleChoices.push_back(std::to_string(i));
-    configSwitch(SAMPLE_PARAM, 0.f, (T::samples.size() - 1), 0.f, "Sample",
-                 sampleChoices);
-    configParam<SpeedQuantity>(PITCH_PARAM, -1.f, 1.f, 0.f, "Pitch");
+    configSwitch(SAMPLE_PARAM, 0.f, (NumSamples - 1), 0.f, "Sample", sampleChoices);
+    configParam<SpeedQuantity<T>>(PITCH_PARAM, -1.f, 1.f, 0.f, "Pitch");
     configParam(DECAY_PARAM, 0.f, 1.f, 1.f, "Decay", "s");
     configParam(PUSH_PARAM, 0.f, 1.f, 0.f, "Trigger button");
     configInput(SAMPLECVIN_INPUT, "Sample CV");
@@ -77,7 +77,6 @@ public:
     if (triggered) {
       LightBrightness = 1.0f;
 
-      constexpr size_t NumSamples = T::samples.size();
       cur_sample_idx = indexed_cv_knob<NumSamples>(inputs[SAMPLECVIN_INPUT].getNormalVoltage(0), params[SAMPLE_PARAM].getValue());
 
       samplePos = 0.f;
@@ -94,26 +93,18 @@ public:
     if (playing) {
       // --- PITCH ---
       float pitchKnob = params[PITCH_PARAM].getValue(); // -1 to 1
-      float pitchCV = inputs[PITCHCVIN_INPUT].isConnected()
-                          ? inputs[PITCHCVIN_INPUT].getVoltage()
-                          : 0.f; // -10V to +10V
-
-      float pitchRatio =
-          pitch_cv_knob<MIN_PLAYBACK_SPEED, MAX_PLAYBACK_SPEED>(pitchCV, pitchKnob);
+      float pitchCV = inputs[PITCHCVIN_INPUT].getNormalVoltage(0);
+      float pitchRatio = pitch_cv_knob<MIN_PLAYBACK_SPEED, MAX_PLAYBACK_SPEED>(pitchCV, pitchKnob);
 
       // --- DECAY ---
       float decayKnob = params[DECAY_PARAM].getValue(); // 0 to 1
-      float decayCV = inputs[DECAYCVIN_INPUT].isConnected()
-                          ? inputs[DECAYCVIN_INPUT].getVoltage() / 5.0f
-                          : 0.f; // -1 to 1
-      float decayMod = decayKnob + decayCV;
-
+      float decayCV = inputs[DECAYCVIN_INPUT].getNormalVoltage(0); // -1 to 1
+      float decayMod = decayKnob + decayCV / 5.f;
       decayMod = std::clamp(decayMod, 0.f, 1.f);
 
       static constexpr auto minDecayTime = 0.005f;
       const auto maxDecayTime = T::samples[cur_sample_idx].size() / 44100.f;
-      const auto decayTime =
-          minDecayTime + decayMod * (maxDecayTime - minDecayTime);
+      const auto decayTime = minDecayTime + decayMod * (maxDecayTime - minDecayTime);
       const auto decayCoef = expf(-1.f / (decayTime * args.sampleRate));
 
       // --- Sample playback ---
