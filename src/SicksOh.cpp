@@ -157,22 +157,17 @@ struct SicksOh : Module {
   }
 
   void process(const ProcessArgs &args) override {
-    float knobSpeed =
-        0.01f + (params[SPEED_PARAM].getValue() + 1.f) * (1.0f - 0.01f);
-    float speedCV = std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -5.f, 5.f);
-    float normSpeed =
-        std::clamp(knobSpeed + (speedCV / 5.f) * 0.5f, 0.01f, 2.0f);
-    float speed = SPEED_LOW + (normSpeed - 0.01f) *
-                                  ((SPEED_HIGH - SPEED_LOW) / (1.0f - 0.01f));
+    // Knob (-1..1) rescaled to -5..5V offset; CV added and clamped to ±5V
+    float knobSpeedOffset = params[SPEED_PARAM].getValue() * 5.f;
+    float speedCV = inputs[SPEEDCVIN_INPUT].getVoltage();
+    float normSpeed = rescale(std::clamp(knobSpeedOffset + speedCV, -5.f, 5.f), -5.f, 5.f, 0.f, 1.f);
+    float speed = SPEED_LOW + normSpeed * (SPEED_HIGH - SPEED_LOW);
 
-    float knobLength = params[LENGTH_PARAM].getValue();
-    float lengthCV =
-        std::clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -5.f, 5.f);
-    float normLength =
-        std::clamp(knobLength + (lengthCV / 5.f) * 0.5f, 0.1f, 1.0f);
-    float lengthRatio =
-        LENGTH_MIN +
-        (normLength - 0.1f) * ((LENGTH_MAX - LENGTH_MIN) / (1.0f - 0.1f));
+    // Knob (0..1) rescaled to -5..5V offset; CV added and clamped to ±5V
+    float knobLengthOffset = rescale(params[LENGTH_PARAM].getValue(), 0.f, 1.f, -5.f, 5.f);
+    float lengthCV = inputs[LENGTHCVIN_INPUT].getVoltage();
+    float normLength = rescale(std::clamp(knobLengthOffset + lengthCV, -5.f, 5.f), -5.f, 5.f, 0.f, 1.f);
+    float lengthRatio = LENGTH_MIN + normLength * (LENGTH_MAX - LENGTH_MIN);
 
     processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, speed,
                  lengthRatio);

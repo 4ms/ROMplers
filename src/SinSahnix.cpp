@@ -144,23 +144,17 @@ struct SinSahnix : Module {
   }
 
   void process(const ProcessArgs &args) override {
-    float baseSpeedParam = params[SPEED_PARAM].getValue();
-    float knobSpeed = 0.01f + (baseSpeedParam + 1.f) * 0.99f;
+    // Knob (-1..1) rescaled to -5..5V offset; CV added and clamped to ±5V
+    float knobSpeedOffset = params[SPEED_PARAM].getValue() * 5.f;
+    float speedCV = inputs[SPEEDCVIN_INPUT].getVoltage();
+    float normSpeed = rescale(std::clamp(knobSpeedOffset + speedCV, -5.f, 5.f), -5.f, 5.f, 0.f, 1.f);
+    float speed = SPEED_LOW + normSpeed * (SPEED_HIGH - SPEED_LOW);
 
-    float speedCV = std::clamp(inputs[SPEEDCVIN_INPUT].getVoltage(), -5.f, 5.f);
-    float speedOffset = (speedCV * 0.1f);
-    float normSpeed = std::clamp(knobSpeed + speedOffset, 0.01f, 2.0f);
-    float speed = SPEED_LOW + (normSpeed - 0.01f) *
-                                  ((SPEED_HIGH - SPEED_LOW) * (1.0f / 0.99f));
-
-    float knobLength = params[LENGTH_PARAM].getValue();
-    float lengthCV =
-        std::clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -5.f, 5.f);
-    float lengthOffset = lengthCV * 0.1f;
-    float normLength = std::clamp(knobLength + lengthOffset, 0.1f, 1.0f);
-    float lengthRatio =
-        LENGTH_MIN +
-        (normLength - 0.1f) * ((LENGTH_MAX - LENGTH_MIN) * (1.0f / 0.9f));
+    // Knob (0..1) rescaled to -5..5V offset; CV added and clamped to ±5V
+    float knobLengthOffset = rescale(params[LENGTH_PARAM].getValue(), 0.f, 1.f, -5.f, 5.f);
+    float lengthCV = inputs[LENGTHCVIN_INPUT].getVoltage();
+    float normLength = rescale(std::clamp(knobLengthOffset + lengthCV, -5.f, 5.f), -5.f, 5.f, 0.f, 1.f);
+    float lengthRatio = LENGTH_MIN + normLength * (LENGTH_MAX - LENGTH_MIN);
 
     processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, speed,
                  lengthRatio);

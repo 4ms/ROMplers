@@ -95,16 +95,12 @@ public:
 
     if (playing) {
       // --- PITCH ---
-      float pitchKnob = params[PITCH_PARAM].getValue(); // -1 to 1
-      float pitchCV = inputs[PITCHCVIN_INPUT].isConnected()
-                          ? inputs[PITCHCVIN_INPUT].getVoltage() / 5.0f
-                          : 0.f; // -1 to 1
-      pitchCV = std::clamp(pitchCV, -1.f, 1.f);
-
-      float pitchMod = pitchKnob + (1.0f - fabs(pitchKnob)) * pitchCV;
-      // Explanation: CV influence is scaled so full knob sweep + full CV covers
-      // -1..1
-      pitchMod = std::clamp(pitchMod, -1.f, 1.f);
+      // Knob (-1..1) rescaled to -5..5V offset; CV added and clamped to ±5V
+      const float knobPitchOffset = params[PITCH_PARAM].getValue() * 5.f;
+      const float pitchCV = inputs[PITCHCVIN_INPUT].isConnected()
+                                ? inputs[PITCHCVIN_INPUT].getVoltage()
+                                : 0.f;
+      float pitchMod = rescale(std::clamp(knobPitchOffset + pitchCV, -5.f, 5.f), -5.f, 5.f, -1.f, 1.f);
 
       float normalizedPitch = (pitchMod + 1.f) * 0.5f;
       float pitchRatio =
@@ -112,17 +108,12 @@ public:
           normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
 
       // --- DECAY ---
-      float decayKnob = params[DECAY_PARAM].getValue(); // 0 to 1
-      float decayCV = inputs[DECAYCVIN_INPUT].isConnected()
-                          ? inputs[DECAYCVIN_INPUT].getVoltage() / 5.0f
-                          : 0.f; // -1 to 1
-      decayCV = std::clamp(decayCV, -1.f, 1.f);
-
-      float decayMod =
-          decayKnob +
-          ((decayCV > 0 ? (1.0f - decayKnob) : decayKnob) * decayCV);
-      // scale CV so that +5V pushes to max, -5V pushes to min, respecting knob
-      decayMod = std::clamp(decayMod, 0.f, 1.f);
+      // Knob (0..1) rescaled to -5..5V offset; CV added and clamped to ±5V
+      const float knobDecayOffset = rescale(params[DECAY_PARAM].getValue(), 0.f, 1.f, -5.f, 5.f);
+      const float decayCV = inputs[DECAYCVIN_INPUT].isConnected()
+                                ? inputs[DECAYCVIN_INPUT].getVoltage()
+                                : 0.f;
+      float decayMod = rescale(std::clamp(knobDecayOffset + decayCV, -5.f, 5.f), -5.f, 5.f, 0.f, 1.f);
 
       static constexpr auto minDecayTime = 0.005f;
       const auto maxDecayTime = T::samples[cur_sample_idx].size() / 44100.f;

@@ -130,23 +130,21 @@ public:
 
   void process(const ProcessArgs &args) override {
     // --- Speed ---
-    const auto knobSpeed = (params[SPEED_PARAM].getValue() + 1.f) * 2.5f;
-    auto speedCV = inputs[SPEEDCVIN_INPUT].isConnected()
-                       ? inputs[SPEEDCVIN_INPUT].getVoltage()
-                       : 0.f;
-    speedCV = std::clamp(speedCV * 0.5f, -5.f, 5.f);
-    const auto combinedSpeed = knobSpeed + speedCV;
-    const auto normSpeed = std::clamp(combinedSpeed / 5.f, 0.f, 1.f);
+    // Knob (-1..1) rescaled to -5..5V offset; CV added and clamped to ±5V
+    const auto knobSpeedOffset = params[SPEED_PARAM].getValue() * 5.f;
+    const auto speedCV = inputs[SPEEDCVIN_INPUT].isConnected()
+                             ? inputs[SPEEDCVIN_INPUT].getVoltage()
+                             : 0.f;
+    const auto normSpeed = rescale(std::clamp(knobSpeedOffset + speedCV, -5.f, 5.f), -5.f, 5.f, 0.f, 1.f);
     const auto speed = SPEED_MIN + normSpeed * (SPEED_MAX - SPEED_MIN);
 
     // --- Length ---
-    const auto knobLength = params[LENGTH_PARAM].getValue() * 5.f;
-    auto lengthCV = inputs[LENGTHCVIN_INPUT].isConnected()
-                        ? inputs[LENGTHCVIN_INPUT].getVoltage()
-                        : 0.f;
-    lengthCV = std::clamp(lengthCV * 0.5f, -5.f, 5.f);
-    const auto combinedLength = knobLength + lengthCV;
-    const auto normLength = std::clamp(combinedLength / 5.f, 0.f, 1.f);
+    // Knob (0..1) rescaled to -5..5V offset; CV added and clamped to ±5V
+    const auto knobLengthOffset = rescale(params[LENGTH_PARAM].getValue(), 0.f, 1.f, -5.f, 5.f);
+    const auto lengthCV = inputs[LENGTHCVIN_INPUT].isConnected()
+                              ? inputs[LENGTHCVIN_INPUT].getVoltage()
+                              : 0.f;
+    const auto normLength = rescale(std::clamp(knobLengthOffset + lengthCV, -5.f, 5.f), -5.f, 5.f, 0.f, 1.f);
     const auto lengthRatio =
         LENGTH_MIN + normLength * (LENGTH_MAX - LENGTH_MIN);
 
