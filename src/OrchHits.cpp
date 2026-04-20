@@ -1,4 +1,5 @@
 #include "OrchHitsSamples.hpp"
+#include "dsp_utils.hh"
 #include "plugin.hpp"
 #include "sample.hh"
 #include <cmath>
@@ -144,13 +145,10 @@ struct OrchHits : Module {
 
         const auto sampleValue = s1 + frac * (s2 - s1);
 
-        float knobDecayTime = params[DECAY_PARAM].getValue(); // already 0..5
-        float cv = inputs[DECAYCVIN_INPUT].isConnected()
-                       ? inputs[DECAYCVIN_INPUT].getVoltage()
-                       : 0.f;
-        float cvScaled = cv * 0.5f; // -10..10 -> -5..5
-        float combined = knobDecayTime + cvScaled;
-        float decayParam = std::clamp(combined / 5.f, 0.f, 1.f);
+        const float cv = inputs[DECAYCVIN_INPUT].isConnected()
+                             ? inputs[DECAYCVIN_INPUT].getVoltage()
+                             : 0.f;
+        const float decayParam = calcDecayModScaled(params[DECAY_PARAM].getValue(), cv);
 
         float decayTime =
             minDecayTime + decayParam * (maxDecayTime - minDecayTime);

@@ -10,6 +10,7 @@ FetchContent_MakeAvailable(doctest)
 add_executable(romplers_tests
     test_main.cpp
     test_sample.cpp
+    test_decay.cpp
 )
 
 target_link_libraries(romplers_tests PRIVATE doctest::doctest)

@@ -1,4 +1,5 @@
 #include "KayOneSamples.hpp"
+#include "dsp_utils.hh"
 #include "plugin.hpp"
 
 struct SpeedQuantity : ParamQuantity {
@@ -145,8 +146,6 @@ struct KayOne : Module {
   }
 
   void process(const ProcessArgs &args) override {
-    static const float lengthCVScale = 0.1f;
-
     // Knob (-1..1) rescaled to -5..5V offset; CV added and clamped to ±5V
     const float knobPitchOffset = params[SPEED_PARAM].getValue() * 5.f;
     const float pitchCV = inputs[SPEEDCVIN_INPUT].isConnected()
@@ -159,13 +158,10 @@ struct KayOne : Module {
         MIN_PLAYBACK_SPEED +
         normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
 
-    float knobLength = params[LENGTH_PARAM].getValue();
-    float normLength = std::clamp(
-        knobLength + inputs[LENGTHCVIN_INPUT].getVoltage() * lengthCVScale,
-        0.1f, 1.0f);
-    float lengthRatio =
-        LENGTH_MIN +
-        (normLength - 0.1f) * ((LENGTH_MAX - LENGTH_MIN) / (1.0f - 0.1f));
+    const float lengthCV = inputs[LENGTHCVIN_INPUT].isConnected()
+                               ? inputs[LENGTHCVIN_INPUT].getVoltage()
+                               : 0.f;
+    const float lengthRatio = calcLengthMod(params[LENGTH_PARAM].getValue(), lengthCV);
 
     // Process all voices
     processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, pitchRatio,

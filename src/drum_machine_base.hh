@@ -1,5 +1,6 @@
 #pragma once
 
+#include "dsp_utils.hh"
 #include "plugin.hpp"
 #include "sample.hh"
 
@@ -143,12 +144,10 @@ public:
         normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
 
     // --- Length ---
-    // Knob (0..1) rescaled to -5..5V offset; CV added and clamped to ±5V
-    const auto knobLengthOffset = rescale(params[LENGTH_PARAM].getValue(), 0.f, 1.f, -5.f, 5.f);
     const auto lengthCV = inputs[LENGTHCVIN_INPUT].isConnected()
                               ? inputs[LENGTHCVIN_INPUT].getVoltage()
                               : 0.f;
-    const auto normLength = rescale(std::clamp(knobLengthOffset + lengthCV, -5.f, 5.f), -5.f, 5.f, 0.f, 1.f);
+    const auto normLength = calcDecayMod(params[LENGTH_PARAM].getValue(), lengthCV);
     const auto lengthRatio =
         LENGTH_MIN + normLength * (LENGTH_MAX - LENGTH_MIN);
 

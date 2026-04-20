@@ -1,4 +1,5 @@
 #include "SlapSamples.hpp"
+#include "dsp_utils.hh"
 #include "plugin.hpp"
 #include "sample.hh"
 #include <cmath>
@@ -110,16 +111,10 @@ struct Slap : Module {
         const auto s2 = slap[nextIdx];
 
         const auto sampleValue = s1 + frac * (s2 - s1);
-        // --- Decay parameter with 0-5 knob + -10..10 CV ---
-        float decayKnob = params[DECAY_PARAM].getValue() * 5.f; // 0-1 → 0-5
-        float decayCV = 0.f;
-        if (inputs[DECAYCVIN_INPUT].isConnected()) {
-          decayCV =
-              inputs[DECAYCVIN_INPUT].getVoltage() * 0.5f; // -10..10 → -5..5
-        }
-        float decayParam = decayKnob + decayCV; // sum knob + CV
-        decayParam = std::clamp(decayParam, 0.f, 5.f);
-        decayParam /= 5.f; // normalize back to 0-1
+        const float decayCV = inputs[DECAYCVIN_INPUT].isConnected()
+                                  ? inputs[DECAYCVIN_INPUT].getVoltage()
+                                  : 0.f;
+        const float decayParam = calcDecayModScaled(params[DECAY_PARAM].getValue() * 5.f, decayCV);
 
         static constexpr float minDecayTime = 0.005f;
         static constexpr float maxDecayTime = numSamples / sampleSampleRate;

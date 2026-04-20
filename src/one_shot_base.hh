@@ -1,6 +1,7 @@
 #pragma once
 
 #include "plugin.hpp"
+#include "dsp_utils.hh"
 
 struct SpeedQuantity : ParamQuantity {
   std::string getDisplayValueString() override {
@@ -108,12 +109,10 @@ public:
           normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
 
       // --- DECAY ---
-      // Knob (0..1) rescaled to -5..5V offset; CV added and clamped to ±5V
-      const float knobDecayOffset = rescale(params[DECAY_PARAM].getValue(), 0.f, 1.f, -5.f, 5.f);
       const float decayCV = inputs[DECAYCVIN_INPUT].isConnected()
                                 ? inputs[DECAYCVIN_INPUT].getVoltage()
                                 : 0.f;
-      float decayMod = rescale(std::clamp(knobDecayOffset + decayCV, -5.f, 5.f), -5.f, 5.f, 0.f, 1.f);
+      float decayMod = calcDecayMod(params[DECAY_PARAM].getValue(), decayCV);
 
       static constexpr auto minDecayTime = 0.005f;
       const auto maxDecayTime = T::samples[cur_sample_idx].size() / 44100.f;

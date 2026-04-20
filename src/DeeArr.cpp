@@ -1,4 +1,5 @@
 #include "DeeArrSamples.hpp"
+#include "dsp_utils.hh"
 #include "plugin.hpp"
 
 struct SpeedQuantity : ParamQuantity {
@@ -128,13 +129,11 @@ struct DeeArr : Module {
         normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
 
     // --- Precalculate length with CV ---
-    float knobLengthV = params[LENGTH_PARAM].getValue() * 5.f;
-    float lengthCVV = 0.f;
-    if (inputs[LENGTHCVIN_INPUT].isConnected())
-      lengthCVV =
-          std::clamp(inputs[LENGTHCVIN_INPUT].getVoltage(), -10.f, 10.f) * 0.5f;
-    float normLength = std::clamp(knobLengthV + lengthCVV, 0.f, 5.f) / 5.f;
-    float lengthRatio = LENGTH_MIN + normLength * (LENGTH_MAX - LENGTH_MIN);
+    const float lengthCVV = inputs[LENGTHCVIN_INPUT].isConnected()
+                                ? inputs[LENGTHCVIN_INPUT].getVoltage()
+                                : 0.f;
+    const float normLength = calcDecayModScaled(params[LENGTH_PARAM].getValue() * 5.f, lengthCVV);
+    const float lengthRatio = LENGTH_MIN + normLength * (LENGTH_MAX - LENGTH_MIN);
 
     // --- Process each voice ---
     processVoice(args, kickVoice, KICKTRIGIN_INPUT, KICKPUSH_PARAM, pitchRatio,
