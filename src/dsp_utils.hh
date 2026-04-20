@@ -14,12 +14,6 @@ inline float calcDecayModScaled(float knobValue, float cvVoltage) {
     return std::clamp((knobValue + cvVoltage * 0.5f) / 5.f, 0.f, 1.f);
 }
 
-// KayOne length: knob (0..1) added to lightly-scaled CV (±10V * 0.1), hard floor at 0.1
-// Returns length ratio 0.1..1.0 directly (not a 0..1 intermediate)
-inline float calcLengthMod(float knobValue, float cvVoltage) {
-    return std::clamp(knobValue + cvVoltage * 0.1f, 0.1f, 1.0f);
-}
-
 // Exponential (logarithmic) decay time: param 0..1 maps to minTime..maxTime
 // on a log scale so each half of the knob spans the same number of doublings.
 inline float calcExpDecayTime(float param, float minTime, float maxTime) {
