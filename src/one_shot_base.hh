@@ -3,11 +3,11 @@
 #include "cv_func.hh"
 #include "plugin.hpp"
 
+template <size_t MIN, size_t MAX>
 struct SpeedQuantity : ParamQuantity {
   std::string getDisplayValueString() override {
-    float v = getValue();
-    float display = (v >= 0.f) ? (v + 1.f) : (v - 1.f);
-    return string::f("%.3gx", display);
+    float v = pitch_cv_knob<MIN, MAX>(0, getValue());
+    return string::f("%.3gx", v);
   }
 };
 
