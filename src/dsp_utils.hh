@@ -1,5 +1,6 @@
 #pragma once
 #include <algorithm>
+#include <cmath>
 
 // Knob (0..1) rescaled to -5..5V offset; CV added and clamped to ±5V; rescaled to 0..1
 inline float calcDecayMod(float knobValue, float cvVoltage) {
@@ -17,6 +18,12 @@ inline float calcDecayModScaled(float knobValue, float cvVoltage) {
 // Returns length ratio 0.1..1.0 directly (not a 0..1 intermediate)
 inline float calcLengthMod(float knobValue, float cvVoltage) {
     return std::clamp(knobValue + cvVoltage * 0.1f, 0.1f, 1.0f);
+}
+
+// 1V/oct pitch ratio for Slap/OrchHits: each volt = one octave.
+// totalVolts = (octaveKnobIndex - unisonIndex) + pitchCV
+inline float calc1VperOctPitchRatio(float totalVolts) {
+    return std::pow(2.f, totalVolts);
 }
 
 // Piecewise linear pitch mapping from normalized position (0..1) to playback ratio:

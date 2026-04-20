@@ -12,6 +12,7 @@ add_executable(romplers_tests
     test_sample.cpp
     test_decay.cpp
     test_pitch.cpp
+    test_oneshot_1voct_pitch.cpp
 )
 
 target_link_libraries(romplers_tests PRIVATE doctest::doctest)

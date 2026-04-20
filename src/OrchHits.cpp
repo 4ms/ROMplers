@@ -119,13 +119,12 @@ struct OrchHits : Module {
       // Quantize to discrete steps 0..4
       float totalOctave = std::clamp(std::round(combined), 0.f, 4.f);
 
-      // Use in pitch calculation
+      // standard 1V/oct, clamped to ±1V: 0V=unison, ±1V=±1oct
       float pitchCV = inputs[PITCHCVIN_INPUT].isConnected()
                           ? std::clamp(inputs[PITCHCVIN_INPUT].getVoltage(), -1.f, 1.f)
                           : 0.f;
-      float totalVolts =
-          (totalOctave - 2.f) + pitchCV; // centered around Unison
-      float pitchRatio = std::pow(2.f, totalVolts);
+      float totalVolts = (totalOctave - 2.f) + pitchCV;
+      float pitchRatio = calc1VperOctPitchRatio(totalVolts);
 
       float sampleRateRatio = sampleSampleRate / args.sampleRate;
       samplePos += pitchRatio * sampleRateRatio;

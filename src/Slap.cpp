@@ -80,22 +80,21 @@ struct Slap : Module {
                   std::clamp(inputs[OCTAVECVIN_INPUT].getVoltage(), -5.f, 5.f) *
                   0.4f)),
           0, 4);
+      // standard 1V/oct, clamped to ±1V: 0V=unison, ±1V=±1oct
       float pitchCV = inputs[PITCHCVIN_INPUT].isConnected()
                           ? std::clamp(inputs[PITCHCVIN_INPUT].getVoltage(), -1.f, 1.f)
                           : 0.f;
 
-      // Sum everything in volts for 1V/oct tracking
-      // Each volt = 1 octave, so total pitch in volts:
-      float totalVolts = finalOctave + pitchCV;
+      float totalVolts = (static_cast<float>(finalOctave) - 1.f) + pitchCV;
 
       // Convert volts to playback rate
       // playbackRate = 2^(V) to get correct 1V/oct frequency
-      float pitchRatio = std::pow(2.f, totalVolts);
+      float pitchRatio = calc1VperOctPitchRatio(totalVolts) * 4.f; // shift 2 octaves up
 
       const float sampleRateRatio = sampleSampleRate / args.sampleRate;
       samplePos += pitchRatio * sampleRateRatio;
 
-      static constexpr auto numSamples = slap.size();
+      constexpr auto numSamples = slap.size();
 
       // Check if sample done
       if (static_cast<unsigned>(samplePos) >= numSamples) {
@@ -116,8 +115,8 @@ struct Slap : Module {
                                   : 0.f;
         const float decayParam = calcDecayModScaled(params[DECAY_PARAM].getValue() * 5.f, decayCV);
 
-        static constexpr float minDecayTime = 0.005f;
-        static constexpr float maxDecayTime = numSamples / sampleSampleRate;
+        constexpr float minDecayTime = 0.005f;
+        constexpr float maxDecayTime = numSamples / sampleSampleRate;
         const float decayTime =
             minDecayTime + decayParam * (maxDecayTime - minDecayTime);
 
