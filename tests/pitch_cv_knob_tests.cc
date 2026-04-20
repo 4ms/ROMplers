@@ -1,4 +1,4 @@
-#include "../src/cv_func.hh"
+#include "../src/cv_knob_utils.hh"
 #include <doctest/doctest.h>
 
 constexpr float MIN = 0.5f;
