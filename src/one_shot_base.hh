@@ -41,9 +41,6 @@ public:
   float lastButtonValue = 0.f;
   float LightBrightness = 0.f;
 
-  static constexpr float MIN_PLAYBACK_SPEED = T::min_rate;
-  static constexpr float MAX_PLAYBACK_SPEED = T::max_rate;
-
   OneShotBaseModule() {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
     std::vector<std::string> sampleChoices;
@@ -104,9 +101,7 @@ public:
       float pitchMod = rescale(std::clamp(knobPitchOffset + pitchCV, -5.f, 5.f), -5.f, 5.f, -1.f, 1.f);
 
       float normalizedPitch = (pitchMod + 1.f) * 0.5f;
-      float pitchRatio =
-          MIN_PLAYBACK_SPEED +
-          normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
+      float pitchRatio = calcPitchRatio(normalizedPitch);
 
       // --- DECAY ---
       const float decayCV = inputs[DECAYCVIN_INPUT].isConnected()

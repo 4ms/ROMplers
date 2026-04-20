@@ -18,3 +18,12 @@ inline float calcDecayModScaled(float knobValue, float cvVoltage) {
 inline float calcLengthMod(float knobValue, float cvVoltage) {
     return std::clamp(knobValue + cvVoltage * 0.1f, 0.1f, 1.0f);
 }
+
+// Piecewise linear pitch mapping from normalized position (0..1) to playback ratio:
+// 0.0 -> 0.01x, 0.5 -> 1.0x, 1.0 -> 2.0x
+inline float calcPitchRatio(float normalizedPitch) {
+    if (normalizedPitch <= 0.5f)
+        return 0.01f + normalizedPitch * 1.98f;
+    else
+        return 1.0f + (normalizedPitch - 0.5f) * 2.0f;
+}

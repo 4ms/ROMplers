@@ -104,8 +104,6 @@ public:
   static constexpr float outputScale = 1.f;
   static constexpr float sumScale = 1.f;
 
-  static constexpr float MIN_PLAYBACK_SPEED = 0.05f;
-  static constexpr float MAX_PLAYBACK_SPEED = 2.0f;
   static constexpr float LENGTH_MIN = 0.1f;
   static constexpr float LENGTH_MAX = 1.0f;
 
@@ -139,9 +137,7 @@ public:
     float pitchMod = rescale(std::clamp(knobPitchOffset + pitchCV, -5.f, 5.f), -5.f, 5.f, -1.f, 1.f);
 
     float normalizedPitch = (pitchMod + 1.f) * 0.5f;
-    float pitchRatio =
-        MIN_PLAYBACK_SPEED +
-        normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
+    float pitchRatio = calcPitchRatio(normalizedPitch);
 
     // --- Length ---
     const auto lengthCV = inputs[LENGTHCVIN_INPUT].isConnected()

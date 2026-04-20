@@ -77,8 +77,6 @@ struct SinSahnix : Module {
   Voice tomHiVoice;
   Voice cymbalVoice;
 
-  const float MIN_PLAYBACK_SPEED = 0.05f;
-  const float MAX_PLAYBACK_SPEED = 2.0f;
   const float LENGTH_MIN = 0.1f;
   const float LENGTH_MAX = 1.0f;
 
@@ -153,9 +151,7 @@ struct SinSahnix : Module {
     float pitchMod = rescale(std::clamp(knobPitchOffset + pitchCV, -5.f, 5.f), -5.f, 5.f, -1.f, 1.f);
 
     float normalizedPitch = (pitchMod + 1.f) * 0.5f;
-    float pitchRatio =
-        MIN_PLAYBACK_SPEED +
-        normalizedPitch * (MAX_PLAYBACK_SPEED - MIN_PLAYBACK_SPEED);
+    float pitchRatio = calcPitchRatio(normalizedPitch);
 
     const float lengthCV = inputs[LENGTHCVIN_INPUT].isConnected()
                                ? inputs[LENGTHCVIN_INPUT].getVoltage()
