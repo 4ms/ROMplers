@@ -15,7 +15,7 @@
 Ace Tone Rhythm King samples with playback speed, sample length, and a mix output.
 
 - **Length**: Sample file length.
-- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to 0.01x playback speed.
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
@@ -30,7 +30,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and a mix outpu
 “Real” acoustic clap samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to 0.01x playback speed.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -45,7 +45,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and a mix outpu
 “Real” acoustic closed hi-hat samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to 0.01x playback speed.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -60,7 +60,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and a mix outpu
 “Real” acoustic crash samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to 0.01x playback speed.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -75,7 +75,7 @@ Ace Tone Rhythm King samples with playback speed, sample length, and a mix outpu
 DR-55 samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
-- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to 0.01x playback speed.
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
@@ -90,7 +90,7 @@ DR-55 samples with playback speed, sample length, direct outs, and a mix output.
 KR55 samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
-- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to 0.01x playback speed.
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
@@ -105,7 +105,7 @@ KR55 samples with playback speed, sample length, direct outs, and a mix output.
 Casio SK-1 samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
-- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to 0.01x playback speed.
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
@@ -120,7 +120,7 @@ Casio SK-1 samples with playback speed, sample length, direct outs, and a mix ou
 “Real” acoustic kick samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to 0.01x playback speed.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -135,7 +135,7 @@ Casio SK-1 samples with playback speed, sample length, direct outs, and a mix ou
 “Real” acoustic open hi-hat samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to 0.01x playback speed.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -151,7 +151,7 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 
 - **Sample**: Sample selection. There are 17 total samples for this module.
 - **Octave**: Octave transpose for sample, from -2 to +2 octaves above root pitch.
-- **1v/Oct**: 1v per octave pitch input.
+- **1v/Oct**: 1v per octave pitch input. Accepts -1V to +1V, covering a 2 octave range.
 - **Decay**: Exponential decay envelope 1ms - 5 seconds.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -166,7 +166,7 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 “Real” acoustic auxiliary percussion samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to 0.01x playback speed.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -181,7 +181,7 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 “Real” acoustic ride samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to 0.01x playback speed.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -196,7 +196,7 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 “Real” acoustic rimshot samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to 0.01x playback speed.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -211,7 +211,7 @@ Pitched orchestra hits, meant to be controlled with a 1v per octave source such 
 CR-78 samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
-- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to 0.01x playback speed.
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
@@ -226,7 +226,7 @@ CR-78 samples with playback speed, sample length, direct outs, and a mix output.
 TR-727 samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
-- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to 0.01x playback speed.
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
@@ -241,7 +241,7 @@ TR-727 samples with playback speed, sample length, direct outs, and a mix output
 TR-606 samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
-- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to 0.01x playback speed.
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
@@ -256,7 +256,7 @@ TR-606 samples with playback speed, sample length, direct outs, and a mix output
 Synsonics samples with playback speed, sample length, direct outs, and a mix output.
 
 - **Length**: Sample file length for all samples.
-- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
+- **Speed**: Playback speed and pitch of the samples. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to 0.01x playback speed.
 - **Main Volume**: Master volume trimpot for the Sum output, 0–100%.
 - **Buttons**: Triggers samples.
 - **Trigger inputs**: Trigger input, conditioned for rising edge detection.
@@ -271,7 +271,7 @@ Synsonics samples with playback speed, sample length, direct outs, and a mix out
 A slap bass sample meant to be controlled with a 1v per octave source such as a keyboard or sequencer.
 
 - **Octave**: Octave transpose for sample, from Unison to +4v octaves above root pitch.
-- **1v/Oct**: 1v per octave pitch input.
+- **1v/Oct**: 1v per octave pitch input. Accepts -1V to +1V, covering a 2 octave range.
 - **Decay**: Exponential decay envelope 1ms - 1 second.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -286,7 +286,7 @@ A slap bass sample meant to be controlled with a 1v per octave source such as a 
 “Real” acoustic snare samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to 0.01x playback speed.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -301,7 +301,7 @@ A slap bass sample meant to be controlled with a 1v per octave source such as a 
 “Real” acoustic tom samples with playback speed, velocity, and a decay envelope.
 
 - **Sample**: Sample selection. There are 16 total samples for this module.
-- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to -2x playback speed.
+- **Pitch**: Playback speed and pitch of the sample. Center position is 1x (original speed); turn right to increase up to 2x playback speed, turn left to decrease to 0.01x playback speed.
 - **Decay**: An exponential decay envelope, 1ms - 1 second long.
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
