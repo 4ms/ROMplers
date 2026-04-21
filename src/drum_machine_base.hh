@@ -4,11 +4,11 @@
 #include "plugin.hpp"
 #include "sample.hh"
 
+template<typename T>
 struct SpeedQuantity : ParamQuantity {
 	std::string getDisplayValueString() override {
-		float v = getValue();
-		float display = (v >= 0.f) ? (v + 1.f) : (v - 1.f);
-		return string::f("%.3gx", display);
+		float v = pitch_cv_knob<T>(0, getValue());
+		return string::f("%.3gx", v);
 	}
 };
 
@@ -117,7 +117,7 @@ public:
 
 	DrumMachineBaseModule() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam<SpeedQuantity>(SPEED_PARAM, -1.f, 1.f, 0.f, "Speed");
+		configParam<SpeedQuantity<PitchMinMax>>(SPEED_PARAM, -1.f, 1.f, 0.f, "Speed");
 		configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length", "%", 0.f, 100.f);
 		configParam(MAINVOL_PARAM, 0.f, 1.f, 0.5f, "Main Volume", "%", 0.f, 100.f);
 
