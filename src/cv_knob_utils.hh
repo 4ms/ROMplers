@@ -39,7 +39,7 @@ inline float calcPitchRatio(float normalizedPitch) {
 template<size_t NumSamples>
 constexpr int indexed_cv_knob(float cv, float knob) {
 	float sampleKnobSel = std::clamp(knob / NumSamples, 0.f, 1.f);
-	float sampleCV = std::clamp(cv / 5.f, -1.f, 1.f);
+	float sampleCV = std::clamp(cv / 10.f, -1.f, 1.f);
 	int sampleIndex = std::round((sampleCV + sampleKnobSel) * NumSamples);
 	return std::clamp<int>(sampleIndex, 0, NumSamples - 1);
 }
