@@ -3,14 +3,6 @@
 #include "plugin.hpp"
 
 template<typename T>
-struct SpeedQuantity : ParamQuantity {
-	std::string getDisplayValueString() override {
-		float v = pitch_cv_knob<T>(0, getValue());
-		return string::f("%.3gx", v);
-	}
-};
-
-template<typename T>
 class OneShotBaseModule : public Module {
 public:
 	static constexpr float min_rate = 0.01f;
@@ -42,7 +34,7 @@ public:
 		for (auto i = 1u; i <= NumSamples; ++i)
 			sampleChoices.push_back(std::to_string(i));
 		configSwitch(SAMPLE_PARAM, 0.f, (NumSamples - 1), 0.f, "Sample", sampleChoices);
-		configParam<SpeedQuantity<PitchMinMax>>(PITCH_PARAM, -1.f, 1.f, 0.f, "Pitch");
+		configParam(PITCH_PARAM, -1.f, 1.f, 0.f, "Pitch", "x", 0.f, 0.995f, 1.005f);
 		configParam(DECAY_PARAM, 0.f, 1.f, 1.f, "Decay", "s");
 		configParam(PUSH_PARAM, 0.f, 1.f, 0.f, "Trigger button");
 		configInput(SAMPLECVIN_INPUT, "Sample CV");
