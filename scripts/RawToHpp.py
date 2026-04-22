@@ -33,7 +33,9 @@ def fix_array_names(xxd_output, new_name):
     if not match:
         return xxd_output
     old_name = match.group(1)
-    fixed_output = "inline constexpr " + re.sub(rf"\b{re.escape(old_name)}\b", new_name, xxd_output)
+    # alignas(int16_t) so Sample::operator[] can load halfwords without
+    # unaligned-access penalties on strict-alignment targets.
+    fixed_output = "alignas(int16_t) inline constexpr " + re.sub(rf"\b{re.escape(old_name)}\b", new_name, xxd_output)
 
     # Fix the length line: replace any "unsigned int <old_name>_len = <num>;"
     # with "unsigned int <new_name>_len = <num>;"
@@ -93,6 +95,7 @@ def main():
         simplified_names.append(name)
 
     with open(output_file, "w") as out_f:
+        out_f.write("#include <cstdint>\n")
         out_f.write(f"// {drum_name} Samples:\n")
         out_f.write("//\n")
         for i, name in enumerate(simplified_names, start=1):
