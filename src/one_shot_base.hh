@@ -33,13 +33,29 @@ public:
 	};
 	static constexpr size_t NumSamples = T::samples.size();
 
+	// Display-side: shows the actual playback rate produced by pitch_cv_knob,
+	// including any voltage on PITCHCVIN_INPUT, so the readout matches what's heard.
+	struct PitchQuantity : ParamQuantity {
+		float getDisplayValue() override {
+			if (!module)
+				return ParamQuantity::getDisplayValue();
+			const float cv = module->inputs[PITCHCVIN_INPUT].getNormalVoltage(0.f);
+			return pitch_cv_knob<PitchMinMax>(cv, getValue());
+		}
+		void setDisplayValue(float displayValue) override {
+			const float norm = (displayValue - PitchMinMax::min_rate) /
+							   (PitchMinMax::max_rate - PitchMinMax::min_rate);
+			setValue(std::clamp(norm * 2.f - 1.f, -1.f, 1.f));
+		}
+	};
+
 	OneShotBaseModule() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		std::vector<std::string> sampleChoices;
 		for (auto i = 1u; i <= NumSamples; ++i)
 			sampleChoices.push_back(std::to_string(i));
 		configSwitch(SAMPLE_PARAM, 0.f, (NumSamples - 1), 0.f, "Sample", sampleChoices);
-		configParam(PITCH_PARAM, -1.f, 1.f, 0.f, "Pitch", "x", 0.f, 0.995f, 1.005f);
+		configParam<PitchQuantity>(PITCH_PARAM, -1.f, 1.f, 0.f, "Pitch", "x");
 		configParam(DECAY_PARAM, 0.f, 1.f, 1.f, "Decay", "s");
 		configParam(PUSH_PARAM, 0.f, 1.f, 0.f, "Trigger button");
 		configInput(SAMPLECVIN_INPUT, "Sample CV");
