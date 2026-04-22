@@ -24,6 +24,19 @@ struct Slap : Module {
 	static constexpr float minDecayTime = 0.005f;
 	static constexpr float maxDecayTime = numSamples / sampleSampleRate;
 
+	// Derived values — recomputed only when their inputs move by more than
+	// kChangeThresh, to avoid per-sample expf/pow.
+	float pitchRatio = 1.f;
+	float sampleRateRatio = 1.f;
+	float decayCoef = 1.f;
+
+	float last_octaveKnob = 0.f;
+	float last_octaveCV = 0.f;
+	float last_pitchCV = 0.f;
+	float last_decayKnob = 0.f;
+	float last_decayCV = 0.f;
+	float last_sampleRate = 0.f;
+
 	Slap() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
@@ -49,7 +62,8 @@ struct Slap : Module {
 		lastTrigValue = trigIn;
 		lastButtonValue = buttonIn;
 
-		if (trigRising || buttonRising) {
+		const bool triggered = trigRising || buttonRising;
+		if (triggered) {
 			slapLightBrightness = 1.f;
 			samplePos = 0.f;
 			playing = true;
@@ -65,26 +79,41 @@ struct Slap : Module {
 		float output = 0.f;
 
 		if (playing) {
-			float octaveKnob = params[OCTAVE_PARAM].getValue(); // 0 .. 4
-			float octaveCV = inputs[OCTAVECVIN_INPUT].getNormalVoltage(0);
+			// Recompute params only when knobs/cv/sampleRate changes
+			const float octaveKnob = params[OCTAVE_PARAM].getValue(); // 0..4
+			const float octaveCV = inputs[OCTAVECVIN_INPUT].getNormalVoltage(0);
+			const float pitchCV = inputs[PITCHCVIN_INPUT].getNormalVoltage(0);
+			const float decayKnob = params[DECAY_PARAM].getValue();
+			const float decayCV = inputs[DECAYCVIN_INPUT].isConnected() ? inputs[DECAYCVIN_INPUT].getVoltage() : 0.f;
+			const float sr = args.sampleRate;
 
-			// Scale CV: ±5V maps to full knob range (0..4)
-			float cvScaled = octaveCV * 2.f / 5.f; // 5V → +2, -5V → -2
+			const bool pitchChanged = changed(octaveKnob, last_octaveKnob) || changed(octaveCV, last_octaveCV) ||
+									  changed(pitchCV, last_pitchCV);
+			const bool decayChanged = changed(decayKnob, last_decayKnob) || changed(decayCV, last_decayCV);
+			const bool srChanged = changed(sr, last_sampleRate);
+			last_sampleRate = sr;
 
-			// Quantize to discrete steps 0..4
-			float totalOctave = std::clamp(std::round(octaveKnob + cvScaled), 0.f, 4.f);
+			if (triggered || pitchChanged) {
+				// ±5V CV maps to full knob range (0..4), then quantized
+				const float cvScaled = octaveCV * 2.f / 5.f;
+				const float totalOctave = std::clamp(std::round(octaveKnob + cvScaled), 0.f, 4.f);
+				// standard 1V/oct, clamped to ±1V: 0V=unison, ±1V=±1oct
+				const float pitchClamped = std::clamp(pitchCV, -1.f, 1.f);
+				const float totalVolts = (totalOctave - 1.f) + pitchClamped;
+				pitchRatio = calc1VperOctPitchRatio(totalVolts) * 4.f; // shift 2 octaves up
+				last_octaveKnob = octaveKnob;
+				last_octaveCV = octaveCV;
+				last_pitchCV = pitchCV;
+			}
+			if (triggered || decayChanged || srChanged) {
+				const float decayParam = calcDecayModScaled(decayKnob * 5.f, decayCV);
+				const float decayTime = calcExpDecayTime(decayParam, minDecayTime, maxDecayTime);
+				decayCoef = expf(-1.f / (decayTime * sr));
+				last_decayKnob = decayKnob;
+				last_decayCV = decayCV;
+			}
 
-			// standard 1V/oct, clamped to ±1V: 0V=unison, ±1V=±1oct
-			float pitchCV = std::clamp(inputs[PITCHCVIN_INPUT].getNormalVoltage(0), -1.f, 1.f);
-			float totalVolts = (static_cast<float>(totalOctave) - 1.f) + pitchCV;
-
-			// Convert volts to playback rate
-			// playbackRate = 2^(V) to get correct 1V/oct frequency
-			float pitchRatio = calc1VperOctPitchRatio(totalVolts) * 4.f; // shift 2 octaves up
-
-			const float sampleRateRatio = sampleSampleRate / args.sampleRate;
-			samplePos += pitchRatio * sampleRateRatio;
-
+			samplePos += pitchRatio * sampleSampleRate / sr;
 
 			// Check if sample done
 			if (static_cast<unsigned>(samplePos) >= numSamples) {
@@ -99,32 +128,15 @@ struct Slap : Module {
 				const auto s2 = slap[nextIdx];
 
 				const auto sampleValue = s1 + frac * (s2 - s1);
-				const float decayCV =
-					inputs[DECAYCVIN_INPUT].isConnected() ? inputs[DECAYCVIN_INPUT].getVoltage() : 0.f;
-				const float decayParam = calcDecayModScaled(params[DECAY_PARAM].getValue() * 5.f, decayCV);
-
-				const float decayTime = calcExpDecayTime(decayParam, minDecayTime, maxDecayTime);
-
-				// Calculate decay coefficient once per sample
-				const float decayCoef = expf(-1.f / (decayTime * args.sampleRate));
 				env *= decayCoef;
-
 				output = sampleValue * env;
+
+				float volumeCV = std::clamp(inputs[VOLCVIN_INPUT].getNormalVoltage(5.f), 0.f, 5.f);
+				output *= volumeCV;
 			}
 		}
 
-		// Volume CV (std::clamped 0..5V)
-		float volumeCV = 5.f;
-		if (inputs[VOLCVIN_INPUT].isConnected()) {
-			volumeCV = inputs[VOLCVIN_INPUT].getVoltage();
-			if (volumeCV < 0.f)
-				volumeCV = 0.f;
-			else if (volumeCV > 5.f)
-				volumeCV = 5.f;
-		}
-
-		output *= volumeCV / 5.f;
-		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.f);
+		outputs[AUDIOOUT_OUTPUT].setVoltage(output);
 	}
 };
 
