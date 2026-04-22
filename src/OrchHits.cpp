@@ -24,7 +24,7 @@ struct OrchHits : Module {
 	float env = 0.f;
 	float lastTrigValue = 0.f;
 	float lastButtonValue = 0.f;
-	float OrchHitsLightBrightness = 0.f;
+	float lightBrightness = 0.f;
 	uint32_t cur_sample_idx = 0;
 
 	// Derived values — recomputed only when their inputs move by more than
@@ -95,16 +95,16 @@ struct OrchHits : Module {
 
 		const bool triggered = trigRising || buttonRising;
 		if (triggered) {
-			OrchHitsLightBrightness = 1.f;
+			lightBrightness = 1.f;
 			samplePos = 0.f;
 			playing = true;
 			env = 1.f;
 		}
 
-		OrchHitsLightBrightness -= args.sampleTime * 10.f;
-		if (OrchHitsLightBrightness < 0.f)
-			OrchHitsLightBrightness = 0.f;
-		lights[ORCHHITS_LIGHT].setBrightnessSmooth(OrchHitsLightBrightness, args.sampleTime);
+		lightBrightness -= args.sampleTime * 10.f;
+		if (lightBrightness < 0.f)
+			lightBrightness = 0.f;
+		lights[ORCHHITS_LIGHT].setBrightnessSmooth(lightBrightness, args.sampleTime);
 
 		float output = 0.f;
 
@@ -166,6 +166,8 @@ struct OrchHits : Module {
 
 				const auto sampleValue = s1 + frac * (s2 - s1);
 				env *= decayCoef;
+				if (decayCoef <= 1e-6f)
+					playing = false;
 
 				output = sampleValue * env;
 			}

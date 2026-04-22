@@ -25,17 +25,6 @@ public:
 		LENGTH_PARAM,
 		MAINVOL_PARAM,
 		DRUM0_PARAM,
-		DRUM1_PARAM,
-		DRUM2_PARAM,
-		DRUM3_PARAM,
-		DRUM4_PARAM,
-		DRUM5_PARAM,
-		DRUM6_PARAM,
-		DRUM7_PARAM,
-		DRUM8_PARAM,
-		DRUM9_PARAM,
-		DRUM10_PARAM,
-		DRUM11_PARAM,
 	};
 
 	static constexpr unsigned PARAMS_LEN = T::drums.size() + 3;
@@ -44,34 +33,12 @@ public:
 		SPEEDCVIN_INPUT,
 		LENGTHCVIN_INPUT,
 		DRUM0_INPUT,
-		DRUM1_INPUT,
-		DRUM2_INPUT,
-		DRUM3_INPUT,
-		DRUM4_INPUT,
-		DRUM5_INPUT,
-		DRUM6_INPUT,
-		DRUM7_INPUT,
-		DRUM8_INPUT,
-		DRUM9_INPUT,
-		DRUM10_INPUT,
-		DRUM11_INPUT,
 	};
 
 	static constexpr unsigned INPUTS_LEN = T::drums.size() + 2;
 
 	enum OutputId {
 		DRUM0_OUTPUT,
-		DRUM1_OUTPUT,
-		DRUM2_OUTPUT,
-		DRUM3_OUTPUT,
-		DRUM4_OUTPUT,
-		DRUM5_OUTPUT,
-		DRUM6_OUTPUT,
-		DRUM7_OUTPUT,
-		DRUM8_OUTPUT,
-		DRUM9_OUTPUT,
-		DRUM10_OUTPUT,
-		DRUM11_OUTPUT,
 	};
 
 	static constexpr unsigned SUM_OUTPUT = T::drums.size();
@@ -79,17 +46,6 @@ public:
 
 	enum LightId {
 		DRUM0_LIGHT,
-		DRUM1_LIGHT,
-		DRUM2_LIGHT,
-		DRUM3_LIGHT,
-		DRUM4_LIGHT,
-		DRUM5_LIGHT,
-		DRUM6_LIGHT,
-		DRUM7_LIGHT,
-		DRUM8_LIGHT,
-		DRUM9_LIGHT,
-		DRUM10_LIGHT,
-		DRUM11_LIGHT,
 	};
 
 	static constexpr unsigned LIGHTS_LEN = T::drums.size();
@@ -102,11 +58,27 @@ public:
 		static constexpr float max_rate = 2.f;
 	};
 
+	// Display-side: shows the actual playback rate produced by pitch_cv_knob,
+	// including any voltage on SPEEDCVIN_INPUT, so the readout matches what's heard.
+	struct SpeedQuantity : ParamQuantity {
+		float getDisplayValue() override {
+			if (!module)
+				return ParamQuantity::getDisplayValue();
+			const float cv = module->inputs[SPEEDCVIN_INPUT].getNormalVoltage(0.f);
+			return pitch_cv_knob<PitchMinMax>(cv, getValue());
+		}
+		void setDisplayValue(float displayValue) override {
+			const float norm = (displayValue - PitchMinMax::min_rate) /
+							   (PitchMinMax::max_rate - PitchMinMax::min_rate);
+			setValue(std::clamp(norm * 2.f - 1.f, -1.f, 1.f));
+		}
+	};
+
 	std::array<Voice, 12> voice{};
 
 	DrumMachineBaseModule() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam(SPEED_PARAM, -1.f, 1.f, 0.f, "Speed", "x", 0.f, 0.995f, 1.005f);
+		configParam<SpeedQuantity>(SPEED_PARAM, -1.f, 1.f, 0.f, "Speed", "x");
 		configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Length", "%", 0.f, 100.f);
 		configParam(MAINVOL_PARAM, 0.f, 1.f, 0.5f, "Main Volume", "%", 0.f, 100.f);
 
@@ -183,22 +155,23 @@ public:
 				outputs[output_id].setVoltage(0.f);
 			}
 
-			if (light_id >= 0) {
-				if (fired)
-					lights[light_id].setBrightness(1.f);
-				else
-					lights[light_id].setBrightnessSmooth(0.f, args.sampleTime);
-			}
+			if (fired)
+				lights[light_id].setBrightness(1.f);
+			else
+				lights[light_id].setBrightnessSmooth(0.f, args.sampleTime);
 		}
 
 		outputs[SUM_OUTPUT].setVoltage(std::clamp(busSum * mainVol, -10.f, 10.f));
 	}
 };
 
+// Single-column drum layout. Drums fill {button, input, output} columns evenly spaced.
+// Top row (Length/Speed/MainVol + CV/Sum) uses larger knobs for <=4 drums
+// and a compact layout otherwise.
 template<typename T, typename W>
-class DrumMachine12BaseWidget : public ModuleWidget {
+class DrumMachineVerticalBase : public ModuleWidget {
 public:
-	DrumMachine12BaseWidget(W *module) {
+	DrumMachineVerticalBase(W *module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, T::panel)));
 
@@ -207,146 +180,111 @@ public:
 		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(16.799, 15.501)), module, W::LENGTH_PARAM));
-		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(38.799, 15.501)), module, W::SPEED_PARAM));
-		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(59.351, 15.501)), module, W::MAINVOL_PARAM));
+		constexpr size_t numDrums = W::drums.size();
+		constexpr bool chunkyTop = numDrums <= 4;
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(8.798, 42.002)), module, W::DRUM0_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(8.798, 42.002)), module, W::DRUM0_LIGHT));
+		if constexpr (chunkyTop) {
+			addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(9.751, 29.2)), module, W::LENGTH_PARAM));
+			addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(25.4, 19.001)), module, W::SPEED_PARAM));
+			addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(41.25, 29.2)), module, W::MAINVOL_PARAM));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.751, 47.001)), module, W::LENGTHCVIN_INPUT));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.4, 36.499)), module, W::SPEEDCVIN_INPUT));
+			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(41.25, 47.001)), module, W::SUM_OUTPUT));
+		} else {
+			addParam(createParamCentered<Knob9mm>(mm2px(Vec(7.751, 12.45)), module, W::LENGTH_PARAM));
+			addParam(createParamCentered<Knob9mm>(mm2px(Vec(27.002, 12.45)), module, W::SPEED_PARAM));
+			addParam(createParamCentered<Knob9mm>(mm2px(Vec(44.2, 12.45)), module, W::MAINVOL_PARAM));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.751, 26.0)), module, W::LENGTHCVIN_INPUT));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(27.002, 26.0)), module, W::SPEEDCVIN_INPUT));
+			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(44.2, 26.0)), module, W::SUM_OUTPUT));
+		}
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(20.5, 42.002)), module, W::DRUM1_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(20.5, 42.002)), module, W::DRUM1_LIGHT));
+		constexpr float yStart = chunkyTop ? 67.f : 37.f;
+		constexpr float yEnd = 112.f;
+		constexpr float ySpacing = numDrums > 1 ? (yEnd - yStart) / (numDrums - 1) : 0.f;
+		constexpr float xButton = 7.751f;
+		constexpr float xInput = 32.0f;
+		constexpr float xOutput = 43.998f;
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(32.3, 42.002)), module, W::DRUM2_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(32.3, 42.002)), module, W::DRUM2_LIGHT));
+		for (size_t i = 0; i < numDrums; ++i) {
+			const float y = yStart + ySpacing * i;
+			addParam(createParamCentered<LEDBezel>(mm2px(Vec(xButton, y)), module, W::DRUM0_PARAM + i));
+			addChild(
+				createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(xButton, y)), module, W::DRUM0_LIGHT + i));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xInput, y)), module, W::DRUM0_INPUT + i));
+			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xOutput, y)), module, W::DRUM0_OUTPUT + i));
+		}
+	}
+};
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(43.998, 42.002)), module, W::DRUM3_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(43.998, 42.002)), module, W::DRUM3_LIGHT));
+struct DrumGridLayout {
+	std::array<float, 6> colX{}; // unused entries left as 0
+	size_t cols = 0;
+	float topX0 = 0.f;
+	float topX1 = 0.f;
+	float topX2 = 0.f;
+};
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(55.7, 42.002)), module, W::DRUM4_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(55.7, 42.002)), module, W::DRUM4_LIGHT));
+inline constexpr DrumGridLayout k12DrumLayout{
+	.colX = {8.798f, 20.5f, 32.3f, 43.998f, 55.7f, 67.501f},
+	.cols = 6,
+	.topX0 = 16.799f,
+	.topX1 = 38.799f,
+	.topX2 = 59.351f,
+};
+inline constexpr DrumGridLayout k10DrumLayout{
+	.colX = {6.999f, 18.75f, 30.501f, 42.249f, 54.0f},
+	.cols = 5,
+	.topX0 = 11.24f,
+	.topX1 = 31.249f,
+	.topX2 = 49.731f,
+};
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(67.501, 42.002)), module, W::DRUM5_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(67.501, 42.002)), module, W::DRUM5_LIGHT));
+// Two-row grid layout used by 10/12-drum machines. Top row holds Length, Speed,
+// MainVol knobs (with Length/Speed CV inputs and Sum output below). Drums fill
+// L.cols columns × 2 rows; column x positions come from the layout struct.
+template<typename T, typename W, DrumGridLayout L>
+class DrumMachineGridBase : public ModuleWidget {
+public:
+	DrumMachineGridBase(W *module) {
+		setModule(module);
+		setPanel(createPanel(asset::plugin(pluginInstance, T::panel)));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(8.798, 84.999)), module, W::DRUM6_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(8.798, 84.999)), module, W::DRUM6_LIGHT));
+		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(20.5, 84.999)), module, W::DRUM7_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(20.5, 84.999)), module, W::DRUM7_LIGHT));
+		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(L.topX0, 15.501)), module, W::LENGTH_PARAM));
+		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(L.topX1, 15.501)), module, W::SPEED_PARAM));
+		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(L.topX2, 15.501)), module, W::MAINVOL_PARAM));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(32.3, 84.999)), module, W::DRUM8_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(32.3, 84.999)), module, W::DRUM8_LIGHT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(L.topX0, 30.801)), module, W::LENGTHCVIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(L.topX1, 30.801)), module, W::SPEEDCVIN_INPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(L.topX2, 30.801)), module, W::SUM_OUTPUT));
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(43.998, 84.999)), module, W::DRUM9_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(43.998, 84.999)), module, W::DRUM9_LIGHT));
+		constexpr float yButtonRow[2] = {42.002f, 84.999f};
+		constexpr float yInputRow[2] = {56.0f, 99.001f};
+		constexpr float yOutputRow[2] = {70.002f, 112.999f};
 
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(55.7, 84.999)), module, W::DRUM10_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(55.7, 84.999)), module, W::DRUM10_LIGHT));
-
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(67.501, 84.999)), module, W::DRUM11_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(67.501, 84.999)), module, W::DRUM11_LIGHT));
-
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.849, 30.801)), module, W::LENGTHCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(38.851, 30.801)), module, W::SPEEDCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.798, 56.0)), module, W::DRUM0_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.5, 56.0)), module, W::DRUM1_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.3, 56.0)), module, W::DRUM2_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43.998, 56.0)), module, W::DRUM3_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55.7, 56.0)), module, W::DRUM4_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(67.501, 56.0)), module, W::DRUM5_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.798, 99.001)), module, W::DRUM6_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.5, 99.001)), module, W::DRUM7_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.3, 99.001)), module, W::DRUM8_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43.998, 99.001)), module, W::DRUM9_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55.7, 99.001)), module, W::DRUM10_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(67.501, 99.001)), module, W::DRUM11_INPUT));
-
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(59.351, 30.801)), module, W::SUM_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(8.798, 70.002)), module, W::DRUM0_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.5, 70.002)), module, W::DRUM1_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.3, 70.002)), module, W::DRUM2_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 70.002)), module, W::DRUM3_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(55.7, 70.002)), module, W::DRUM4_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(67.501, 70.002)), module, W::DRUM5_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(8.798, 112.999)), module, W::DRUM6_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.5, 112.999)), module, W::DRUM7_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.3, 112.999)), module, W::DRUM8_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.998, 112.999)), module, W::DRUM9_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(55.7, 112.999)), module, W::DRUM10_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(67.501, 112.999)), module, W::DRUM11_OUTPUT));
+		for (size_t i = 0; i < W::drums.size(); ++i) {
+			const size_t row = i / L.cols;
+			const float x = L.colX[i % L.cols];
+			addParam(createParamCentered<LEDBezel>(mm2px(Vec(x, yButtonRow[row])), module, W::DRUM0_PARAM + i));
+			addChild(createLightCentered<LEDBezelLight<WhiteLight>>(
+				mm2px(Vec(x, yButtonRow[row])), module, W::DRUM0_LIGHT + i));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x, yInputRow[row])), module, W::DRUM0_INPUT + i));
+			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(x, yOutputRow[row])), module, W::DRUM0_OUTPUT + i));
+		}
 	}
 };
 
 template<typename T, typename W>
-class DrumMachine10BaseWidget : public ModuleWidget {
-public:
-	DrumMachine10BaseWidget(W *module) {
-		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, T::panel)));
+struct DrumMachine12BaseWidget : DrumMachineGridBase<T, W, k12DrumLayout> {
+	using DrumMachineGridBase<T, W, k12DrumLayout>::DrumMachineGridBase;
+};
 
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-
-		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(11.24, 15.501)), module, W::LENGTH_PARAM));
-		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(31.249, 15.501)), module, W::SPEED_PARAM));
-		addParam(createParamCentered<Davies1900hBlack>(mm2px(Vec(49.731, 15.501)), module, W::MAINVOL_PARAM));
-
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(6.999, 42.002)), module, W::DRUM0_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(6.999, 42.002)), module, W::DRUM0_LIGHT));
-
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(18.75, 42.002)), module, W::DRUM1_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(18.75, 42.002)), module, W::DRUM1_LIGHT));
-
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(30.501, 42.002)), module, W::DRUM2_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(30.501, 42.002)), module, W::DRUM2_LIGHT));
-
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(42.249, 42.002)), module, W::DRUM3_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(42.249, 42.002)), module, W::DRUM3_LIGHT));
-
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(54.0, 42.002)), module, W::DRUM4_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(54.0, 42.002)), module, W::DRUM4_LIGHT));
-
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(6.999, 84.999)), module, W::DRUM5_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(6.999, 84.999)), module, W::DRUM5_LIGHT));
-
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(18.75, 84.999)), module, W::DRUM6_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(18.75, 84.999)), module, W::DRUM6_LIGHT));
-
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(30.501, 84.999)), module, W::DRUM7_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(30.501, 84.999)), module, W::DRUM7_LIGHT));
-
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(42.249, 84.999)), module, W::DRUM8_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(42.249, 84.999)), module, W::DRUM8_LIGHT));
-
-		addParam(createParamCentered<LEDBezel>(mm2px(Vec(54.0, 84.999)), module, W::DRUM9_PARAM));
-		addChild(createLightCentered<LEDBezelLight<WhiteLight>>(mm2px(Vec(54.0, 84.999)), module, W::DRUM9_LIGHT));
-
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.24, 30.801)), module, W::LENGTHCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31.249, 30.801)), module, W::SPEEDCVIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.999, 56.0)), module, W::DRUM0_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(18.75, 56.0)), module, W::DRUM1_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(30.501, 56.0)), module, W::DRUM2_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(42.249, 56.0)), module, W::DRUM3_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(54.0, 56.0)), module, W::DRUM4_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.999, 99.001)), module, W::DRUM5_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(18.75, 99.001)), module, W::DRUM6_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(30.501, 99.001)), module, W::DRUM7_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(42.249, 99.001)), module, W::DRUM8_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(54.0, 99.001)), module, W::DRUM9_INPUT));
-
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(49.731, 30.801)), module, W::SUM_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(6.999, 70.002)), module, W::DRUM0_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.75, 70.002)), module, W::DRUM1_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(30.501, 70.002)), module, W::DRUM2_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(42.249, 70.002)), module, W::DRUM3_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(54.0, 70.002)), module, W::DRUM4_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(6.999, 112.999)), module, W::DRUM5_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.75, 112.999)), module, W::DRUM6_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(30.501, 112.999)), module, W::DRUM7_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(42.249, 112.999)), module, W::DRUM8_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(54.0, 112.999)), module, W::DRUM9_OUTPUT));
-	}
+template<typename T, typename W>
+struct DrumMachine10BaseWidget : DrumMachineGridBase<T, W, k10DrumLayout> {
+	using DrumMachineGridBase<T, W, k10DrumLayout>::DrumMachineGridBase;
 };
