@@ -94,13 +94,10 @@ struct Slap : Module {
 			last_sampleRate = sr;
 
 			if (triggered || pitchChanged) {
-				// ±5V CV maps to full knob range (0..4), then quantized
-				const float cvScaled = octaveCV * 2.f / 5.f;
-				const float totalOctave = std::clamp(std::round(octaveKnob + cvScaled), 0.f, 4.f);
-				// standard 1V/oct, clamped to ±1V: 0V=unison, ±1V=±1oct
-				const float pitchClamped = std::clamp(pitchCV, -1.f, 1.f);
-				const float totalVolts = (totalOctave - 1.f) + pitchClamped;
-				pitchRatio = calc1VperOctPitchRatio(totalVolts) * 4.f; // shift 2 octaves up
+				const float totalOctave = std::clamp(std::round(octaveKnob + octaveCV), 0.f, 4.f);
+				const float totalVolts = std::clamp((totalOctave - 1.f) + pitchCV, -3.f, 3.f);
+				pitchRatio = calc1VperOctPitchRatio(totalVolts) * 4.f; // 2 octaves up
+
 				last_octaveKnob = octaveKnob;
 				last_octaveCV = octaveCV;
 				last_pitchCV = pitchCV;
