@@ -127,6 +127,8 @@ struct Slap : Module {
 				const auto sampleValue = s1 + frac * (s2 - s1);
 				env *= decayCoef;
 				output = sampleValue * env;
+				if (decayCoef <= 1e-6f)
+					playing = false;
 
 				float volumeCV = std::clamp(inputs[VOLCVIN_INPUT].getNormalVoltage(5.f), 0.f, 5.f);
 				output *= volumeCV;

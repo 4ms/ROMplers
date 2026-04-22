@@ -116,6 +116,8 @@ public:
 				auto sampleValue = T::samples[cur_sample_idx][idx] +
 								   frac * (T::samples[cur_sample_idx][nextIdx] - T::samples[cur_sample_idx][idx]);
 				env *= decayCoef;
+				if (decayCoef <= 1e-6f)
+					playing = false;
 				output = sampleValue * env;
 			}
 		}
