@@ -1,8 +1,8 @@
-import subprocess
-import glob
 import argparse
+import glob
 import os
 import re
+import struct
 import sys
 
 # Detailed user instructions for audio file preparation
@@ -22,30 +22,37 @@ How to Export in Audacity:
 4. Encoding: "**Signed** 16-bit PCM"
 """
 
+# Int16 literals per line in the generated array. xxd defaults to 12 bytes/line;
+# 12 int16 values per line is a similar visual density.
+VALUES_PER_LINE = 12
+
+
 def sanitize_array_name(filename):
     base = os.path.splitext(os.path.basename(filename))[0]
-    sanitized =  re.sub(r'\W', '_', base)
-    return sanitized
+    return re.sub(r'\W', '_', base)
 
-def fix_array_names(xxd_output, new_name):
-    # Replace array name in the array declaration line
-    match = re.search(r"unsigned char (\w+)\[\] = {", xxd_output)
-    if not match:
-        return xxd_output
-    old_name = match.group(1)
-    # alignas(int16_t) so Sample::operator[] can load halfwords without
-    # unaligned-access penalties on strict-alignment targets.
-    fixed_output = "alignas(int16_t) inline constexpr " + re.sub(rf"\b{re.escape(old_name)}\b", new_name, xxd_output)
 
-    # Fix the length line: replace any "unsigned int <old_name>_len = <num>;"
-    # with "unsigned int <new_name>_len = <num>;"
-    len_pattern = re.compile(r"unsigned int (\w+_len) = (\d+);")
-    def repl_len(m):
-        return f"inline constexpr unsigned int {new_name}_len = {m.group(2)};"
-    
-    fixed_output = len_pattern.sub(repl_len, fixed_output)
+def raw_to_int16_array(raw_path, array_name):
+    """Read a 16-bit little-endian signed PCM file and emit a C++ int16_t[]
+    array declaration. Declaring the backing storage as int16_t (rather than
+    unsigned char) means Sample::operator[] gets a naturally-aligned halfword
+    load with no UB and no need for alignas."""
+    with open(raw_path, "rb") as f:
+        raw = f.read()
 
-    return fixed_output
+    count = len(raw) // 2
+    if count * 2 != len(raw):
+        print(f"Warning: {raw_path} has an odd byte count; dropping trailing byte.")
+    values = struct.unpack(f"<{count}h", raw[:count * 2])
+
+    lines = [f"inline constexpr int16_t {array_name}[] = {{"]
+    for i in range(0, len(values), VALUES_PER_LINE):
+        chunk = values[i:i + VALUES_PER_LINE]
+        formatted = ", ".join(f"{v:6d}" for v in chunk)
+        lines.append(f"  {formatted},")
+    lines.append("};")
+    return "\n".join(lines)
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -56,6 +63,8 @@ def main():
                         help="Input directory containing .raw* files (default: current directory)")
     parser.add_argument("--output", "-o", type=str,
                         help="Output directory where the .hpp file will be saved")
+    parser.add_argument("--prefix", "-p", type=str, default="",
+                        help="Prefix prepended to each generated array name (e.g. 'SK' -> 'SKKick')")
     parser.add_argument("--info", action="store_true",
                         help="Show detailed instructions for preparing your audio files")
     args = parser.parse_args()
@@ -66,7 +75,7 @@ def main():
 
     drum_name = input("Drum Machine Name? ").strip()
     clean_name = drum_name.replace("_", "")
-    
+
     # Determine output file path
     if args.output:
         output_dir = args.output
@@ -103,15 +112,11 @@ def main():
         out_f.write(f"//\n// Total # of Samples = {len(files)}\n\n")
 
         for f in files:
-            result = subprocess.run(["xxd", "-i", f], capture_output=True, text=True)
-            if result.returncode != 0:
-                print(f"Error converting file {f}: {result.stderr}")
-                continue
-            simple_name = sanitize_array_name(f)
-            fixed_output = fix_array_names(result.stdout, simple_name)
-            out_f.write(fixed_output + "\n")
+            array_name = args.prefix + sanitize_array_name(f)
+            out_f.write(raw_to_int16_array(f, array_name) + "\n\n")
 
     print(f"Samples written to {output_file}")
+
 
 if __name__ == "__main__":
     main()
