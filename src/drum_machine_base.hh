@@ -94,9 +94,6 @@ public:
 
 	static constexpr unsigned LIGHTS_LEN = T::drums.size();
 
-	static constexpr float outputScale = 1.f;
-	static constexpr float sumScale = 1.f;
-
 	static constexpr float LENGTH_MIN = 0.1f;
 	static constexpr float LENGTH_MAX = 1.0f;
 
@@ -138,7 +135,7 @@ public:
 
 		const auto mainVol = params[MAINVOL_PARAM].getValue();
 
-		auto busSum{0.f};
+		float busSum = 0.f;
 
 		for (auto i = 0u; i < T::drums.size(); ++i) {
 			const auto output_id = i + DRUM0_OUTPUT;
@@ -169,8 +166,14 @@ public:
 			if (v.playing) {
 				const auto idx = static_cast<uint32_t>(v.samplePos);
 				if (idx < maxSamples) {
-					const auto sumVoltage = samp[idx] * 5.f;
-					outputs[output_id].setVoltage(sumVoltage * T::outputScale * T::drums[i].scale);
+					const auto sumVoltage = samp[idx] * 5.f * T::drums[i].scale;
+
+					if (outputs[output_id].isConnected()) {
+						outputs[output_id].setVoltage(sumVoltage);
+					} else {
+						busSum += sumVoltage;
+					}
+
 					v.samplePos += pitchRatio;
 				} else {
 					v.playing = false;
@@ -186,14 +189,9 @@ public:
 				else
 					lights[light_id].setBrightnessSmooth(0.f, args.sampleTime);
 			}
-
-			if (!outputs[output_id].isConnected()) {
-				busSum += outputs[output_id].getVoltage() / T::outputScale / T::drums[i].scale;
-			}
 		}
 
-		outputs[SUM_OUTPUT].setVoltage(
-			std::clamp(busSum / (float)T::drums.size() * mainVol * 10.f * T::sumScale, -10.f, 10.f));
+		outputs[SUM_OUTPUT].setVoltage(std::clamp(busSum * mainVol, -10.f, 10.f));
 	}
 };
 
