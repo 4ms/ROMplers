@@ -133,12 +133,8 @@ struct OrchHits : Module {
 				last_sampleCV = sampleCV;
 			}
 			if (pitchChanged) {
-				// ±5V CV maps to full knob range (0..4), then quantized
-				const float cvScaled = octaveCV * 2.f / 5.f;
-				const float totalOctave = std::clamp(std::round(octaveKnob + cvScaled), 0.f, 4.f);
-				// standard 1V/oct, clamped to ±1V: 0V=unison, ±1V=±1oct
-				const float pitchClamped = std::clamp(pitchCV, -1.f, 1.f);
-				const float totalVolts = (totalOctave - 2.f) + pitchClamped;
+				const float totalOctave = std::clamp(std::round(octaveKnob + octaveCV), 0.f, 4.f);
+				const float totalVolts = std::clamp((totalOctave - 2.f) + pitchCV, -3.f, 3.f);
 				pitchRatio = calc1VperOctPitchRatio(totalVolts);
 				last_octaveKnob = octaveKnob;
 				last_octaveCV = octaveCV;
