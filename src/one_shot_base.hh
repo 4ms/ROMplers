@@ -22,6 +22,13 @@ public:
 	float lastButtonValue = 0.f;
 	float LightBrightness = 0.f;
 
+	float decayCoef = 1.f;
+	float maxDecayTime = 0.f; // set at trigger (depends on sample length)
+
+	float last_decayKnob = 0.f;
+	float last_decayCV = 0.f;
+	float last_sampleRate = 0.f;
+
 	struct PitchMinMax {
 		static constexpr float min_rate = 0.01f;
 		static constexpr float max_rate = 2.f;
@@ -66,6 +73,9 @@ public:
 			samplePos = 0.f;
 			playing = true;
 			env = 1.0f;
+
+			// Sample-length-dependent max decay only changes on trigger.
+			maxDecayTime = T::samples[cur_sample_idx].size() / 44100.f;
 		}
 
 		LightBrightness = std::max(0.f, LightBrightness - (float)(args.sampleTime * 10.f));
@@ -74,22 +84,30 @@ public:
 		float output = 0.f;
 
 		if (playing) {
-			// --- PITCH ---
-			float pitchKnob = params[PITCH_PARAM].getValue(); // -1 to 1
-			float pitchCV = inputs[PITCHCVIN_INPUT].getNormalVoltage(0);
-			float pitchRatio = pitch_cv_knob<PitchMinMax>(pitchCV, pitchKnob);
+			// Recompute only when inputs move by more than kChangeThresh, to
+			// avoid per-sample expf/pow (expensive on ARM targets).
+			const float pitchKnob = params[PITCH_PARAM].getValue();
+			const float pitchCV = inputs[PITCHCVIN_INPUT].getNormalVoltage(0);
+			const float decayKnob = params[DECAY_PARAM].getValue();
+			const float decayCV = inputs[DECAYCVIN_INPUT].getNormalVoltage(0);
+			const float sr = args.sampleRate;
 
-			// --- DECAY ---
-			float decayCV = inputs[DECAYCVIN_INPUT].getNormalVoltage(0);
-			float decayMod = calcDecayMod(params[DECAY_PARAM].getValue(), decayCV);
+			const bool srChanged = changed(sr, last_sampleRate);
+			const bool decayChanged = changed(decayKnob, last_decayKnob) || changed(decayCV, last_decayCV);
 
-			static constexpr auto minDecayTime = 0.005f;
-			const auto maxDecayTime = T::samples[cur_sample_idx].size() / 44100.f;
-			const auto decayTime = minDecayTime + decayMod * (maxDecayTime - minDecayTime);
-			const auto decayCoef = expf(-1.f / (decayTime * args.sampleRate));
+			if (triggered || decayChanged || srChanged) {
+				static constexpr float minDecayTime = 0.005f;
+				const float decayMod = calcDecayMod(decayKnob, decayCV);
+				const float decayTime = minDecayTime + decayMod * (maxDecayTime - minDecayTime);
+				decayCoef = expf(-1.f / (decayTime * sr));
+				last_decayKnob = decayKnob;
+				last_decayCV = decayCV;
+				last_sampleRate = sr;
+			}
 
-			// --- Sample playback ---
-			samplePos += pitchRatio * (44100.f / args.sampleRate);
+			// Sample playback
+			const float pitchRatio = pitch_cv_knob<PitchMinMax>(pitchCV, pitchKnob);
+			samplePos += pitchRatio * 44100.f / sr;
 
 			if ((uint32_t)samplePos >= T::samples[cur_sample_idx].size()) {
 				playing = false;

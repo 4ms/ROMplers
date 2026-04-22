@@ -3,6 +3,13 @@
 #include <cmath>
 #include <cstddef>
 
+// Threshold for detecting meaningful knob/CV movement — 1/1000 of the raw unit.
+// Used to skip expensive recomputes (expf/pow) when inputs are static.
+inline constexpr float kChangeThresh = 1e-3f;
+inline bool changed(float a, float b) {
+	return std::abs(a - b) > kChangeThresh;
+}
+
 // Knob (0..1) rescaled to -5..5V offset; CV added and clamped to ±5V; rescaled to 0..1
 inline float calcDecayMod(float knobValue, float cvVoltage) {
 	const float knobOffset = knobValue * 10.f - 5.f;
