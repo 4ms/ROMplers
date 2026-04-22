@@ -89,7 +89,6 @@ struct Slap : Module {
 			// Check if sample done
 			if (static_cast<unsigned>(samplePos) >= numSamples) {
 				playing = false;
-				output = 0.f;
 			} else {
 				// Linear interpolate sample
 				const auto idx = (uint32_t)samplePos;
