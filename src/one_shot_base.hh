@@ -5,8 +5,6 @@
 template<typename T>
 class OneShotBaseModule : public Module {
 public:
-	static constexpr float min_rate = 0.01f;
-	static constexpr float max_rate = 2.f;
 	enum ParamId { SAMPLE_PARAM, PITCH_PARAM, DECAY_PARAM, PUSH_PARAM, PARAMS_LEN };
 	enum InputId { SAMPLECVIN_INPUT, PITCHCVIN_INPUT, DECAYCVIN_INPUT, TRIGIN_INPUT, VOLCVIN_INPUT, INPUTS_LEN };
 	enum OutputId { AUDIOOUT_OUTPUT, OUTPUTS_LEN };
@@ -20,7 +18,7 @@ public:
 	float env = 0.f;
 	float lastTrigValue = 0.f;
 	float lastButtonValue = 0.f;
-	float LightBrightness = 0.f;
+	float lightBrightness = 0.f;
 
 	float decayCoef = 1.f;
 	float maxDecayTime = 0.f; // set at trigger (depends on sample length)
@@ -65,7 +63,7 @@ public:
 		bool triggered = trigRising || buttonRising;
 
 		if (triggered) {
-			LightBrightness = 1.0f;
+			lightBrightness = 1.0f;
 
 			cur_sample_idx = indexed_cv_knob<NumSamples>(inputs[SAMPLECVIN_INPUT].getNormalVoltage(0),
 														 params[SAMPLE_PARAM].getValue());
@@ -78,8 +76,8 @@ public:
 			maxDecayTime = T::samples[cur_sample_idx].size() / 44100.f;
 		}
 
-		LightBrightness = std::max(0.f, LightBrightness - (float)(args.sampleTime * 10.f));
-		lights[LIGHT].setBrightnessSmooth(LightBrightness, args.sampleTime);
+		lightBrightness = std::max(0.f, lightBrightness - (float)(args.sampleTime * 10.f));
+		lights[LIGHT].setBrightnessSmooth(lightBrightness, args.sampleTime);
 
 		float output = 0.f;
 

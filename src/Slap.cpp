@@ -17,7 +17,7 @@ struct Slap : Module {
 	float env = 0.f;
 	float lastTrigValue = 0.f;
 	float lastButtonValue = 0.f;
-	float slapLightBrightness = 0.f;
+	float lightBrightness = 0.f;
 
 	static constexpr float sampleSampleRate = 44100.f;
 	static constexpr auto numSamples = slap.size();
@@ -64,17 +64,17 @@ struct Slap : Module {
 
 		const bool triggered = trigRising || buttonRising;
 		if (triggered) {
-			slapLightBrightness = 1.f;
+			lightBrightness = 1.f;
 			samplePos = 0.f;
 			playing = true;
 			env = 1.f;
 		}
 
 		// Update light with smooth fade, decrement by fixed rate
-		slapLightBrightness -= args.sampleTime * 10.f;
-		if (slapLightBrightness < 0.f)
-			slapLightBrightness = 0.f;
-		lights[SLAP_LIGHT].setBrightnessSmooth(slapLightBrightness, args.sampleTime);
+		lightBrightness -= args.sampleTime * 10.f;
+		if (lightBrightness < 0.f)
+			lightBrightness = 0.f;
+		lights[SLAP_LIGHT].setBrightnessSmooth(lightBrightness, args.sampleTime);
 
 		float output = 0.f;
 
