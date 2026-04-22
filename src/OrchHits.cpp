@@ -25,6 +25,21 @@ struct OrchHits : Module {
 	float lastTrigValue = 0.f;
 	float lastButtonValue = 0.f;
 	float OrchHitsLightBrightness = 0.f;
+	uint32_t cur_sample_idx = 0;
+
+	// Derived values — recomputed only when their inputs move by more than
+	// kChangeThresh, to avoid per-sample expf/pow.
+	float pitchRatio = 1.f;
+	float decayCoef = 1.f;
+
+	float last_sampleKnob = 0.f;
+	float last_sampleCV = 0.f;
+	float last_octaveKnob = 0.f;
+	float last_octaveCV = 0.f;
+	float last_pitchCV = 0.f;
+	float last_decayKnob = 0.f;
+	float last_decayCV = 0.f;
+	float last_sampleRate = 0.f;
 
 	static constexpr float sampleSampleRate = 44100.f;
 
@@ -70,12 +85,6 @@ struct OrchHits : Module {
 	}
 
 	void process(const ProcessArgs &args) override {
-		// --- SAMPLE SELECTION WITH CV ---
-		int selectedIndex = indexed_cv_knob<samples.size()>(inputs[SAMPLECVIN_INPUT].getNormalVoltage(0),
-															params[SAMPLE_PARAM].getValue());
-
-		auto &s = samples[selectedIndex];
-
 		float trigIn = inputs[TRIGIN_INPUT].getVoltage();
 		float buttonIn = params[PUSH_PARAM].getValue();
 
@@ -84,7 +93,8 @@ struct OrchHits : Module {
 		lastTrigValue = trigIn;
 		lastButtonValue = buttonIn;
 
-		if (trigRising || buttonRising) {
+		const bool triggered = trigRising || buttonRising;
+		if (triggered) {
 			OrchHitsLightBrightness = 1.f;
 			samplePos = 0.f;
 			playing = true;
@@ -99,29 +109,57 @@ struct OrchHits : Module {
 		float output = 0.f;
 
 		if (playing) {
-			// --- OCTAVE CONTROL WITH QUANTIZED CV (±5V) ---
-			float octaveKnob = params[OCTAVE_PARAM].getValue(); // 0 .. 4
-			float octaveCV = inputs[OCTAVECVIN_INPUT].getNormalVoltage(0);
+			// Recompute only when inputs move by more than kChangeThresh, to
+			// avoid per-sample expf/pow (expensive on ARM targets).
+			const float sampleKnob = params[SAMPLE_PARAM].getValue();
+			const float sampleCV = inputs[SAMPLECVIN_INPUT].getNormalVoltage(0);
+			const float octaveKnob = params[OCTAVE_PARAM].getValue(); // 0..4
+			const float octaveCV = inputs[OCTAVECVIN_INPUT].getNormalVoltage(0);
+			const float pitchCV = inputs[PITCHCVIN_INPUT].getNormalVoltage(0);
+			const float decayKnob = params[DECAY_PARAM].getValue();
+			const float decayCV = inputs[DECAYCVIN_INPUT].getNormalVoltage(0);
+			const float sr = args.sampleRate;
 
-			// Scale CV: ±5V maps to full knob range (0..4)
-			float cvScaled = octaveCV * 2.f / 5.f; // 5V → +2, -5V → -2
+			const bool sampleSelChanged =
+				triggered || changed(sampleKnob, last_sampleKnob) || changed(sampleCV, last_sampleCV);
+			const bool pitchChanged = triggered || changed(octaveKnob, last_octaveKnob) ||
+									  changed(octaveCV, last_octaveCV) || changed(pitchCV, last_pitchCV);
+			const bool srChanged = triggered || changed(sr, last_sampleRate);
+			const bool decayChanged = triggered || changed(decayKnob, last_decayKnob) || changed(decayCV, last_decayCV);
 
-			// Quantize to discrete steps 0..4
-			float totalOctave = std::clamp(std::round(octaveKnob + cvScaled), 0.f, 4.f);
+			if (sampleSelChanged) {
+				cur_sample_idx = indexed_cv_knob<samples.size()>(sampleCV, sampleKnob);
+				last_sampleKnob = sampleKnob;
+				last_sampleCV = sampleCV;
+			}
+			if (pitchChanged) {
+				// ±5V CV maps to full knob range (0..4), then quantized
+				const float cvScaled = octaveCV * 2.f / 5.f;
+				const float totalOctave = std::clamp(std::round(octaveKnob + cvScaled), 0.f, 4.f);
+				// standard 1V/oct, clamped to ±1V: 0V=unison, ±1V=±1oct
+				const float pitchClamped = std::clamp(pitchCV, -1.f, 1.f);
+				const float totalVolts = (totalOctave - 2.f) + pitchClamped;
+				pitchRatio = calc1VperOctPitchRatio(totalVolts);
+				last_octaveKnob = octaveKnob;
+				last_octaveCV = octaveCV;
+				last_pitchCV = pitchCV;
+			}
+			if (decayChanged || srChanged) {
+				const float decayParam = calcDecayModScaled(decayKnob, decayCV);
+				const float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
+				decayCoef = std::exp(-5.f / (decayTime * sr));
+				last_decayKnob = decayKnob;
+				last_decayCV = decayCV;
+				last_sampleRate = sr;
+			}
 
-			// standard 1V/oct, clamped to ±1V: 0V=unison, ±1V=±1oct
-			float pitchCV = std::clamp(inputs[PITCHCVIN_INPUT].getNormalVoltage(0), -1.f, 1.f);
-			float totalVolts = (totalOctave - 2.f) + pitchCV;
-			float pitchRatio = calc1VperOctPitchRatio(totalVolts);
-
-			float sampleRateRatio = sampleSampleRate / args.sampleRate;
-			samplePos += pitchRatio * sampleRateRatio;
+			auto &s = samples[cur_sample_idx];
+			samplePos += pitchRatio * sampleSampleRate / sr;
 
 			const auto numSamplesInSample = s.size();
 
 			if ((uint32_t)samplePos >= numSamplesInSample) {
 				playing = false;
-				output = 0.f;
 			} else {
 				auto idx = (uint32_t)samplePos;
 				int nextIdx = (idx + 1 < numSamplesInSample) ? idx + 1 : idx;
@@ -131,21 +169,14 @@ struct OrchHits : Module {
 				const auto s2 = s[nextIdx];
 
 				const auto sampleValue = s1 + frac * (s2 - s1);
-
-				const float cv = inputs[DECAYCVIN_INPUT].getNormalVoltage(0);
-				const float decayParam = calcDecayModScaled(params[DECAY_PARAM].getValue(), cv);
-
-				float decayTime = minDecayTime + decayParam * (maxDecayTime - minDecayTime);
-				float decayCoef = std::exp(-5.f / (decayTime * args.sampleRate));
 				env *= decayCoef;
 
 				output = sampleValue * env;
 			}
 		}
 
-		float volumeCV = std::clamp(inputs[VOLCVIN_INPUT].getNormalVoltage(5.f), 0.f, 5.f);
-		output *= volumeCV / 5.f;
-		outputs[AUDIOOUT_OUTPUT].setVoltage(output * 5.f);
+		const float volumeCV = std::clamp(inputs[VOLCVIN_INPUT].getNormalVoltage(5.f), 0.f, 5.f);
+		outputs[AUDIOOUT_OUTPUT].setVoltage(output * volumeCV);
 	}
 };
 
