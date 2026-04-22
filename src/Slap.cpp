@@ -10,7 +10,7 @@ struct Slap : Module {
 	enum OutputId { AUDIOOUT_OUTPUT, OUTPUTS_LEN };
 	enum LightId { SLAP_LIGHT, LIGHTS_LEN };
 
-	static constexpr Sample slap{Slap1};
+	static constexpr Sample slap{SLSlap};
 	float samplePos = 0.f;
 	bool playing = false;
 
@@ -20,6 +20,9 @@ struct Slap : Module {
 	float slapLightBrightness = 0.f;
 
 	static constexpr float sampleSampleRate = 44100.f;
+	static constexpr auto numSamples = slap.size();
+	static constexpr float minDecayTime = 0.005f;
+	static constexpr float maxDecayTime = numSamples / sampleSampleRate;
 
 	Slap() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -82,7 +85,6 @@ struct Slap : Module {
 			const float sampleRateRatio = sampleSampleRate / args.sampleRate;
 			samplePos += pitchRatio * sampleRateRatio;
 
-			constexpr auto numSamples = slap.size();
 
 			// Check if sample done
 			if (static_cast<unsigned>(samplePos) >= numSamples) {
@@ -102,8 +104,6 @@ struct Slap : Module {
 					inputs[DECAYCVIN_INPUT].isConnected() ? inputs[DECAYCVIN_INPUT].getVoltage() : 0.f;
 				const float decayParam = calcDecayModScaled(params[DECAY_PARAM].getValue() * 5.f, decayCV);
 
-				constexpr float minDecayTime = 0.005f;
-				constexpr float maxDecayTime = numSamples / sampleSampleRate;
 				const float decayTime = calcExpDecayTime(decayParam, minDecayTime, maxDecayTime);
 
 				// Calculate decay coefficient once per sample
