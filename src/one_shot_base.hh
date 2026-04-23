@@ -27,10 +27,6 @@ public:
 	float last_decayCV = 0.f;
 	float last_sampleRate = 0.f;
 
-	struct PitchMinMax {
-		static constexpr float min_rate = 0.01f;
-		static constexpr float max_rate = 2.f;
-	};
 	static constexpr size_t NumSamples = T::samples.size();
 
 	// Display-side: shows the actual playback rate produced by pitch_cv_knob,
@@ -39,13 +35,12 @@ public:
 		float getDisplayValue() override {
 			if (!module)
 				return ParamQuantity::getDisplayValue();
-			const float cv = module->inputs[PITCHCVIN_INPUT].getNormalVoltage(0.f);
-			return pitch_cv_knob<PitchMinMax>(cv, getValue());
+			const float cv = 0;
+			return pitch_cv_knob(cv, getValue());
 		}
 		void setDisplayValue(float displayValue) override {
-			const float norm = (displayValue - PitchMinMax::min_rate) /
-							   (PitchMinMax::max_rate - PitchMinMax::min_rate);
-			setValue(std::clamp(norm * 2.f - 1.f, -1.f, 1.f));
+			// 	const float norm = (displayValue - PitchMinMax::min_rate) / (PitchMinMax::max_rate - PitchMinMax::min_rate);
+			// 	setValue(std::clamp(norm * 2.f - 1.f, -1.f, 1.f));
 		}
 	};
 
@@ -120,7 +115,7 @@ public:
 			}
 
 			// Sample playback
-			const float pitchRatio = pitch_cv_knob<PitchMinMax>(pitchCV, pitchKnob);
+			const float pitchRatio = pitch_cv_knob(pitchCV, pitchKnob);
 			samplePos += pitchRatio * 44100.f / sr;
 
 			if ((uint32_t)samplePos >= T::samples[cur_sample_idx].size()) {

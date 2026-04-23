@@ -36,7 +36,7 @@ inline float calc1VperOctPitchRatio(float totalVolts) {
 
 // Piecewise linear pitch mapping from normalized position (0..1) to playback ratio:
 // 0.0 -> 0.01x, 0.5 -> 1.0x, 1.0 -> 2.0x
-inline float calcPitchRatio(float normalizedPitch) {
+constexpr inline float piecewiseLinearPitchRatio(float normalizedPitch) {
 	if (normalizedPitch <= 0.5f)
 		return 0.01f + normalizedPitch * 1.98f;
 	else
@@ -55,10 +55,10 @@ constexpr int indexed_cv_knob(float cv, float knob) {
 	return std::clamp<int>(sampleIndex, 0, NumSamples - 1);
 }
 
-template<typename T>
+// Scales cv [-5, +5] and knob [-1, +1] to [0.01, 2] with 0,0 returning 1.0
 constexpr float pitch_cv_knob(float cv, float knob) {
 	float pitchCV = cv / 5.f;
 	float pitchMod = std::clamp(knob + pitchCV, -1.f, 1.f);
 	float normalizedPitch = (pitchMod + 1.f) * 0.5f;
-	return T::min_rate + normalizedPitch * (T::max_rate - T::min_rate);
+	return piecewiseLinearPitchRatio(normalizedPitch);
 }

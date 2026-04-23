@@ -53,24 +53,19 @@ public:
 	static constexpr float LENGTH_MIN = 0.1f;
 	static constexpr float LENGTH_MAX = 1.0f;
 
-	struct PitchMinMax {
-		static constexpr float min_rate = 0.01f;
-		static constexpr float max_rate = 2.f;
-	};
-
 	// Display-side: shows the actual playback rate produced by pitch_cv_knob,
 	// including any voltage on SPEEDCVIN_INPUT, so the readout matches what's heard.
 	struct SpeedQuantity : ParamQuantity {
 		float getDisplayValue() override {
 			if (!module)
 				return ParamQuantity::getDisplayValue();
-			const float cv = module->inputs[SPEEDCVIN_INPUT].getNormalVoltage(0.f);
-			return pitch_cv_knob<PitchMinMax>(cv, getValue());
+			const float cv = 0;
+			return pitch_cv_knob(cv, getValue());
 		}
 		void setDisplayValue(float displayValue) override {
-			const float norm = (displayValue - PitchMinMax::min_rate) /
-							   (PitchMinMax::max_rate - PitchMinMax::min_rate);
-			setValue(std::clamp(norm * 2.f - 1.f, -1.f, 1.f));
+			// const float norm = (displayValue - PitchMinMax::min_rate) /
+			// 				   (PitchMinMax::max_rate - PitchMinMax::min_rate);
+			// setValue(std::clamp(norm * 2.f - 1.f, -1.f, 1.f));
 		}
 	};
 
@@ -98,7 +93,7 @@ public:
 		// --- Speed ---
 		float pitchKnob = params[SPEED_PARAM].getValue(); // -1 to 1
 		float pitchCV = inputs[SPEEDCVIN_INPUT].getNormalVoltage(0);
-		float pitchRatio = pitch_cv_knob<PitchMinMax>(pitchCV, pitchKnob);
+		float pitchRatio = pitch_cv_knob(pitchCV, pitchKnob);
 
 		// --- Length ---
 		const auto lengthCV = inputs[LENGTHCVIN_INPUT].getNormalVoltage(0);
