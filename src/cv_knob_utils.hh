@@ -62,3 +62,11 @@ constexpr float pitch_cv_knob(float cv, float knob) {
 	float normalizedPitch = (pitchMod + 1.f) * 0.5f;
 	return piecewiseLinearPitchRatio(normalizedPitch);
 }
+
+// Inverse of pitch_cv_knob(0, knob): solve for knob [-1, +1] given a displayed
+// rate in [0.01, 2]. Values outside the range are clamped.
+constexpr float pitch_knob_from_rate(float rate) {
+	if (rate <= 1.f)
+		return std::clamp((rate - 0.01f) / 0.99f - 1.f, -1.f, 0.f);
+	return std::clamp(rate - 1.f, 0.f, 1.f);
+}

@@ -63,9 +63,7 @@ public:
 			return pitch_cv_knob(cv, getValue());
 		}
 		void setDisplayValue(float displayValue) override {
-			// const float norm = (displayValue - PitchMinMax::min_rate) /
-			// 				   (PitchMinMax::max_rate - PitchMinMax::min_rate);
-			// setValue(std::clamp(norm * 2.f - 1.f, -1.f, 1.f));
+			setValue(pitch_knob_from_rate(displayValue));
 		}
 	};
 
