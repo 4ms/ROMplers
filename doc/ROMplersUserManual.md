@@ -6,6 +6,7 @@
 - All unlabeled jacks are CV inputs for the associated parameter next to them. 
 - Unless otherwise noted, CV inputs are -5V to +5V, effectively moving the knob up or down along its entire range. Vol CV jacks are 0-5V.
 - Trigger inputs detect rising edge and ignore pulse width.
+- On drum kit modules (AyysKing, DeeArr, KayArr, KayOne, SeaArr, SehvenToo, SicksOh, SinSahnix), patching a drum's direct output removes it from the Sum bus.
 
 ---
 ## AyysKing — Ace King drums
@@ -149,9 +150,10 @@ Casio SK-1 samples with playback speed, sample length, direct outs, and a mix ou
 
 Pitched orchestra hits, meant to be controlled with a 1V per octave source such as a keyboard or sequencer.
 
-- **Sample**: Sample selection. There are 17 total samples for this module.
-- **Octave**: Octave transpose for sample, from -2 to +2 octaves above root pitch.
-- **1V/Oct**: 1V per octave pitch input. Maximum pitch shift (including Octave knob and jack) is -3 to +3 octaves.
+- **Sample**: Sample selection. There are 16 total samples for this module.
+- **Octave**: Octave transpose, five positions from -2 to +2 octaves. Each step is one octave.
+- **Octave CV**: CV input that shifts the Octave selection in integer steps (1V = one octave step), clamped to the -2 to +2 range.
+- **1V/Oct**: 1V per octave pitch input. The Octave setting and this CV are summed; total pitch shift is clamped to ±3 octaves.
 - **Decay**: Exponential decay envelope, 100 ms – 5 seconds (linear scaling).
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
@@ -270,8 +272,9 @@ Synsonics samples with playback speed, sample length, direct outs, and a mix out
 
 A slap bass sample meant to be controlled with a 1V per octave source such as a keyboard or sequencer.
 
-- **Octave**: Octave transpose for sample, from -1 to +3V octaves above root pitch.
-- **1V/Oct**: 1V per octave pitch input. Maximum pitch shift (including Octave knob and jack) is -2 to +4 octaves.
+- **Octave**: Octave transpose, five positions from -1 to +3 octaves. Each step is one octave.
+- **Octave CV**: CV input that shifts the Octave selection in integer steps (1V = one octave step), clamped to the -1 to +3 range.
+- **1V/Oct**: 1V per octave pitch input. The Octave setting and this CV are summed; total pitch shift is clamped to ±3 octaves.
 - **Decay**: Exponential decay envelope, 5 ms – 440 ms (logarithmic scaling).
 - **Button**: Triggers the sample.
 - **Trig**: Trigger input, conditioned for rising edge detection. 
